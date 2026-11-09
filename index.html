@@ -266,6 +266,15 @@ button.on{color:#fff}
 .rt>.hd.tbl[aria-expanded="true"]{box-shadow:0 0 0 3px var(--acc)}
 .hd.tbl .tb-date,.hd.tbl .tb-side .sub{color:#5d6a70}
 .hd.tbl .tb-side .done{color:#1f7a4c}
+/* Insignia de estilo en la tablilla y en los botones */
+.sty{display:flex;align-items:center;gap:7px;text-align:right}
+.sty>svg{width:30px;height:30px;padding:6px;border-radius:50%;flex:none;order:2}
+.sty>span{display:flex;flex-direction:column;font-size:12px;line-height:1.2;color:#1b2226}
+.sty b{font-weight:700;font-size:13px}
+.sty.s-av>svg{background:#6b3fd6;color:#fff}.sty.s-fl>svg{background:#ffb81f;color:#1b2226}.sty.s-en>svg{background:#1f9d5c;color:#fff}
+.sty.s-av b{color:#5a32bd}.sty.s-fl b{color:#a36a00}.sty.s-en b{color:#177a47}
+.styles .sbi svg{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+@media (prefers-reduced-motion:no-preference){.sty.pop>svg{animation:stypop .45s cubic-bezier(.3,1.6,.5,1)}@keyframes stypop{from{transform:scale(.3);opacity:0}}}
 </style>
 
 </head>
@@ -459,7 +468,7 @@ async function act(fn){if(S.busy)return;S.busy=true;
   try{const r=await fn();if(r&&r.error)throw r.error;if(r&&r.data)applyRows(r.data)}
   catch(e){toast("No se ha podido guardar: "+(e.message||e))}
   S.busy=false;render()}
-function markAscent(route,style){if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
+function markAscent(route,style){S.jm=route.id;clearTimeout(S.jmt);S.jmt=setTimeout(()=>S.jm=null,1500);if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
   return act(async()=>{const r=await(a?sb.from("liga_ascents").update({style}).eq("id",a.id).select():sb.from("liga_ascents").insert({route_id:route.id,style}).select());if(r.error)return r;
     /* A vista o flash en cuerda: la misma vía de autoseguro se marca sola como flash */
     if(route.sec==="cuerda"&&(style==="A vista"||style==="Flash")){const tw=S.routes.find(x=>x.active&&x.sec==="autoseguro"&&x.line===route.line&&x.grade===route.grade&&x.hold===route.hold);
@@ -872,14 +881,18 @@ function mapView(){
   if($("#fback"))$("#fback").onclick=()=>{S.zone=null;S.open=null;mapView()};
   bindRoutes();
 }
+/* Iconos de estilo en la tablilla: a vista = ojo, flash = rayo, encadenada = cadena */
+const STY={"A vista":["s-av",`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.3" fill="currentColor"/></svg>`],
+ "Flash":["s-fl",`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4.5 13.5h6.2L9.5 22l9-12h-6.3z" fill="currentColor"/></svg>`],
+ "Encadenada":["s-en",`<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.2 4.2 0 0 0-6-6l-1.2 1.2"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.2 4.2 0 0 0 6 6l1.2-1.2"/></g></svg>`]};
 function routeRow(r){
   const h=HOLDS[r.hold]||["Sin color","var(--line)"],a=myAsc(r.id),open=S.open===r.id;
   const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?r.created.split("-").reverse().join("."):"";
   return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
   <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}</span><span class="tb-gr">${r.grade}</span></span>
-  <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="done">${a.style}<br>+${pts(a)} pts</span>`:`<span class="sub">Sin hacer</span>`}</span></button>
+  <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
-  <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
+  <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
   ${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
