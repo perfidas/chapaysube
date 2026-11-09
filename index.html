@@ -234,6 +234,11 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .pyr .pn{text-align:right;font-variant-numeric:tabular-nums;color:var(--mut)}
 .pyr .pr.z .pn{opacity:.5}
 .ptabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}.ptabs button{flex:1;min-height:36px;padding:4px 10px}
+/* Corona del líder y movimientos de puesto en las últimas 24 h */
+.rk .pos{position:relative}
+.crown{display:block;width:26px;height:16px;margin:0 auto 1px;color:var(--gold)}
+.mv{display:block;font:600 11px/1.1 var(--body);margin-top:2px;white-space:nowrap}
+.mv.dw{color:var(--g3)}.mv.up{color:var(--g1)}
 </style>
 
 </head>
@@ -867,7 +872,11 @@ function bindRoutes(){
 }
 
 const unit=(n,sec)=>`${n} ${sec==="boulder"?(n===1?"bloque":"bloques"):(n===1?"vía":"vías")}`;
-function rkList(r,year){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}"><span class="pos">${i+1}</span><span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
+const CROWN=`<svg class="crown" viewBox="0 0 26 16" aria-hidden="true"><path fill="currentColor" d="M2 4l5 4 6-7 6 7 5-4-2 11H4z"/><circle cx="2" cy="3.5" r="1.8" fill="currentColor"/><circle cx="13" cy="1.6" r="1.8" fill="currentColor"/><circle cx="24" cy="3.5" r="1.8" fill="currentColor"/></svg>`;
+/* Puesto de cada uno hace 24 h, para marcar quién ha bajado o subido */
+function moves(sec){const{from,to}=period("bim"),ago=new Date(Date.now()-864e5);if(ago<=from)return null;const m={};rankRange(sec,from,ago).forEach((x,i)=>m[x.id]=i+1);return m}
+const mvTag=(m,id,i)=>{if(!m||!m[id])return"";const d=m[id]-(i+1);return d<0?`<span class="mv dw" title="Hace 24 h iba ${m[id]}.º">▼ ${-d}</span>`:d>0?`<span class="mv up" title="Hace 24 h iba ${m[id]}.º">▲ ${d}</span>`:""};
+function rkList(r,year,m){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}" aria-label="${i===0?"Líder: ":""}${esc(x.name)}"><span class="pos">${i===0?CROWN:""}${i+1}${mvTag(m,x.id,i)}</span><span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
 function podium(r,year){return `<div class="pod">${[0,1,2].map(i=>{const x=r[i];return x?`<button class="pc p${i+1}" data-u="${x.id}"><span class="pos">${i+1}.º</span><b>${esc(x.name)}</b><small>${fmt(x.p)} ${year?"pts de liga":"pts"}</small></button>`:`<div class="pc nope"><span class="pos">${i+1}.º</span><small>Sin puntuar</small></div>`}).join("")}</div>`}
 const years=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
 function closedBims(y){const n=new Date(),cy=n.getFullYear();return Array.from({length:y<cy?6:y===cy?Math.floor(n.getMonth()/2):0},(_,b)=>b)}
@@ -887,7 +896,7 @@ function rankView(){
   if(S.rmode==="hist")html=histHtml();
   else{const p=period(S.rmode),r=ranking(S.sec,S.rmode);
     html=`<div class="sub" style="margin-bottom:10px">${p.label}${S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
-    ${r.length?rkList(r,S.rmode==="year"):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. Marca tus vías desde el mapa.</div>`}`}
+    ${r.length?rkList(r,S.rmode==="year",S.rmode==="bim"?moves(S.sec):null):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. Marca tus vías desde el mapa.</div>`}`}
   $("#body").innerHTML=`<div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;
   $("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
