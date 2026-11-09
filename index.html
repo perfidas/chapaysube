@@ -851,7 +851,6 @@ function mapSvg(){
     g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}
     <text class="zlab ${sel?"sel":""}" x="${f(lx)}" y="${f(ly)}" text-anchor="${anc}">${z.name.replace("Exterior · ","")}</text></g>`});
   return `<svg viewBox="0 0 ${VB.w} ${VB.h}" role="img" aria-label="Vista cenital de la zona de cuerda">
-    <text class="area" x="${(WX[0]+WX[1])/2}" y="20" text-anchor="middle">INTERIOR</text>
     <rect class="inset" x="${BOX.x}" y="${BOX.y}" width="${BOX.w}" height="${BOX.h}" rx="6"/>
     <text class="area" x="${BOX.x+12}" y="${BOX.y+20}">ZONA EXTERIOR</text>${g}</svg>`}
 
