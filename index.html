@@ -267,7 +267,7 @@ const ZONES={cuerda:(()=>{
   /* Pared 2 y Pared 5 a la misma altura: Pared 3 (9 líneas) y Pared 4 (10) suben lo mismo, la 4 algo más inclinada */
   const G=18,H=208,w3=Math.sqrt(len(9)**2-H*H),w4=Math.sqrt(len(10)**2-H*H),un=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
   const dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H),un(w3,H),[1,0],[Math.sin(ang),-Math.cos(ang)]];
-  const walls=[["p1","Pared 6",10,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3","Pared 3",9,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
+  const walls=[["p1","Pared 6",26,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3","Pared 3",9,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
   let cur=[40,40];const arr=[];
   walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
     if(i>0)cur=[cur[0]+d[0]*G+(i===3?14:0),cur[1]+d[1]*G];
@@ -280,18 +280,22 @@ const ZONES={cuerda:(()=>{
   WX=[28,mx-40+28];const MB=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[1])));
   /* Zona exterior en recuadro a la derecha: L en espejo y girada 90° a la derecha.
      Lado largo vertical (numeración seguida tras el interior). */
-  BOX={x:Math.round((WX[0]+WX[1])/2-125),y:MB+40,w:250,h:300};
+  /* La Pared 6 es muy larga: el recuadro exterior va a su izquierda, debajo del resto de paredes, si cabe */
+  {const rest=Math.max(...arr.filter(z=>z.id!=="p1").flatMap(z=>z.pts.map(p=>p[1]))),p6=arr.find(z=>z.id==="p1").pts,y0=rest+40,
+    xAt=y=>{const[a,b]=p6;const t=(y-a[1])/(b[1]-a[1]);return a[0]+(b[0]-a[0])*Math.max(0,Math.min(1,t))};
+    const fits=Math.min(xAt(y0),xAt(y0+300))-30>=WX[0]+250;
+    BOX=fits?{x:WX[0],y:y0,w:250,h:300}:{x:Math.round((WX[0]+WX[1])/2-125),y:MB+40,w:250,h:300}}
   const cx=BOX.x+20+len(4)+18+10,cy=BOX.y+42+len(8);
   arr.push(
    {id:"x1",name:"Exterior · lado largo",n:8,pts:[[cx,cy-len(8)],[cx,cy]],side:-1},
    {id:"x2",name:"Exterior · lado corto",n:4,pts:[[cx-18,cy+18],[cx-18-len(4),cy+18]],side:-1});
   return arr})()};
-const VB={w:Math.ceil(WX[1]+28),h:Math.ceil(BOX.y+BOX.h+10)};
+const VB={w:Math.ceil(WX[1]+28),h:Math.ceil(Math.max(BOX.y+BOX.h,...ZONES.cuerda.flatMap(z=>z.pts.map(p=>p[1])))+24)};
 /* Numeración de líneas: seguida desde la Pared 1 */
 /* Interior numerado al revés (la antigua 37 es la 1); la zona exterior sigue después */
 /* Primer número de cada pared. Las paredes del interior se numeran en sentido contrario a como se dibujan.
    No existen las líneas 24, 25 (entre la Pared 3 y la 4) ni la 36 (entre la Pared 4 y la 5). */
-const FIRST={p4:1,a2:11,p3:15,p2:26,a1:37,p1:42,x1:52,x2:60};
+const FIRST={p4:1,a2:11,p3:15,p2:26,a1:37,p1:42,x1:68,x2:76};
 const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
 /* Autoseguro usa las mismas paredes y líneas que cuerda, con sus propias vías y su propio ranking */
 ZONES.autoseguro=ZONES.cuerda;
