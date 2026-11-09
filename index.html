@@ -662,7 +662,7 @@ function finderHtml(){const f=FQ(),bl=S.sec==="boulder",opt=(v,l,cur)=>`<option 
   ${bl?`<label class="fl" for="fcol">Dificultad<select id="fcol">${opt("","Todas",f.col)}${BKEYS.map(k=>opt(k,BCOL[k][0],f.col)).join("")}</select></label>`
     :`<label class="fl" for="fmin">Grado desde<select id="fmin">${opt("","Cualquiera",f.min)}${GRADES.map(g=>opt(g,g,f.min)).join("")}</select></label>
   <label class="fl" for="fmax">hasta<select id="fmax">${opt("","Cualquiera",f.max)}${GRADES.map(g=>opt(g,g,f.max)).join("")}</select></label>`}
-  <label class="fl" for="fh">Presas<select id="fh">${opt("","Todas",f.hold)}${Object.entries(HOLDS).map(([k,v])=>opt(k,v[0],f.hold)).join("")}</select></label></div>
+</div>
   <div class="frow2">${S.me?`<label class="chk" for="ftd"><input type="checkbox" id="ftd" ${f.todo?"checked":""}> Solo ${bl?"los":"las"} que no he hecho este bimestre</label>`:"<span></span>"}
   ${fOn(f)?`<button class="link" id="fclr">Quitar filtros</button>`:""}</div></section>`}
 function bindFinder(view){const f=FQ(),set=(k,v)=>{f[k]=v;S.zone=null;S.open=null;view()};
