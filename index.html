@@ -360,11 +360,17 @@ async function loadAll(){
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
   STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
-  S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));
-  S.users=S.people.filter(x=>x.ok);
-  S.routes=r.map(x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active}));
-  S.asc=a.map(x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at}));
+  setPeople(p);S.routes=r.map(mapR);S.asc=a.map(mapA);S.synced=Date.now();
 }
+/* Carga por partes: después de la carga inicial, solo viajan las filas que cambian (tiempo real o la respuesta de lo que guardas) */
+const mapR=x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active});
+const mapA=x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at});
+function setPeople(p){S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));S.users=S.people.filter(x=>x.ok)}
+async function loadPeople(){setPeople(await fetchAll(()=>sb.from("liga_people").select("*").order("user_id")))}
+function putIn(list,row){const i=list.findIndex(x=>x.id===row.id);if(i<0)list.push(row);else list[i]=row}
+function applyRows(data){if(!data)return;(Array.isArray(data)?data:[data]).forEach(x=>{if(!x||!x.id)return;
+  if("route_id" in x)putIn(S.asc,mapA(x));else if("sec" in x&&"active" in x)putIn(S.routes,mapR(x))})}
+const dropAsc=id=>{S.asc=S.asc.filter(a=>a.id!==id)};
 let session=null;
 async function refresh(){
   S.me=session?.user?.id||null;S.owner=false;S.bed=false;
@@ -384,24 +390,32 @@ async function refresh(){
 /* Solicitudes de alta: solo el administrador las ve */
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
-let bt;function bump(){clearTimeout(bt);bt=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},350)}
+let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},250)}
+/* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
+let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
+/* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
+function onRt(p){const t=p.table;
+  if(t==="players"){loadPeople().then(()=>S.owner?loadPending():0).then(redraw,()=>{});return}
+  if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_ascents")dropAsc(id);else S.routes=S.routes.filter(r=>r.id!==id)}
+  else applyRows(p.new);
+  redraw()}
 function toast(t,undo){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}
   e.innerHTML=`<span>${esc(t)}</span>${undo?`<button id="tundo">Deshacer</button>`:""}`;if(undo)$("#tundo").onclick=()=>{e.hidden=true;undo()};
   e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,undo?6000:4000)}
 function needLogin(){S.back=S.view==="login"?"home":S.view;S.view="login";S.scrollTop=true;render()}
 async function act(fn){if(S.busy)return;S.busy=true;
-  try{const r=await fn();if(r&&r.error)throw r.error;await loadAll()}
+  try{const r=await fn();if(r&&r.error)throw r.error;if(r&&r.data)applyRows(r.data)}
   catch(e){toast("No se ha podido guardar: "+(e.message||e))}
   S.busy=false;render()}
 function markAscent(route,style){if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
-  return act(async()=>{const r=await(a?sb.from("liga_ascents").update({style}).eq("id",a.id):sb.from("liga_ascents").insert({route_id:route.id,style}));if(r.error)return r;
+  return act(async()=>{const r=await(a?sb.from("liga_ascents").update({style}).eq("id",a.id).select():sb.from("liga_ascents").insert({route_id:route.id,style}).select());if(r.error)return r;
     /* A vista o flash en cuerda: la misma vía de autoseguro se marca sola como flash */
     if(route.sec==="cuerda"&&(style==="A vista"||style==="Flash")){const tw=S.routes.find(x=>x.active&&x.sec==="autoseguro"&&x.line===route.line&&x.grade===route.grade&&x.hold===route.hold);
-      if(tw&&!myAsc(tw.id)){const r2=await sb.from("liga_ascents").insert({route_id:tw.id,style:"Flash"});if(!r2.error)toast("También se ha marcado como flash en autoseguro")}}
+      if(tw&&!myAsc(tw.id)){const r2=await sb.from("liga_ascents").insert({route_id:tw.id,style:"Flash"}).select();if(!r2.error)applyRows(r2.data);if(!r2.error)toast("También se ha marcado como flash en autoseguro")}}
     return r})}
-function unmark(route){const a=myAsc(route.id);if(a)return act(()=>sb.from("liga_ascents").delete().eq("id",a.id))}
-function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select("id").single();if(r.error)throw r.error;S.open=r.data.id})}
-function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id))}
+function unmark(route){const a=myAsc(route.id);if(a)return act(async()=>{const r=await sb.from("liga_ascents").delete().eq("id",a.id);if(!r.error)dropAsc(a.id);return r})}
+function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select().single();if(r.error)throw r.error;applyRows(r.data);S.open=r.data.id})}
+function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id).select())}
 async function start(){
   if(!READY){S.view="setup";return render()}
   render();
@@ -409,10 +423,12 @@ async function start(){
     session=(await sb.auth.getSession()).data.session;
     sb.auth.onAuthStateChange((ev,s)=>{session=s;if(ev==="SIGNED_IN"||ev==="SIGNED_OUT"||ev==="USER_UPDATED")setTimeout(()=>refresh().catch(showErr),0)});
     await refresh();
-    sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},bump)
-      .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},bump)
-      .on("postgres_changes",{event:"*",schema:"public",table:"players"},bump).subscribe();
-    document.addEventListener("visibilitychange",()=>{if(!document.hidden)bump()});
+    let wasOn=false,hidAt=0;
+    sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},onRt)
+      .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},onRt)
+      .on("postgres_changes",{event:"*",schema:"public",table:"players"},onRt)
+      .subscribe(st=>{if(st==="SUBSCRIBED"){if(wasOn)bump();wasOn=true}});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)hidAt=Date.now();else if(hidAt&&Date.now()-hidAt>60000)bump()});
   }catch(e){showErr(e)}
 }
 function showErr(e){S.view="error";S.err=e.message||String(e);render()}
@@ -523,7 +539,7 @@ function approvals(){
   <h3 class="pfh">Pendientes</h3>${pe.length?`<div class="lc">${pe.map(p=>row(p,`<button class="pri" data-ok="${p.user_id}">Aprobar</button>`)).join("")}</div>`:`<div class="empty">No hay solicitudes pendientes.</div>`}
   <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="${p.boulder?"pri":""}" data-bo="${p.user_id}" data-v="${p.boulder?0:1}" title="Puede montar y desmontar bloques de boulder">${p.boulder?"Monta boulder ✓":"Monta boulder"}</button><button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
   $("#bk").onclick=()=>{S.view="home";S.arm=null;render()};
-  const setOk=async(id,ok)=>{const{error}=await sb.rpc("liga_set_approved",{p_user:id,p_ok:ok});if(error)return toast("No se ha podido guardar: "+error.message);await loadAll();await loadPending();approvals()};
+  const setOk=async(id,ok)=>{const{error}=await sb.rpc("liga_set_approved",{p_user:id,p_ok:ok});if(error)return toast("No se ha podido guardar: "+error.message);await loadPeople();await loadPending();approvals()};
   document.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>{b.disabled=true;setOk(b.dataset.ok,true)});
   document.querySelectorAll("[data-bo]").forEach(b=>b.onclick=async()=>{b.disabled=true;const{error}=await sb.rpc("liga_set_boulder",{p_user:b.dataset.bo,p_ok:b.dataset.v==="1"});if(error)toast("No se ha podido guardar: "+error.message);await loadPending();approvals()});
   document.querySelectorAll("[data-no]").forEach(b=>b.onclick=()=>{const k="no"+b.dataset.no;if(S.arm!==k){S.arm=k;return approvals()}S.arm=null;setOk(b.dataset.no,false)});
@@ -676,11 +692,11 @@ function bindQuick(z,bs){const q=S.qk;
   document.querySelectorAll("[data-qh]").forEach(b=>b.onclick=async()=>{if(!q.pick||S.busy)return;const color=q.pick,hold=b.dataset.qh,zone=z.id,zn=z.name;
     if(bs.some(x=>x.color===color&&x.hold===hold&&(x.created||"")===q.date))return toast(`Ya hay un bloque ${BCOL[color][0].toLowerCase()} con presas ${HOLDS[hold][0].toLowerCase()} montado ese día en ${zn}.`);
     let id=null;q.pick=null;
-    await act(async()=>{const r=await sb.from("liga_routes").insert({sec:"boulder",zone,grade:color,hold,created:q.date}).select("id").single();if(r.error)throw r.error;id=r.data.id;(S.just||(S.just=new Set())).add(id)});
+    await act(async()=>{const r=await sb.from("liga_routes").insert({sec:"boulder",zone,grade:color,hold,created:q.date}).select().single();if(r.error)throw r.error;applyRows(r.data);id=r.data.id;(S.just||(S.just=new Set())).add(id)});
     if(id)toast(`Montado en ${zn}: ${BCOL[color][0].toLowerCase()}, presas ${HOLDS[hold][0].toLowerCase()}`,()=>{S.just.delete(id);updRoute(id,{active:false})})});
   $("#qren").onclick=async()=>{if(S.arm!=="ren"){S.arm="ren";return boulderView()}S.arm=null;const ids=bs.map(b=>b.id),zn=z.name;
-    await act(()=>sb.from("liga_routes").update({active:false}).in("id",ids));
-    toast(`${ids.length} ${ids.length===1?"bloque desmontado":"bloques desmontados"} en ${zn}. Ya puedes cargar los nuevos.`,()=>act(()=>sb.from("liga_routes").update({active:true}).in("id",ids)))};
+    await act(()=>sb.from("liga_routes").update({active:false}).in("id",ids).select());
+    toast(`${ids.length} ${ids.length===1?"bloque desmontado":"bloques desmontados"} en ${zn}. Ya puedes cargar los nuevos.`,()=>act(()=>sb.from("liga_routes").update({active:true}).in("id",ids).select()))};
 }
 function bRow(b){
   const c=BCOL[b.color],a=myAsc(b.id),open=S.open===b.id;
