@@ -195,6 +195,31 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .mult div,.gpt div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column}
 .mult b,.gpt b{font:700 22px/1.1 var(--disp);font-variant-numeric:tabular-nums}
 .mult span,.gpt span{font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+/* Carga rápida de boulder (modo editor) */
+.has .bz:not(.sel) .bwall,.has .bz:not(.sel) .bdots{opacity:.35}.has .bz:not(.sel) .zlab{opacity:.4}
+.has .bz.sel .bwall{stroke-width:18}.has .bz.sel .zlab{font-weight:700;font-size:19px}
+.bdot.jst{stroke:var(--g1);stroke-width:3.6}
+@media (prefers-reduced-motion:no-preference){.bdot.jst{animation:qblink 1s ease 2}@keyframes qblink{50%{r:14}}}
+.qhere{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--acc);color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.qhere small{display:block;font:600 12px var(--body);letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.qhere b{font:700 30px/1 var(--disp)}.qhere span{flex:1;min-width:0}
+.qhere button{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.qk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.qstep{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.qstep i{font:700 13px var(--body);font-style:normal;background:var(--ink);color:var(--bg);border-radius:99px;width:22px;height:22px;display:inline-grid;place-items:center;flex:none}
+.qstep.ok i{background:var(--g1)}
+.qd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qd button,.qh button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;font-size:13px}
+.qd button.on{background:var(--card);color:var(--ink);border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.qd.pk button:not(.on){opacity:.45}
+.qd i{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink)}
+.qh{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.qh i{width:30px;height:18px;border-radius:5px;border:1.5px solid var(--ink)}
+.qh.off{opacity:.35;pointer-events:none}
+.qk label{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--mut);font-size:14px}
+.qren{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.toast{display:flex;gap:12px;align-items:center;width:max-content}
+.toast button{background:transparent;color:var(--bg);border-color:var(--bg);min-height:34px;padding:2px 10px;flex:none}
 </style>
 
 </head>
@@ -360,7 +385,9 @@ async function refresh(){
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
 let bt;function bump(){clearTimeout(bt);bt=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},350)}
-function toast(t){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,4000)}
+function toast(t,undo){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}
+  e.innerHTML=`<span>${esc(t)}</span>${undo?`<button id="tundo">Deshacer</button>`:""}`;if(undo)$("#tundo").onclick=()=>{e.hidden=true;undo()};
+  e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,undo?6000:4000)}
 function needLogin(){S.back=S.view==="login"?"home":S.view;S.view="login";S.scrollTop=true;render()}
 async function act(fn){if(S.busy)return;S.busy=true;
   try{const r=await fn();if(r&&r.error)throw r.error;await loadAll()}
@@ -606,7 +633,7 @@ function bSvg(){
   const zs=BSECT.map(z=>{const sel=S.zone===z.id;return `<g class="zone bz ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, ${bOf(z.id).length} bloques">
     <path class="bwall" d="${z.d}"/><path d="${z.d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="round"/><g class="bdots"></g>
     <text class="zlab ${sel?"sel":""}" x="${z.lab[0]}" y="${z.lab[1]}" text-anchor="${z.lab[2]}">${z.short||z.name}</text></g>`}).join("");
-  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
+  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder" class="${S.edit&&S.zone?"has":""}"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
    ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
@@ -617,7 +644,7 @@ function bSvg(){
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     bs.forEach((b,i)=>{const pt=p.getPointAtLength(L*(i+.5)/bs.length),c=document.createElementNS("http://www.w3.org/2000/svg","circle");
-      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",b.color==="dorado"?"url(#bgold)":BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c)})})}
+      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",b.color==="dorado"?"url(#bgold)":BCOL[b.color][1]);c.setAttribute("class","bdot"+(S.just?.has(b.id)?" jst":isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c)})})}
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
@@ -626,10 +653,34 @@ function boulderView(){
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
-  $("#zp").innerHTML=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
+  $("#zp").innerHTML=`${S.edit?quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
-   ${S.edit?`<button class="addr" id="badd" style="margin-top:12px">Añadir bloque en ${z.name}</button>`:""}</section>`;
-  bindB(z);
+   </section>${S.edit?renHtml(bs):""}`;
+  bindB(z);if(S.edit)bindQuick(z,bs);
+}
+/* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
+function quickHtml(z,bs){const q=S.qk||(S.qk={pick:null,date:isoDay(new Date())});
+  return `<div class="qhere" id="qhere"><span><small>Estás montando en</small><b>${z.name}</b></span><button id="qchg">Cambiar</button></div>
+  <section class="qk"><h3>Añadir bloque en ${z.name}</h3>
+   <div class="qstep ${q.pick?"ok":""}"><i>1</i><b>Toca la dificultad</b></div>
+   <div class="qd ${q.pick?"pk":""}">${BKEYS.map(k=>`<button data-qd="${k}" class="${q.pick===k?"on":""}" aria-pressed="${q.pick===k}"><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</button>`).join("")}</div>
+   <div class="qstep"><i>2</i><b>Toca el color de las presas</b><span class="sub">y queda montado</span></div>
+   <div class="qh ${q.pick?"":"off"}">${Object.entries(HOLDS).map(([k,v])=>`<button data-qh="${k}"><i style="background:${v[1]}"></i>${v[0]}</button>`).join("")}</div>
+   <label for="qdate">Fecha de montaje<input type="date" id="qdate" value="${q.date}" max="${isoDay(new Date())}"></label>
+  </section>`}
+function renHtml(bs){return `<div class="qren"><button class="dng" id="qren" ${bs.length?"":"disabled"}>${S.arm==="ren"?`Pulsa otra vez: desmontar los ${bs.length}`:"Renovar sector"}</button><span class="sub">Desmonta todos los bloques de este sector para cargar los nuevos. Los encadenes ya hechos se conservan.</span></div>`}
+function bindQuick(z,bs){const q=S.qk;
+  $("#qchg").onclick=()=>{S.zone=null;S.open=null;S.arm=null;q.pick=null;boulderView();$(".map").scrollIntoView({behavior:"smooth",block:"start"})};
+  $("#qdate").onchange=e=>{q.date=e.target.value||isoDay(new Date())};
+  document.querySelectorAll("[data-qd]").forEach(b=>b.onclick=()=>{q.pick=q.pick===b.dataset.qd?null:b.dataset.qd;S.arm=null;boulderView()});
+  document.querySelectorAll("[data-qh]").forEach(b=>b.onclick=async()=>{if(!q.pick||S.busy)return;const color=q.pick,hold=b.dataset.qh,zone=z.id,zn=z.name;
+    if(bs.some(x=>x.color===color&&x.hold===hold&&(x.created||"")===q.date))return toast(`Ya hay un bloque ${BCOL[color][0].toLowerCase()} con presas ${HOLDS[hold][0].toLowerCase()} montado ese día en ${zn}.`);
+    let id=null;q.pick=null;
+    await act(async()=>{const r=await sb.from("liga_routes").insert({sec:"boulder",zone,grade:color,hold,created:q.date}).select("id").single();if(r.error)throw r.error;id=r.data.id;(S.just||(S.just=new Set())).add(id)});
+    if(id)toast(`Montado en ${zn}: ${BCOL[color][0].toLowerCase()}, presas ${HOLDS[hold][0].toLowerCase()}`,()=>{S.just.delete(id);updRoute(id,{active:false})})});
+  $("#qren").onclick=async()=>{if(S.arm!=="ren"){S.arm="ren";return boulderView()}S.arm=null;const ids=bs.map(b=>b.id),zn=z.name;
+    await act(()=>sb.from("liga_routes").update({active:false}).in("id",ids));
+    toast(`${ids.length} ${ids.length===1?"bloque desmontado":"bloques desmontados"} en ${zn}. Ya puedes cargar los nuevos.`,()=>act(()=>sb.from("liga_routes").update({active:true}).in("id",ids)))};
 }
 function bRow(b){
   const c=BCOL[b.color],a=myAsc(b.id),open=S.open===b.id;
@@ -649,7 +700,6 @@ function bRow(b){
   </div>`:""}</div>`}
 function bindB(z){
   document.querySelectorAll(".hd").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.r?null:b.dataset.r;S.arm=null;boulderView()});
-  if($("#badd"))$("#badd").onclick=()=>{S.arm=null;addRoute({sec:"boulder",zone:z.id,grade:"blanco",created:isoDay(new Date())})};
   const b=S.routes.find(x=>x.id===S.open);if(!b)return;
   document.querySelectorAll("[data-st]").forEach(x=>x.onclick=()=>markAscent(b,x.dataset.st));
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return boulderView()}S.arm=null;unmark(b)};
