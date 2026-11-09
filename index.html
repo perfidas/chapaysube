@@ -363,7 +363,11 @@ async function act(fn){if(S.busy)return;S.busy=true;
   catch(e){toast("No se ha podido guardar: "+(e.message||e))}
   S.busy=false;render()}
 function markAscent(route,style){if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
-  return act(()=>a?sb.from("liga_ascents").update({style}).eq("id",a.id):sb.from("liga_ascents").insert({route_id:route.id,style}))}
+  return act(async()=>{const r=await(a?sb.from("liga_ascents").update({style}).eq("id",a.id):sb.from("liga_ascents").insert({route_id:route.id,style}));if(r.error)return r;
+    /* A vista o flash en cuerda: la misma vía de autoseguro se marca sola como flash */
+    if(route.sec==="cuerda"&&(style==="A vista"||style==="Flash")){const tw=S.routes.find(x=>x.active&&x.sec==="autoseguro"&&x.line===route.line&&x.grade===route.grade&&x.hold===route.hold);
+      if(tw&&!myAsc(tw.id)){const r2=await sb.from("liga_ascents").insert({route_id:tw.id,style:"Flash"});if(!r2.error)toast("También se ha marcado como flash en autoseguro")}}
+    return r})}
 function unmark(route){const a=myAsc(route.id);if(a)return act(()=>sb.from("liga_ascents").delete().eq("id",a.id))}
 function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select("id").single();if(r.error)throw r.error;S.open=r.data.id})}
 function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id))}
@@ -504,6 +508,7 @@ function rules(){
    <li>Cada vía que encadenas suma los puntos de su grado multiplicados por cómo la hiciste.</li>
    <li>Cada vía cuenta una sola vez por bimestre. Si la vuelves a marcar, se queda lo último que marques.</li>
    <li>Si una vía se desmonta, los puntos que ya sumaste con ella se mantienen.</li>
+   <li>Si haces a vista o flash una vía de cuerda que también está en autoseguro, en autoseguro se te marca sola como flash.</li>
   </ul>
   <div class="mult">${STYLES.map(([s,m])=>`<div><b>×${String(m).replace(".",",")}</b><span>${s}</span></div>`).join("")}</div>
   <p class="sub">Ejemplo: un 6b a vista da ${GP["6b"]} × 1,3 = ${ex} puntos.</p>
