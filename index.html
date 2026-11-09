@@ -212,10 +212,10 @@ const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
 const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"}];
 /* Boulder: el color es la dificultad, de más fácil a más difícil */
-const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Dorado","#a8740f",450]};
+const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Blanco y negro","#555555",450]};
 const BKEYS=Object.keys(BCOL);
-/* El dorado lleva brillo metálico para no confundirlo con el amarillo */
-const GOLD_BG="linear-gradient(135deg,#6b4508 0%,#c8901e 35%,#fff0b3 50%,#c8901e 65%,#6b4508 100%)";
+/* El nivel más alto (clave «dorado» en la base de datos) se pinta mitad blanco, mitad negro */
+const GOLD_BG="linear-gradient(135deg,#ffffff 0 50%,#111111 50% 100%)";
 const bbg=k=>k==="dorado"?GOLD_BG:BCOL[k]?.[1];
 const BSTYLES=[["Flash",1.2],["Encadenado",1]],BSM=Object.fromEntries(BSTYLES);
 const BSECT=[
@@ -603,7 +603,7 @@ function bSvg(){
   const zs=BSECT.map(z=>{const sel=S.zone===z.id;return `<g class="zone bz ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, ${bOf(z.id).length} bloques">
     <path class="bwall" d="${z.d}"/><path d="${z.d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="round"/><g class="bdots"></g>
     <text class="zlab ${sel?"sel":""}" x="${z.lab[0]}" y="${z.lab[1]}" text-anchor="${z.lab[2]}">${z.short||z.name}</text></g>`}).join("");
-  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b4508"/><stop offset=".35" stop-color="#c8901e"/><stop offset=".5" stop-color="#fff0b3"/><stop offset=".65" stop-color="#c8901e"/><stop offset="1" stop-color="#6b4508"/></linearGradient></defs>
+  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
    ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
