@@ -162,7 +162,7 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .apr{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line)}
 .apr:first-child{border-top:0}
 .apr>span{min-width:0}
-.aprb{display:flex;gap:6px;flex:none}
+.aprb{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end;max-width:62%}
 .cnt{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--acc);color:#fff;font-size:12px;font-weight:700;margin-left:4px}
 .finder{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
 .frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
@@ -342,8 +342,9 @@ async function loadAll(){
 }
 let session=null;
 async function refresh(){
-  S.me=session?.user?.id||null;S.owner=false;
-  if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data}
+  S.me=session?.user?.id||null;S.owner=false;S.bed=false;
+  if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data;
+    if(!S.owner){const r=await sb.rpc("liga_is_boulder_editor");S.bed=!r.error&&!!r.data}}
   await loadAll();
   const md=session?.user?.user_metadata||{};
   if(S.me&&!S.people.some(u=>u.id===S.me)&&(md.name||"").trim().length>=2){
@@ -491,12 +492,13 @@ function approvals(){
   const ps=S.pend||[],pe=ps.filter(p=>!p.approved&&p.user_id!==S.me),ap=ps.filter(p=>p.approved&&p.user_id!==S.me);
   const row=(p,btns)=>`<div class="apr"><span><b>${esc(p.name)}</b>${p.invited_by?`<br><span class="sub">Invitado por ${esc(p.invited_by)}</span>`:""}</span><span class="aprb">${btns}</span></div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Escaladores</h2>
-  <p class="sub" style="margin:4px 0 12px">Las aprobaciones valen para las dos apps.</p>
+  <p class="sub" style="margin:4px 0 12px">Las aprobaciones valen para las dos apps. «Monta boulder» deja a ese escalador añadir, cambiar y desmontar bloques de boulder, y nada más.</p>
   <h3 class="pfh">Pendientes</h3>${pe.length?`<div class="lc">${pe.map(p=>row(p,`<button class="pri" data-ok="${p.user_id}">Aprobar</button>`)).join("")}</div>`:`<div class="empty">No hay solicitudes pendientes.</div>`}
-  <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
+  <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="${p.boulder?"pri":""}" data-bo="${p.user_id}" data-v="${p.boulder?0:1}" title="Puede montar y desmontar bloques de boulder">${p.boulder?"Monta boulder ✓":"Monta boulder"}</button><button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
   $("#bk").onclick=()=>{S.view="home";S.arm=null;render()};
   const setOk=async(id,ok)=>{const{error}=await sb.rpc("liga_set_approved",{p_user:id,p_ok:ok});if(error)return toast("No se ha podido guardar: "+error.message);await loadAll();await loadPending();approvals()};
   document.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>{b.disabled=true;setOk(b.dataset.ok,true)});
+  document.querySelectorAll("[data-bo]").forEach(b=>b.onclick=async()=>{b.disabled=true;const{error}=await sb.rpc("liga_set_boulder",{p_user:b.dataset.bo,p_ok:b.dataset.v==="1"});if(error)toast("No se ha podido guardar: "+error.message);await loadPending();approvals()});
   document.querySelectorAll("[data-no]").forEach(b=>b.onclick=()=>{const k="no"+b.dataset.no;if(S.arm!==k){S.arm=k;return approvals()}S.arm=null;setOk(b.dataset.no,false)});
 }
 function openRules(){S.back=S.view;S.view="rules";S.scrollTop=true;render()}
@@ -568,7 +570,7 @@ function perfil(){
 function whoBar(){
   const mine=S.people.find(u=>u.id===S.me);
   if(S.me&&mine&&!mine.ok&&!S.owner)return `<div class="who"><span class="sub" style="flex:1">${esc(mine.name)}: tu cuenta está pendiente de aprobar.</span><button id="out">Salir</button></div>`;
-  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:""}<button id="myp">Mi perfil</button>${S.owner?`<button id="apv">Escaladores${pendCount()?` <span class="cnt">${pendCount()}</span>`:""}</button>`:""}<button id="out">Salir</button></div>`
+  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:S.bed?`<span class="tag">Monta boulder</span>`:""}<button id="myp">Mi perfil</button>${S.owner?`<button id="apv">Escaladores${pendCount()?` <span class="cnt">${pendCount()}</span>`:""}</button>`:""}<button id="out">Salir</button></div>`
   :`<div class="who"><span class="sub" style="flex:1">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}
 function bindWho(){if(S.me){$("#out").onclick=()=>sb.auth.signOut();if($("#myp"))$("#myp").onclick=()=>openProfile(S.me);if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()}}else $("#lin").onclick=()=>{S.reg=false;needLogin()}}
 
@@ -587,13 +589,14 @@ function home(){
 }
 
 function section(){
-  const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder";
-  $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${hasMap&&S.owner?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
+  const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
+  if(!canEdit)S.edit=false;
+  $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
   <h2>${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
   <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body"></div>`;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
-  if(hasMap&&S.owner)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;section()};
+  if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;section()};
   $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
   S.tab==="mapa"?(S.sec==="boulder"?boulderView():mapView()):rankView();
 }
