@@ -164,6 +164,23 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .apr>span{min-width:0}
 .aprb{display:flex;gap:6px;flex:none}
 .cnt{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--acc);color:#fff;font-size:12px;font-weight:700;margin-left:4px}
+.finder{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.frow select{width:100%;font-weight:400}
+.frow2{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px}
+.chk input{width:20px;height:20px;min-height:0;accent-color:var(--acc)}
+.ldot.hit{fill:var(--acc);stroke:var(--acc)}
+.lnum.hit{fill:#fff}
+.ldot.dim,.lnum.dim{opacity:.28}
+.bdot.hit{stroke:var(--acc);stroke-width:3.4}
+.bdot.dim{opacity:.18}
+.rgh{font:700 13px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:12px 2px 4px;border-top:1px solid var(--line)}
+.res .rgh+.nit{border-top:0}
+.lnb{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 15px var(--disp);border:2px solid var(--ink)}
+.rt.dimr{opacity:.4}
+.fnote{font-size:14px;color:var(--mut);margin:-2px 0 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:baseline}
+.fnote .link{padding:0}
 .rbtn{width:100%;margin-top:14px;background:none;border-style:dashed;color:var(--red);font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
 .rbtn::before,.rbtn::after{color:var(--gold);font-size:15px;letter-spacing:-1px}
 .rbtn::before{content:"\25B6\25B6"}
@@ -582,17 +599,17 @@ function bSvg(){
    <path class="door" d="M306 22 L414 22"/><text class="area" x="360" y="14" text-anchor="middle">ACCESO</text>
    <path class="door" d="M329 522 L614 452"/><text class="area" x="500" y="512" text-anchor="middle" transform="rotate(-14 500 512)">ACCESO</text>
    ${zs}</svg>`}
-function placeBDots(){
+function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     bs.forEach((b,i)=>{const pt=p.getPointAtLength(L*(i+.5)/bs.length),c=document.createElementNS("http://www.w3.org/2000/svg","circle");
-      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":""));box.appendChild(c)})})}
+      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c)})})}
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
-  $("#body").innerHTML=`<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
-  placeBDots();
+  $("#body").innerHTML=`${finderHtml()}<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
+  placeBDots();bindFinder(boulderView);
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
-  if(!z){$("#zp").innerHTML=`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
   $("#zp").innerHTML=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
@@ -601,7 +618,8 @@ function boulderView(){
 }
 function bRow(b){
   const c=BCOL[b.color],a=myAsc(b.id),open=S.open===b.id;
-  return `<div class="rt"><button class="hd" data-r="${b.id}" aria-expanded="${open}"><span class="bsw" style="background:${c[1]}"></span>
+  const f=FQ(),dim=fOn(f)&&!fMatch(b,f);
+  return `<div class="rt ${dim?"dimr":""}"><button class="hd" data-r="${b.id}" aria-expanded="${open}"><span class="bsw" style="background:${c[1]}"></span>
   <span><b>${c[0]}</b>${isNew(b)?NEWBM:""}${b.created?` <span class="sub">· creado el ${fdate(b.created)}</span>`:""}<br>${HOLDS[b.hold]?`<span class="hold"><i style="background:${HOLDS[b.hold][1]}"></i>Presas: ${HOLDS[b.hold][0].toLowerCase()}</span><br>`:`<span class="sub">Presas: sin indicar</span><br>`}${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
@@ -627,15 +645,48 @@ function bindB(z){
     $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return boulderView()}S.arm=null;S.open=null;updRoute(b.id,{active:false})}}
 }
 
+/* ---------- Buscador: filtra por grado, color y lo que no has hecho, y señala dónde está ---------- */
+const FQ=()=>S.fq?.[S.sec]||((S.fq=S.fq||{})[S.sec]={min:"",max:"",hold:"",col:"",todo:false});
+const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.todo);
+function fMatch(r,f){
+  if(f.hold&&r.hold!==f.hold)return false;
+  if(f.todo&&myAsc(r.id))return false;
+  if(r.sec==="boulder")return !f.col||r.color===f.col;
+  const i=GRADES.indexOf(r.grade);
+  if(f.min&&i<GRADES.indexOf(f.min))return false;
+  if(f.max&&i>GRADES.indexOf(f.max))return false;
+  return true}
+const fHits=()=>{const f=FQ();return fOn(f)?S.routes.filter(r=>r.sec===S.sec&&r.active&&!isOff(r.line)&&fMatch(r,f)):null};
+function finderHtml(){const f=FQ(),bl=S.sec==="boulder",opt=(v,l,cur)=>`<option value="${v}" ${v===cur?"selected":""}>${l}</option>`;
+  return `<section class="finder" aria-label="Buscar ${bl?"bloques":"vías"}"><div class="frow">
+  ${bl?`<label class="fl" for="fcol">Dificultad<select id="fcol">${opt("","Todas",f.col)}${BKEYS.map(k=>opt(k,BCOL[k][0],f.col)).join("")}</select></label>`
+    :`<label class="fl" for="fmin">Grado desde<select id="fmin">${opt("","Cualquiera",f.min)}${GRADES.map(g=>opt(g,g,f.min)).join("")}</select></label>
+  <label class="fl" for="fmax">hasta<select id="fmax">${opt("","Cualquiera",f.max)}${GRADES.map(g=>opt(g,g,f.max)).join("")}</select></label>`}
+  <label class="fl" for="fh">Presas<select id="fh">${opt("","Todas",f.hold)}${Object.entries(HOLDS).map(([k,v])=>opt(k,v[0],f.hold)).join("")}</select></label></div>
+  <div class="frow2">${S.me?`<label class="chk" for="ftd"><input type="checkbox" id="ftd" ${f.todo?"checked":""}> Solo ${bl?"los":"las"} que no he hecho este bimestre</label>`:"<span></span>"}
+  ${fOn(f)?`<button class="link" id="fclr">Quitar filtros</button>`:""}</div></section>`}
+function bindFinder(view){const f=FQ(),set=(k,v)=>{f[k]=v;S.zone=null;S.open=null;view()};
+  [["fmin","min"],["fmax","max"],["fh","hold"],["fcol","col"]].forEach(([id,k])=>{const e=$("#"+id);if(e)e.onchange=()=>{const v=e.value;
+    if(k==="min"&&v&&f.max&&GRADES.indexOf(f.max)<GRADES.indexOf(v))f.max="";if(k==="max"&&v&&f.min&&GRADES.indexOf(f.min)>GRADES.indexOf(v))f.min="";set(k,v)}});
+  if($("#ftd"))$("#ftd").onchange=e=>set("todo",e.target.checked);
+  if($("#fclr"))$("#fclr").onclick=()=>{Object.assign(f,{min:"",max:"",hold:"",col:"",todo:false});S.zone=null;S.open=null;view()}}
+function resultsHtml(){const hs=fHits();if(!hs)return null;const bl=S.sec==="boulder";
+  if(!hs.length)return `<div class="empty">No hay ${bl?"bloques":"vías"} que cumplan el filtro. Prueba a ampliar el grado o quitar algún filtro.</div>`;
+  const groups=bl?BSECT.map(z=>({name:z.name,rs:hs.filter(r=>r.zone===z.id)})):ZONES[S.sec].slice().sort((a,b)=>a.lo-b.lo).map(z=>({name:z.name,rs:hs.filter(r=>LINES[r.line]?.zone===z.id).sort((a,b)=>a.line-b.line||GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade))}));
+  return `<section class="news res" aria-label="Resultados"><header><h3>${hs.length} ${bl?(hs.length===1?"bloque encontrado":"bloques encontrados"):(hs.length===1?"vía encontrada":"vías encontradas")}</h3><span class="sub">Toca una para ir a ella. En el mapa están resaltadas.</span></header>
+  ${groups.filter(g=>g.rs.length).map(g=>`<div class="rgh">${g.name.replace("Exterior · ","Exterior, ")}</div>${g.rs.map(r=>bl
+    ?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${BCOL[r.color]?.[1]}"></span><span><b>${BCOL[r.color]?.[0]||""}</b>${isNew(r)?NEWBM:""}<br><span class="sub">${HOLDS[r.hold]?"Presas "+HOLDS[r.hold][0].toLowerCase():"Presas sin indicar"}${myAsc(r.id)?" · hecho":""}</span></span></button>`
+    :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}`).join("")}</section>`}
+
 function mapSvg(){
   if(!ZONES[S.sec])return `<div class="hint">${S.sec==="autoseguro"?"Autoseguro usará las paredes del mapa de cuerda.":"El mapa de boulder llegará más adelante."}</div>`;
   let g="";
-  const f=v=>v.toFixed(1);
+  const f=v=>v.toFixed(1),hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   ZONES[S.sec].forEach(z=>{const sel=S.zone===z.id;const[p,q]=z.pts;const L=Math.hypot(q[0]-p[0],q[1]-p[1]);const dx=(q[0]-p[0])/L,dy=(q[1]-p[1])/L;
     const s=[p[0]+dx*GAP,p[1]+dy*GAP],e=[q[0]-dx*GAP,q[1]-dy*GAP],d=`M${f(s[0])} ${f(s[1])} L${f(e[0])} ${f(e[1])}`;
     let dots="";for(let i=0;i<z.n;i++){const num=z.nums[i];const[x,y]=lerp(p,q,(i+.5)/z.n);const rs=routesOf(num),dn=rs.some(r=>myAsc(r.id)),nw=rs.some(isNew);
-      const off=isOff(num);
-      dots+=`<circle class="ldot ${nw?"nw":""} ${dn?"dn":""} ${rs.length?"":"none"} ${off?"off":""}" cx="${f(x)}" cy="${f(y)}" r="11"/><text class="lnum ${off?"off":""}" x="${f(x)}" y="${f(y+4.5)}" text-anchor="middle">${num}</text>${off?`<line class="strike" x1="${f(x-9)}" y1="${f(y)}" x2="${f(x+9)}" y2="${f(y)}"/>`:""}`}
+      const off=isOff(num),hit=HS?rs.some(r=>HS.has(r.id)):null;
+      dots+=`<circle class="ldot ${nw?"nw":""} ${dn?"dn":""} ${rs.length?"":"none"} ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" cx="${f(x)}" cy="${f(y)}" r="11"/><text class="lnum ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" x="${f(x)}" y="${f(y+4.5)}" text-anchor="middle">${num}</text>${off?`<line class="strike" x1="${f(x-9)}" y1="${f(y)}" x2="${f(x+9)}" y2="${f(y)}"/>`:""}`}
     const nx=-dy*z.side,ny=dx*z.side,m=lerp(p,q,.5),lx=m[0]+nx*24,ly=m[1]+ny*24+4,anc=nx>.3?"start":nx<-.3?"end":"middle";
     g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}
     <text class="zlab ${sel?"sel":""}" x="${f(lx)}" y="${f(ly)}" text-anchor="${anc}">${z.name.replace("Exterior · ","")}</text></g>`});
@@ -646,22 +697,26 @@ function mapSvg(){
 
 function mapView(){
   const z=ZONES[S.sec]?.find(x=>x.id===S.zone);
-  $("#body").innerHTML=`<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
+  $("#body").innerHTML=`${ZONES[S.sec]?finderHtml():""}<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
+  if(ZONES[S.sec])bindFinder(mapView);
   document.querySelectorAll(".zone").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;mapView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!ZONES[S.sec])return;
-  if(!z){$("#zp").innerHTML=`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}`;bindNews(mapView);return}
-  let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>`;
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}`;bindNews(mapView);return}
+  const fl=fOn(FQ())?`<div class="fnote">Con el filtro activo, las vías que no lo cumplen salen atenuadas. <button class="link" id="fback">Volver a los resultados</button></div>`:"";
+  let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>${fl}`;
   for(const num of [...z.nums].sort((a,b)=>a-b)){const rs=routesOf(num);
     if(isOff(num)&&!rs.length){html+=`<section class="lc off" aria-label="Línea ${num}, no se usa"><header><span class="num">${num}</span><b><s>Línea ${num}</s></b><span class="sub">· No se usa</span></header></section>`;continue}
     html+=`<section class="lc" aria-label="Línea ${num}"><header><span class="num">${num}</span><b>Línea ${num}</b><span class="sub">· ${rs.length} ${rs.length===1?"vía":"vías"}</span></header>
     ${rs.map(routeRow).join("")||`<div class="rt"><div class="hint" style="padding:10px">Sin vías montadas.</div></div>`}
     ${S.edit?`<button class="addr" data-add="${num}">Añadir vía a la línea ${num}</button>`:""}</section>`}
   $("#zp").innerHTML=html;
+  if($("#fback"))$("#fback").onclick=()=>{S.zone=null;S.open=null;mapView()};
   bindRoutes();
 }
 function routeRow(r){
   const h=HOLDS[r.hold],a=myAsc(r.id),open=S.open===r.id;
-  return `<div class="rt"><button class="hd" data-r="${r.id}" aria-expanded="${open}"><span class="sw" style="background:${h[1]}"></span>
+  const f=FQ(),dim=fOn(f)&&!fMatch(r,f);
+  return `<div class="rt ${dim?"dimr":""}"><button class="hd" data-r="${r.id}" aria-expanded="${open}"><span class="sw" style="background:${h[1]}"></span>
   <span><b>${h[0]}</b>${isNew(r)?NEWB:""}${r.created?` <span class="sub">· creada el ${fdate(r.created)}</span>`:""}<br>${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
   <span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
