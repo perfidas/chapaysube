@@ -251,6 +251,21 @@ button.on{color:#fff}
 .rk .rkb.pod1 .pos{color:var(--gold)}
 .rk .rkb.me{border-color:var(--acc)}
 .tabs button.on,.ptabs button.on{background:var(--acc);border-color:var(--acc)}
+/* Cada vía como su tablilla del rocódromo: barra de color, línea y color arriba, grado grande, fecha a la derecha */
+.rt>.hd.tbl{display:grid;grid-template-columns:12px 1fr auto;gap:14px;align-items:stretch;padding:10px 14px 10px 10px}
+.tb-bar{border-radius:99px;min-height:64px;border:1px solid rgba(0,0,0,.25)}
+.tb-main{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.tb-top{font:600 15px/1.2 var(--body)}
+.tb-gr{font:900 46px/.95 var(--disp);letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.tb-side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right;font-size:12px;gap:6px}
+.tb-date{color:var(--mut);font-variant-numeric:tabular-nums;font-size:13px}
+.tb-side .done{font-size:12px;line-height:1.25}
+/* Tablilla de papel (solo cuerda y autoseguro): tarjeta blanca como la impresa en la pared */
+.rt>.hd.tbl{background:#f4f4f1;color:#1b2226;border-radius:8px;margin:6px;width:calc(100% - 12px)}
+.rt:has(>.hd.tbl){border-top:0}
+.rt>.hd.tbl[aria-expanded="true"]{box-shadow:0 0 0 3px var(--acc)}
+.hd.tbl .tb-date,.hd.tbl .tb-side .sub{color:#5d6a70}
+.hd.tbl .tb-side .done{color:#1f7a4c}
 </style>
 
 </head>
@@ -853,11 +868,11 @@ function mapView(){
   bindRoutes();
 }
 function routeRow(r){
-  const h=HOLDS[r.hold],a=myAsc(r.id),open=S.open===r.id;
-  const f=FQ(),dim=fOn(f)&&!fMatch(r,f);
-  return `<div class="rt ${dim?"dimr":""}"><button class="hd" data-r="${r.id}" aria-expanded="${open}"><span class="sw" style="background:${h[1]}"></span>
-  <span><b>${h[0]}</b>${isNew(r)?NEWB:""}${r.created?` <span class="sub">· creada el ${fdate(r.created)}</span>`:""}<br>${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
-  <span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>
+  const h=HOLDS[r.hold]||["Sin color","var(--line)"],a=myAsc(r.id),open=S.open===r.id;
+  const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?r.created.split("-").reverse().join("."):"";
+  return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
+  <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}</span><span class="tb-gr">${r.grade}</span></span>
+  <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="done">${a.style}<br>+${pts(a)} pts</span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
   ${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
