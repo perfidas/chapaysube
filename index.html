@@ -360,8 +360,11 @@ const ZONES={cuerda:(()=>{
     const fits=Math.min(xAt(y0),xAt(y0+300))-30>=WX[0]+250;
     BOX=fits?{x:WX[0],y:y0,w:250,h:300}:{x:Math.round((WX[0]+WX[1])/2-125),y:MB+40,w:250,h:300}}
   /* La Pared 6 se parte en dos secciones sobre la misma recta: 6.1 (42–54) y 6.2 (55–67) */
-  {const k=arr.findIndex(z=>z.id==="p1"),[A,B]=arr[k].pts,cut=t=>[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t],g=7/len(26);
-   arr.splice(k,1,{id:"p1b",name:"Pared 6.2",n:13,pts:[A,cut(.5-g)],side:-1},{id:"p1",name:"Pared 6.1",n:13,pts:[cut(.5+g),B],side:-1})}
+  {const k=arr.findIndex(z=>z.id==="p1"),[A,B]=arr[k].pts,L=Math.hypot(B[0]-A[0],B[1]-A[1]),ux=(B[0]-A[0])/L,uy=(B[1]-A[1])/L,
+     bend=-60,M=[(A[0]+B[0])/2+uy*bend*(A[0]<B[0]?-1:1)*Math.sign(uy||1),(A[1]+B[1])/2-ux*bend*(A[0]<B[0]?-1:1)*Math.sign(uy||1)],
+     toward=(P,Q,d)=>{const l=Math.hypot(Q[0]-P[0],Q[1]-P[1]);return[P[0]+(Q[0]-P[0])*d/l,P[1]+(Q[1]-P[1])*d/l]};
+   /* «bend» empuja el punto de unión hacia dentro de la sala: las dos mitades se inclinan hacia el interior */
+   arr.splice(k,1,{id:"p1b",name:"Pared 6.2",n:13,pts:[A,toward(M,A,7)],side:-1},{id:"p1",name:"Pared 6.1",n:13,pts:[toward(M,B,7),B],side:-1})}
   const cx=BOX.x+20+len(4)+18+10,cy=BOX.y+42+len(8);
   arr.push(
    {id:"x1",name:"Exterior · lado largo",n:8,pts:[[cx,cy-len(8)],[cx,cy]],side:-1},
