@@ -333,7 +333,7 @@ const KEY="liga-rocodromo-v2";
 const SP=24,GAP=8,lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
 let BOX=null,WX=[0,0];
 /* Líneas que existen en la pared pero no se usan en cada sección: salen tachadas y no admiten vías */
-const UNUSED={cuerda:new Set([15]),autoseguro:new Set([15,22,23,27,28,29,30,31,32,33,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65])};
+const UNUSED={cuerda:new Set([15]),autoseguro:new Set([15,22,23,27,28,29,30,31,32,33,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66])};
 const isOff=n=>!!UNUSED[S.sec]?.has(n);
 const ZONES={cuerda:(()=>{
   const ang=12*Math.PI/180,h=82,len=n=>n*SP;
