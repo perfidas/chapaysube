@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2f7db8">
+<meta name="theme-color" content="#0f1720">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,12 +14,12 @@
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Liga del Rocódromo</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Rubik:wght@400;500;600;700&display=swap">
 <style>
-/* Misma identidad que «Mis vías»: fondo de resina gris verdoso, acento magenta de cinta exprés, tipografía condensada de tablilla de grado. Columna única de móvil. */
-:root{--gold:#c79400;--silver:#7f8b90;--bronze:#a8662e;--red:#e8101f;--bg:#e8ebe8;--card:#f7f8f6;--ink:#1b2226;--mut:#5d6a70;--line:#c9d0cc;--acc:#e0147a;--deep:#1f4e5f;--wall:#9fb0b5;--wall2:#5f747c;--floor:#e1e8eb;--block:#c4cfd3;--wallsel:#e0147a;--g1:#2f8f5b;--g2:#c98a0a;--g3:#d2432b;--g4:#7b3fb5;--disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;--body:Barlow,system-ui,-apple-system,"Segoe UI",sans-serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#f2c230;--silver:#b9c3c7;--bronze:#d8955a;--red:#ff3d47;--bg:#12171a;--card:#1b2227;--ink:#eef2f0;--mut:#9aa8ae;--line:#2c373d;--acc:#ff4fa3;--deep:#6fb6cc;--wall:#3e4f56;--wall2:#8aa3ad;--floor:#22303a;--block:#34444c;--wallsel:#ff4fa3;--g1:#4fc487;--g2:#e5ac3a;--g3:#ff7a62;--g4:#b88af0;color-scheme:dark}}
-:root[data-theme="dark"]{--gold:#f2c230;--silver:#b9c3c7;--bronze:#d8955a;--red:#ff3d47;--bg:#12171a;--card:#1b2227;--ink:#eef2f0;--mut:#9aa8ae;--line:#2c373d;--acc:#ff4fa3;--deep:#6fb6cc;--wall:#3e4f56;--wall2:#8aa3ad;--floor:#22303a;--block:#34444c;--wallsel:#ff4fa3;--g1:#4fc487;--g2:#e5ac3a;--g3:#ff7a62;--g4:#b88af0;color-scheme:dark}
+/* Estilo «Competición»: oscuro como un marcador de estadio, oro para el líder, rosa de cinta exprés como acento. Títulos en mayúsculas con letra estrecha de marcador. Un solo tema oscuro a propósito. */
+:root{--gold:#ffc53d;--silver:#c3ced6;--bronze:#e0955a;--red:#ff4d5a;--bg:#0f1720;--card:#18232e;--ink:#eef3f6;--mut:#8ea0ad;--line:#26333f;--acc:#ff3d7f;--deep:#ff3d7f;--wall:#2b3a47;--wall2:#6f8797;--floor:#16212b;--block:#22303c;--wallsel:#ff3d7f;--g1:#3fd28b;--g2:#ffb83d;--g3:#ff6b5b;--g4:#c49bff;--disp:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:Rubik,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#ffc53d;--silver:#c3ced6;--bronze:#e0955a;--red:#ff4d5a;--bg:#0f1720;--card:#18232e;--ink:#eef3f6;--mut:#8ea0ad;--line:#26333f;--acc:#ff3d7f;--deep:#ff3d7f;--wall:#2b3a47;--wall2:#6f8797;--floor:#16212b;--block:#22303c;--wallsel:#ff3d7f;--g1:#3fd28b;--g2:#ffb83d;--g3:#ff6b5b;--g4:#c49bff;color-scheme:dark}}
+:root[data-theme="dark"]{--gold:#ffc53d;--silver:#c3ced6;--bronze:#e0955a;--red:#ff4d5a;--bg:#0f1720;--card:#18232e;--ink:#eef3f6;--mut:#8ea0ad;--line:#26333f;--acc:#ff3d7f;--deep:#ff3d7f;--wall:#2b3a47;--wall2:#6f8797;--floor:#16212b;--block:#22303c;--wallsel:#ff3d7f;--g1:#3fd28b;--g2:#ffb83d;--g3:#ff6b5b;--g4:#c49bff;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body)}
 main{max-width:640px;margin:0 auto;padding-block:12px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -239,6 +239,18 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .crown{display:block;width:26px;height:16px;margin:0 auto 1px;color:var(--gold)}
 .mv{display:block;font:600 11px/1.1 var(--body);margin-top:2px;white-space:nowrap}
 .mv.dw{color:var(--g3)}.mv.up{color:var(--g1)}
+/* Competición: tipografía de marcador y líder en oro */
+h1,h2,h3{text-transform:uppercase;letter-spacing:.03em;font-weight:900}
+h3{font-weight:800}
+button.on{color:#fff}
+.sec b,.rk .pos,.rk .p,.sec .pts{font-weight:900}
+.sec b{text-transform:uppercase;letter-spacing:.03em}
+.rk .rkb{border-radius:6px}
+.rk li:nth-child(even) .rkb{background:#152029}
+.rk .rkb.pod1{border-color:var(--gold);background:linear-gradient(90deg,rgba(255,197,61,.16),transparent 70%),var(--card)}
+.rk .rkb.pod1 .pos{color:var(--gold)}
+.rk .rkb.me{border-color:var(--acc)}
+.tabs button.on,.ptabs button.on{background:var(--acc);border-color:var(--acc)}
 </style>
 
 </head>
