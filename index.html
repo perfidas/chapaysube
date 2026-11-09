@@ -212,8 +212,11 @@ const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
 const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"}];
 /* Boulder: el color es la dificultad, de más fácil a más difícil */
-const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Dorado","#c9a227",450]};
+const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Dorado","#a8740f",450]};
 const BKEYS=Object.keys(BCOL);
+/* El dorado lleva brillo metálico para no confundirlo con el amarillo */
+const GOLD_BG="linear-gradient(135deg,#6b4508 0%,#c8901e 35%,#fff0b3 50%,#c8901e 65%,#6b4508 100%)";
+const bbg=k=>k==="dorado"?GOLD_BG:BCOL[k]?.[1];
 const BSTYLES=[["Flash",1.2],["Encadenado",1]],BSM=Object.fromEntries(BSTYLES);
 const BSECT=[
  {id:"b5a",name:"Sector 1.1",short:"1.1",d:"M254 528 L314 528",lab:[284,516,"middle"]},
@@ -413,7 +416,7 @@ const zoneOf=r=>r.sec==="boulder"?r.zone:LINES[r.line]?.zone;
 const NEWB='<span class="new">Nueva</span>',NEWBM='<span class="new">Nuevo</span>';
 function newsBox(){const ns=newOf(S.sec);if(!ns.length)return"";const bl=S.sec==="boulder",max=30;
   return `<section class="news" aria-label="Novedades"><header><h3>Novedades</h3><span class="sub">${ns.length} ${bl?(ns.length===1?"bloque montado":"bloques montados"):(ns.length===1?"vía montada":"vías montadas")} en los últimos ${NEW_DAYS} días</span></header>
-  ${ns.slice(0,max).map(r=>bl?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${BCOL[r.color]?.[1]}"></span><span><b>${BCOL[r.color]?.[0]||""}</b><br><span class="sub">${BSECT.find(z=>z.id===r.zone)?.name||""} · ${fdate(r.created)}</span></span></button>`
+  ${ns.slice(0,max).map(r=>bl?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b><br><span class="sub">${BSECT.find(z=>z.id===r.zone)?.name||""} · ${fdate(r.created)}</span></span></button>`
    :`<button class="nit" data-nr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}<br><span class="sub">${ZONES[S.sec]?.find(z=>z.id===zoneOf(r))?.name||""} · ${fdate(r.created)}</span></span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}
   ${ns.length>max?`<p class="sub" style="margin:6px 0 0">Y ${ns.length-max} más. Toca una pared para verlas todas.</p>`:""}</section>`}
 function bindNews(view){document.querySelectorAll("[data-nr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.nr);if(!r)return;
@@ -516,7 +519,7 @@ function rules(){
   <div class="gpt">${GRADES.map(g=>`<div><b style="color:${gcol(g)}">${g}</b><span>${GP[g]}</span></div>`).join("")}</div>
   <h3>Boulder: puntos por color</h3>
   <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×1,2.</p>
-  <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
+  <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
   <h3>Ranking anual</h3>
   <ul>
    <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
@@ -531,7 +534,7 @@ function rules(){
 function openProfile(id){S.pid=id;if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
 const ord=n=>n?n+".º":"–";
 function bestOf(as,sec){if(!as.length)return"–";
-  if(sec==="boulder"){const k=as.map(a=>a.grade).sort((a,b)=>BKEYS.indexOf(b)-BKEYS.indexOf(a))[0];return BCOL[k]?`<i class="pip" style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}`:"–"}
+  if(sec==="boulder"){const k=as.map(a=>a.grade).sort((a,b)=>BKEYS.indexOf(b)-BKEYS.indexOf(a))[0];return BCOL[k]?`<i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}`:"–"}
   const g=as.map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];return `<span style="color:${gcol(g)}">${g}</span>`}
 function ascDesc(a){const r=S.routes.find(x=>x.id===a.route);
   if(a.sec==="boulder")return `${r?BSECT.find(z=>z.id===r.zone)?.name||"Boulder":"Bloque desmontado"} · ${BCOL[a.grade]?.[0]||a.grade}`;
@@ -600,7 +603,7 @@ function bSvg(){
   const zs=BSECT.map(z=>{const sel=S.zone===z.id;return `<g class="zone bz ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, ${bOf(z.id).length} bloques">
     <path class="bwall" d="${z.d}"/><path d="${z.d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="round"/><g class="bdots"></g>
     <text class="zlab ${sel?"sel":""}" x="${z.lab[0]}" y="${z.lab[1]}" text-anchor="${z.lab[2]}">${z.short||z.name}</text></g>`}).join("");
-  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder">
+  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b4508"/><stop offset=".35" stop-color="#c8901e"/><stop offset=".5" stop-color="#fff0b3"/><stop offset=".65" stop-color="#c8901e"/><stop offset="1" stop-color="#6b4508"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
    ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
@@ -611,11 +614,11 @@ function bSvg(){
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     bs.forEach((b,i)=>{const pt=p.getPointAtLength(L*(i+.5)/bs.length),c=document.createElementNS("http://www.w3.org/2000/svg","circle");
-      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c)})})}
+      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",b.color==="dorado"?"url(#bgold)":BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c)})})}
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
-  $("#body").innerHTML=`${finderHtml()}<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
+  $("#body").innerHTML=`${finderHtml()}<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
   placeBDots();bindFinder(boulderView);
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
@@ -628,7 +631,7 @@ function boulderView(){
 function bRow(b){
   const c=BCOL[b.color],a=myAsc(b.id),open=S.open===b.id;
   const f=FQ(),dim=fOn(f)&&!fMatch(b,f);
-  return `<div class="rt ${dim?"dimr":""}"><button class="hd" data-r="${b.id}" aria-expanded="${open}"><span class="bsw" style="background:${c[1]}"></span>
+  return `<div class="rt ${dim?"dimr":""}"><button class="hd" data-r="${b.id}" aria-expanded="${open}"><span class="bsw" style="background:${bbg(b.color)}"></span>
   <span><b>${c[0]}</b>${isNew(b)?NEWBM:""}${b.created?` <span class="sub">· creado el ${fdate(b.created)}</span>`:""}<br>${HOLDS[b.hold]?`<span class="hold"><i style="background:${HOLDS[b.hold][1]}"></i>Presas: ${HOLDS[b.hold][0].toLowerCase()}</span><br>`:`<span class="sub">Presas: sin indicar</span><br>`}${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
@@ -684,7 +687,7 @@ function resultsHtml(){const hs=fHits();if(!hs)return null;const bl=S.sec==="bou
   const groups=bl?BSECT.map(z=>({name:z.name,rs:hs.filter(r=>r.zone===z.id)})):ZONES[S.sec].slice().sort((a,b)=>a.lo-b.lo).map(z=>({name:z.name,rs:hs.filter(r=>LINES[r.line]?.zone===z.id).sort((a,b)=>a.line-b.line||GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade))}));
   return `<section class="news res" aria-label="Resultados"><header><h3>${hs.length} ${bl?(hs.length===1?"bloque encontrado":"bloques encontrados"):(hs.length===1?"vía encontrada":"vías encontradas")}</h3><span class="sub">Toca una para ir a ella. En el mapa están resaltadas.</span></header>
   ${groups.filter(g=>g.rs.length).map(g=>`<div class="rgh">${g.name.replace("Exterior · ","Exterior, ")}</div>${g.rs.map(r=>bl
-    ?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${BCOL[r.color]?.[1]}"></span><span><b>${BCOL[r.color]?.[0]||""}</b>${isNew(r)?NEWBM:""}<br><span class="sub">${HOLDS[r.hold]?"Presas "+HOLDS[r.hold][0].toLowerCase():"Presas sin indicar"}${myAsc(r.id)?" · hecho":""}</span></span></button>`
+    ?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b>${isNew(r)?NEWBM:""}<br><span class="sub">${HOLDS[r.hold]?"Presas "+HOLDS[r.hold][0].toLowerCase():"Presas sin indicar"}${myAsc(r.id)?" · hecho":""}</span></span></button>`
     :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}`).join("")}</section>`}
 
 function mapSvg(){
