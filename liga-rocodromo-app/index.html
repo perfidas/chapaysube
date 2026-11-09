@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f7db8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Liga SC">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="iconos/favicon-32.png">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Liga del Rocódromo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Misma identidad que «Mis vías»: fondo de resina gris verdoso, acento magenta de cinta exprés, tipografía condensada de tablilla de grado. Columna única de móvil. */
+:root{--gold:#c79400;--silver:#7f8b90;--bronze:#a8662e;--red:#e8101f;--bg:#e8ebe8;--card:#f7f8f6;--ink:#1b2226;--mut:#5d6a70;--line:#c9d0cc;--acc:#e0147a;--deep:#1f4e5f;--wall:#9fb0b5;--wall2:#5f747c;--floor:#e1e8eb;--block:#c4cfd3;--wallsel:#e0147a;--g1:#2f8f5b;--g2:#c98a0a;--g3:#d2432b;--g4:#7b3fb5;--disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;--body:Barlow,system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#f2c230;--silver:#b9c3c7;--bronze:#d8955a;--red:#ff3d47;--bg:#12171a;--card:#1b2227;--ink:#eef2f0;--mut:#9aa8ae;--line:#2c373d;--acc:#ff4fa3;--deep:#6fb6cc;--wall:#3e4f56;--wall2:#8aa3ad;--floor:#22303a;--block:#34444c;--wallsel:#ff4fa3;--g1:#4fc487;--g2:#e5ac3a;--g3:#ff7a62;--g4:#b88af0;color-scheme:dark}}
+:root[data-theme="dark"]{--gold:#f2c230;--silver:#b9c3c7;--bronze:#d8955a;--red:#ff3d47;--bg:#12171a;--card:#1b2227;--ink:#eef2f0;--mut:#9aa8ae;--line:#2c373d;--acc:#ff4fa3;--deep:#6fb6cc;--wall:#3e4f56;--wall2:#8aa3ad;--floor:#22303a;--block:#34444c;--wallsel:#ff4fa3;--g1:#4fc487;--g2:#e5ac3a;--g3:#ff7a62;--g4:#b88af0;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body)}
+main{max-width:640px;margin:0 auto;padding-block:12px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:.2px;text-wrap:balance}
+h1{font-size:36px;line-height:1}
+h2{font-size:30px;line-height:1.05}
+h3{font-size:22px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 13px;min-height:40px}
+button:focus-visible,input:focus-visible,select:focus-visible,.zone:focus-visible{outline:3px solid var(--deep);outline-offset:1px}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button.on{background:var(--deep);border-color:var(--deep);color:var(--bg)}
+button.dng{color:var(--g3);border-color:var(--g3)}
+input,select{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 12px;flex-wrap:wrap}
+.sub{color:var(--mut);font-size:14px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.who select,.who input{flex:1 1 140px}
+.demo{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px dashed var(--g2);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:14px}
+.sec{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.sec b{font:700 30px/1 var(--disp)}
+.sec .pts{grid-row:1/3;grid-column:2;text-align:right;font:700 28px/1 var(--disp);font-variant-numeric:tabular-nums}
+.sec .pts small{display:block;font:500 13px var(--body);color:var(--mut)}
+.tag{display:inline-block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.tabs{display:flex;gap:6px;margin:6px 0 12px}
+.tabs button{flex:1}
+.map{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;overflow-x:auto}
+.map svg{display:block;width:100%;height:auto}
+.zone{cursor:pointer}
+.zone .strip{stroke:var(--wall);transition:stroke .15s}
+.zone:hover .strip,.zone:focus-visible .strip{stroke:var(--acc);stroke-opacity:.6}
+.zone:hover .zlab{fill:var(--acc)}
+.zone.sel .strip{stroke:var(--wallsel);stroke-opacity:1}
+.ldot{fill:var(--card);stroke:var(--ink);stroke-width:1.2}
+.ldot.nw{stroke:var(--gold);stroke-width:3.2}
+.bdot.nw{stroke:var(--gold);stroke-width:3.4}
+.ldot.dn{stroke:var(--g1);stroke-width:2.6}
+.ldot.off,.ldot.none.off{fill:var(--line);stroke:var(--mut);stroke-dasharray:none;opacity:1}
+.lnum.off{opacity:.45}
+.zone.sel .ldot.off,.zone.sel .ldot.none.off{fill:var(--line);stroke:var(--mut)}
+.zone.sel .lnum.off{fill:var(--ink)}
+.strike{stroke:var(--g3);stroke-width:2.6;stroke-linecap:round}
+.lc.off{opacity:.6;border-style:dashed}
+.lc.off s{text-decoration-thickness:2px;text-decoration-color:var(--g3)}
+.ldot.none{opacity:.4;stroke-dasharray:3 2}
+.zone.sel .ldot{fill:var(--acc);stroke:var(--acc)}
+.zone.sel .ldot.dn{stroke:var(--g1)}
+.zone.sel .lnum{fill:#fff}
+.zone:hover .ldot{stroke-width:2}
+.lnum{font:700 13px var(--body);fill:var(--ink)}
+.zlab{font:600 15px var(--body);fill:var(--mut)}
+.zlab.sel{fill:var(--acc)}
+.zmain{font:700 15px var(--body);fill:var(--ink);opacity:.8}
+.area{font:700 13px var(--body);letter-spacing:.14em;fill:var(--mut);opacity:.75}
+.inset{fill:var(--bg);stroke:var(--mut);stroke-width:1.5}
+.hint{text-align:center;color:var(--mut);padding:18px 8px}
+.lc{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.lc>header{display:flex;align-items:center;gap:10px;padding:10px 12px 6px}
+.num{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 17px var(--disp);border:2px solid var(--ink)}
+.rt{border-top:1px solid var(--line)}
+.rt>.hd{display:flex;gap:12px;align-items:center;width:100%;border:0;border-radius:0;background:none;padding:9px 12px;text-align:left}
+.sw{width:14px;height:30px;border-radius:4px;flex:none;border:1px solid var(--line)}
+.gr{font:700 24px/1 var(--disp);min-width:44px;text-align:center;margin-left:auto;border-left:3px solid currentColor;padding-left:9px;font-variant-numeric:tabular-nums}
+.done{font-size:13px;color:var(--g1);font-weight:600}
+.bd{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.styles{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.styles button{display:flex;justify-content:space-between;gap:6px}
+.styles small{color:inherit;opacity:.75;font-variant-numeric:tabular-nums}
+.ed{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.ed label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:3px}
+.ed .full{grid-column:1/-1}
+.floor{fill:var(--floor)}
+.island{fill:var(--block)}
+.door{fill:none;stroke:var(--mut);stroke-width:2;stroke-dasharray:6 6}
+.bwall{fill:none;stroke:var(--wall2);stroke-width:12;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
+.bz.sel .bwall{stroke:var(--wallsel);stroke-opacity:1}
+.bdot{stroke:var(--ink);stroke-width:1.2}
+.bdot.dn{stroke:var(--g1);stroke-width:3.5}
+.hold{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.hold i{width:14px;height:14px;border-radius:3px;border:1px solid var(--mut);display:inline-block}
+.bsw{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--mut)}
+.bleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:13px;color:var(--mut)}
+.bleg span{display:flex;align-items:center;gap:5px}
+.bleg i,.pip{width:12px;height:12px;border-radius:50%;border:1px solid var(--mut);display:inline-block}
+.pip{margin-right:5px;vertical-align:middle}
+.err{color:var(--g3);font-size:14px;font-weight:600}
+.addr{margin:4px 12px 12px;width:calc(100% - 24px)}
+.fl{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:14px}
+.fl input{width:100%;font-weight:400;font-size:16px}
+button.link{background:none;border:0;color:var(--deep);font-weight:600;text-decoration:underline;padding:8px 0;align-self:flex-start}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;z-index:20;max-width:min(90vw,520px);font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.rk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rk .rkb{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-height:0}
+.rk .rkb>span{min-width:0}
+.rk .rkb.me{border-color:var(--acc);border-width:2px}
+.rk .pos{font:700 24px/1 var(--disp);text-align:center;font-variant-numeric:tabular-nums}
+.rk .p{font:700 24px/1 var(--disp);text-align:right;font-variant-numeric:tabular-nums}
+.rk .p small{display:block;font:500 12px var(--body);color:var(--mut)}
+.pod1 .pos{color:var(--g2)}
+.empty{text-align:center;color:var(--mut);padding:30px 10px;background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.new{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:var(--gold);color:#1b2226;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;vertical-align:2px}
+.tag.nwtag{border-color:var(--gold);color:var(--ink);font-weight:600}
+.news{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 12px 4px;margin-top:4px}
+.news header{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.nit{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:9px 2px}
+.nit>span{min-width:0}
+.pod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.pc{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;min-height:0}
+.pc .pos{font:700 24px/1 var(--disp)}
+.pc b{font-size:14px;overflow-wrap:anywhere}
+.pc small{color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
+.pc.p1{border-color:var(--gold)}.pc.p1 .pos{color:var(--gold)}.pc.p2 .pos{color:var(--silver)}.pc.p3 .pos{color:var(--bronze)}
+.pc.nope{border-style:dashed;opacity:.6}
+.hc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.hc header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.hc header b{font:700 22px/1.1 var(--disp)}
+.ychips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.pfc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:14px;align-items:baseline}
+.kv>span{color:var(--mut)}
+.kv>b{text-align:right;font-variant-numeric:tabular-nums}
+.pfh{margin:18px 0 8px}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.postab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.postab th,.postab td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.postab tbody th{white-space:normal;padding-left:10px}
+.postab thead th:first-child{padding-left:10px}
+.postab tr:last-child th,.postab tr:last-child td{border-bottom:0}
+.postab th:first-child{text-align:left;font-weight:600}
+.postab thead th{color:var(--mut);font-weight:600;font-size:13px}
+.med1{color:var(--gold);font-weight:700}.med2{color:var(--silver);font-weight:700}.med3{color:var(--bronze);font-weight:700}
+.ai{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--line)}
+.ai:first-child{border-top:0}
+.ai>span{min-width:0}
+.ad{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
+.ap{font:700 20px/1 var(--disp);color:var(--g1);font-variant-numeric:tabular-nums}
+.rbtn{width:100%;margin-top:14px;background:none;border-style:dashed;color:var(--red);font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
+.rbtn::before,.rbtn::after{color:var(--gold);font-size:15px;letter-spacing:-1px}
+.rbtn::before{content:"\25B6\25B6"}
+.rbtn::after{content:"\25C0\25C0"}
+.rl{display:flex;flex-direction:column;gap:10px;max-width:62ch}
+.rl h3{margin-top:10px}
+.rl p,.rl ul{margin:0}
+.rl ul{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.mult,.gpt{display:grid;gap:6px}
+.mult{grid-template-columns:repeat(3,1fr)}
+.gpt{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.mult div,.gpt div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column}
+.mult b,.gpt b{font:700 22px/1.1 var(--disp);font-variant-numeric:tabular-nums}
+.mult span,.gpt span{font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+</style>
+
+</head>
+<body>
+<main id="app"></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== Configuración de Supabase: pega aquí los datos de tu proyecto (Project Settings > API) ===== */
+const CFG={url:"https://ctziadohyvkyikcjbepz.supabase.co",key:"sb_publishable_QMkPAjb5L-ZKNXPxX1mDjw_djy4fNKT"};
+const GRADES=["4","5a","5b","5c","6a","6a+","6b","6b+","6c","6c+","7a","7a+","7b","7b+","7c","7c+","8a","8a+","8b"];
+const GP={"4":30,"5a":45,"5b":60,"5c":80,"6a":100,"6a+":120,"6b":150,"6b+":180,"6c":220,"6c+":260,"7a":320,"7a+":380,"7b":450,"7b+":520,"7c":600,"7c+":700,"8a":800,"8a+":920,"8b":1050};
+const STYLES=[["A vista",1.3],["Flash",1.15],["Encadenada",1]];
+const SM=Object.fromEntries(STYLES);
+const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
+const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"}];
+/* Boulder: el color es la dificultad, de más fácil a más difícil */
+const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Dorado","#c9a227",450]};
+const BKEYS=Object.keys(BCOL);
+const BSTYLES=[["Flash",1.2],["Encadenado",1]],BSM=Object.fromEntries(BSTYLES);
+const BSECT=[
+ {id:"b5a",name:"Sector 1.1",short:"1.1",d:"M254 528 L314 528",lab:[284,516,"middle"]},
+ {id:"b5b",name:"Sector 1.2",short:"1.2",d:"M322 536 L322 652",lab:[306,600,"end"]},
+ {id:"b5c",name:"Sector 1.3",short:"1.3",d:"M314 660 L229 660",lab:[271,646,"middle"]},
+ {id:"b5d",name:"Sector 1.4",short:"1.4",d:"M217 660 L133 660",lab:[175,646,"middle"]},
+ {id:"b5e",name:"Sector 1.5",short:"1.5",d:"M125 652 L125 578",lab:[140,620,"start"]},
+ {id:"b5f",name:"Sector 1.6",short:"1.6",d:"M125 566 L125 488",lab:[140,530,"start"]},
+];
+/* Sectores 2–7: cada muro se parte en subsecciones de igual longitud, numeradas en sentido horario */
+const BMAIN=[{t:"Sector 1",x:222,y:592,a:"middle"},{t:"Oeste",x:298,y:236,a:"start"},{t:"Este",x:418,y:236,a:"end"},{t:"Sur",x:358,y:412,a:"middle"}];
+/* Isla central: lados rectos y fondo redondeado */
+const ISLAND="M296 66 L420 66 Q430 66 430 78 L430 370 Q430 440 358 440 Q286 440 286 370 L286 78 Q286 66 296 66 Z";
+const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i/n,u=1-t;return[u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]]});
+(()=>{
+  const defs=[["b6",2,[[125,470],[125,306]],2,[1,0]],["b7",3,[[125,288],[125,66]],3,[1,0]],["b1",4,[[125,48],[125,22],[298,22]],3,[0,1]],
+    ["b2",5,[[422,22],[620,22],[620,66]],3,[0,1]],["b3",6,[[620,84],[620,282]],3,[-1,0]],["b4",7,[[620,302],[620,448]],2,[-1,0]],
+    ["i2","Isla este",[[430,84],[430,378]],3,[1,0],1],
+    ["i3","Isla sur",[...qpts([430,370],[430,440],[358,440],.15,1,10),...qpts([358,440],[286,440],[286,370],0,.85,10).slice(1)],2,[0,1],1],
+    ["i4","Isla oeste",[[286,378],[286,84]],3,[-1,0],1]];
+  const subs=[],lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+  defs.forEach(([id,num,pts,k,[nx,ny],isl])=>{
+    const L=[];let tot=0;for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);L.push(l);tot+=l}
+    const at=d=>{for(let j=0;j<L.length;j++){if(d<=L[j]||j===L.length-1)return lerp(pts[j],pts[j+1],Math.min(1,d/L[j]));d-=L[j]}};
+    const anc=nx>0?"start":nx<0?"end":"middle",lp=(m,o)=>[Math.min(595,Math.max(150,m[0]+nx*o)),m[1]+ny*o+(ny>0?10:4)];
+    for(let i=0;i<k;i++){const a=tot*i/k+(i?6:0),b=tot*(i+1)/k-(i<k-1?6:0),p=[at(a)];let acc=0;
+      for(let j=0;j<L.length-1;j++){acc+=L[j];if(acc>a&&acc<b)p.push(pts[j+1])}p.push(at(b));
+      const[lx,ly]=lp(at((a+b)/2),16);
+      subs.push({id:id+"-"+(i+1),name:isl?`${num} ${i+1}`:`Sector ${num}.${i+1}`,short:isl?num.split(" ")[1][0].toUpperCase()+(i+1):`${num}.${i+1}`,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[lx,ly,anc]})}
+    if(!isl){let[mx,my]=lp(at(tot/2),70);if(anc==="middle")mx=Math.min(510,Math.max(240,mx));BMAIN.push({t:"Sector "+num,x:mx,y:my,a:anc})}});
+  BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
+})();
+const BFLOOR="M125 22 L620 22 L620 450 L322 525 L322 660 L125 660 Z";
+let bseed=11;const brnd=()=>(bseed=(bseed*16807)%2147483647)/2147483647;
+function demoBoulders(){const out=[];BSECT.forEach(z=>{const n=z.short?1+Math.floor(brnd()*3):3+Math.floor(brnd()*5);for(let i=0;i<n;i++)out.push({id:newId("b"),sec:"boulder",zone:z.id,color:BKEYS[Math.min(7,Math.floor(brnd()*brnd()*9))],hold:Object.keys(HOLDS)[Math.floor(brnd()*9)],created:isoDay(new Date(Date.now()-Math.floor(brnd()*70)*864e5)),active:true})});return out}
+function demoBAsc(users,bs,asc){const now=new Date();users.forEach((u,k)=>{for(let j=0;j<[10,14,7,11][k%4];j++){const b=bs[Math.floor(brnd()*bs.length)];const back=brnd()<.55?Math.floor(brnd()*6):40+Math.floor(brnd()*200);const at=new Date(now-back*864e5);if(at.getFullYear()!==now.getFullYear())continue;
+  upsert(asc,{u:u.id,route:b.id,sec:"boulder",grade:b.color,style:brnd()<.35?"Flash":"Encadenado",at:at.toISOString()})}})}
+const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Dic"];
+const KEY="liga-rocodromo-v2";
+
+/* ---------- Mapa cenital de Cuerda: W con los fondos rectos + L exterior ---------- */
+/* Escala única: cada línea ocupa SP unidades en todas las paredes, así las longitudes son proporcionales al número de líneas. */
+const SP=24,GAP=8,lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+let BOX=null,WX=[0,0];
+/* Líneas que existen en la pared pero no se usan en cada sección: salen tachadas y no admiten vías */
+const UNUSED={cuerda:new Set([15]),autoseguro:new Set([15,22,23,27,28,29,30,31,32,33,41])};
+const isOff=n=>!!UNUSED[S.sec]?.has(n);
+const ZONES={cuerda:(()=>{
+  const ang=12*Math.PI/180,h=82,len=n=>n*SP;
+  /* Cada pared mantiene su longitud (proporcional a sus líneas) y entre una y otra queda un hueco G */
+  /* Pared 2 y Pared 5 a la misma altura: Pared 3 (9 líneas) y Pared 4 (10) suben lo mismo, la 4 algo más inclinada */
+  const G=18,H=208,w3=Math.sqrt(len(9)**2-H*H),w4=Math.sqrt(len(10)**2-H*H),un=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
+  const dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H),un(w3,H),[1,0],[Math.sin(ang),-Math.cos(ang)]];
+  const walls=[["p1","Pared 6",10,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3","Pared 3",9,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
+  let cur=[40,40];const arr=[];
+  walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
+    if(i>0)cur=[cur[0]+d[0]*G+(i===3?14:0),cur[1]+d[1]*G];
+    const end=[cur[0]+d[0]*len(n),cur[1]+d[1]*len(n)];
+    arr.push({id,name,n,pts:[cur,end],side,...(wide?{wide:1}:{})});cur=end});
+
+  /* Interior girado 180° */
+  const mx=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[0]))),my=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[1]))),R=p=>[mx-p[0]+28,my-p[1]+44];
+  arr.forEach(z=>z.pts=z.pts.map(R));
+  WX=[28,mx-40+28];const MB=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[1])));
+  /* Zona exterior en recuadro a la derecha: L en espejo y girada 90° a la derecha.
+     Lado largo vertical (numeración seguida tras el interior). */
+  BOX={x:Math.round((WX[0]+WX[1])/2-125),y:MB+40,w:250,h:300};
+  const cx=BOX.x+20+len(4)+18+10,cy=BOX.y+42+len(8);
+  arr.push(
+   {id:"x1",name:"Exterior · lado largo",n:8,pts:[[cx,cy-len(8)],[cx,cy]],side:-1},
+   {id:"x2",name:"Exterior · lado corto",n:4,pts:[[cx-18,cy+18],[cx-18-len(4),cy+18]],side:-1});
+  return arr})()};
+const VB={w:Math.ceil(WX[1]+28),h:Math.ceil(BOX.y+BOX.h+10)};
+/* Numeración de líneas: seguida desde la Pared 1 */
+/* Interior numerado al revés (la antigua 37 es la 1); la zona exterior sigue después */
+/* Primer número de cada pared. Las paredes del interior se numeran en sentido contrario a como se dibujan.
+   No existen las líneas 24, 25 (entre la Pared 3 y la 4) ni la 36 (entre la Pared 4 y la 5). */
+const FIRST={p4:1,a2:11,p3:15,p2:26,a1:37,p1:42,x1:52,x2:60};
+const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
+/* Autoseguro usa las mismas paredes y líneas que cuerda, con sus propias vías y su propio ranking */
+ZONES.autoseguro=ZONES.cuerda;
+function demoAuto(users,asc){const out=[],hk=Object.keys(HOLDS),now=new Date();const nums=Object.keys(LINES).map(Number).filter(()=>rnd()<.3);
+  nums.forEach(n=>{const k=1+Math.floor(rnd()*2);for(let i=0;i<k;i++)out.push({id:newId("r"),sec:"autoseguro",line:n,grade:GRADES[2+Math.floor(rnd()*8)],hold:hk[Math.floor(rnd()*hk.length)],active:true,created:isoDay(new Date(Date.now()-Math.floor(rnd()*90)*864e5))})});
+  users.forEach((u,k)=>{for(let j=0;j<[6,9,4,7][k%4];j++){const r=out[Math.floor(rnd()*out.length)];const back=rnd()<.55?Math.floor(rnd()*6):40+Math.floor(rnd()*200);const at=new Date(now-back*864e5);if(at.getFullYear()!==now.getFullYear())continue;
+    upsert(asc,{u:u.id,route:r.id,sec:"autoseguro",grade:r.grade,style:STYLES[Math.floor(rnd()*STYLES.length)][0],at:at.toISOString()})}});return out}
+function along(pts,t){let L=[],tot=0;for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);L.push(l);tot+=l}
+  let d=t*tot;for(let i=0;i<L.length;i++){if(d<=L[i]||i===L.length-1)return lerp(pts[i],pts[i+1],Math.min(1,d/L[i]));d-=L[i]}}
+
+/* ---------- Datos ---------- */
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+let uid=0;const newId=p=>p+Date.now().toString(36)+(uid++);
+function lineRoutes(L){const out=[],hk=Object.keys(HOLDS),used=new Set();for(let i=0;i<3;i++){let h;do h=hk[Math.floor(rnd()*hk.length)];while(used.has(h));used.add(h);
+    out.push({id:newId("r"),sec:L.sec,line:L.num,grade:GRADES[2+Math.floor(rnd()*10)],hold:h,active:true,created:isoDay(new Date(Date.now()-Math.floor(rnd()*90)*864e5))})}return out}
+function isoDay(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+const fdate=s=>{if(!s)return"";const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})};
+function makeRoutes(){return Object.values(LINES).flatMap(lineRoutes)}
+function bimKey(d){return d.getFullYear()+"-"+Math.floor(d.getMonth()/2)}
+
+/* ---------- Supabase: datos compartidos por todos ---------- */
+const READY=!/PEGA_AQUI/.test(CFG.url+CFG.key)&&typeof supabase!=="undefined";
+const sb=READY?supabase.createClient(CFG.url,CFG.key):null;
+const S={users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
+function save(){}
+async function fetchAll(build){let out=[];for(let from=0;;from+=1000){const{data,error}=await build().range(from,from+999);if(error)throw error;out=out.concat(data);if(data.length<1000)return out}}
+async function loadAll(){
+  const q=t=>sb.from(t).select("*").then(x=>{if(x.error)throw x.error;return x.data});
+  const[p,r,a,gp,st]=await Promise.all([
+    fetchAll(()=>sb.from("liga_players").select("*").order("user_id")),
+    fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
+    fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
+    q("liga_points"),q("liga_styles")]);
+  gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
+  st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
+  STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
+  S.users=p.map(x=>({id:x.user_id,name:x.name}));
+  S.routes=r.map(x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active}));
+  S.asc=a.map(x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at}));
+}
+let session=null;
+async function refresh(){
+  S.me=session?.user?.id||null;S.owner=false;
+  if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data}
+  await loadAll();
+  if(S.me&&!S.users.some(u=>u.id===S.me)){
+    const nm=(session.user.user_metadata?.name||"").trim();
+    if(nm.length>=2){const{error}=await sb.from("liga_players").insert({user_id:S.me,name:nm});if(!error)await loadAll()}
+  }
+  if(S.me&&!S.users.some(u=>u.id===S.me))S.view="name";
+  else if(["loading","login","name"].includes(S.view))S.view=S.back&&S.back!=="login"?S.back:"home";
+  render();
+}
+let bt;function bump(){clearTimeout(bt);bt=setTimeout(async()=>{try{await loadAll()}catch(e){return}if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},350)}
+function toast(t){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,4000)}
+function needLogin(){S.back=S.view==="login"?"home":S.view;S.view="login";S.scrollTop=true;render()}
+async function act(fn){if(S.busy)return;S.busy=true;
+  try{const r=await fn();if(r&&r.error)throw r.error;await loadAll()}
+  catch(e){toast("No se ha podido guardar: "+(e.message||e))}
+  S.busy=false;render()}
+function markAscent(route,style){if(!S.me)return needLogin();const a=myAsc(route.id);
+  return act(()=>a?sb.from("liga_ascents").update({style}).eq("id",a.id):sb.from("liga_ascents").insert({route_id:route.id,style}))}
+function unmark(route){const a=myAsc(route.id);if(a)return act(()=>sb.from("liga_ascents").delete().eq("id",a.id))}
+function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select("id").single();if(r.error)throw r.error;S.open=r.data.id})}
+function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id))}
+async function start(){
+  if(!READY){S.view="setup";return render()}
+  render();
+  try{
+    session=(await sb.auth.getSession()).data.session;
+    sb.auth.onAuthStateChange((ev,s)=>{session=s;if(ev==="SIGNED_IN"||ev==="SIGNED_OUT"||ev==="USER_UPDATED")setTimeout(()=>refresh().catch(showErr),0)});
+    await refresh();
+    sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},bump)
+      .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},bump)
+      .on("postgres_changes",{event:"*",schema:"public",table:"liga_players"},bump).subscribe();
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)bump()});
+  }catch(e){showErr(e)}
+}
+function showErr(e){S.view="error";S.err=e.message||String(e);render()}
+
+/* ---------- Periodos y puntos ---------- */
+function period(mode,d=new Date()){const y=d.getFullYear();
+  if(mode==="year")return{from:new Date(y,0,1),to:new Date(y+1,0,1),label:"Anual "+y};
+  const b=Math.floor(d.getMonth()/2);return{from:new Date(y,b*2,1),to:new Date(y,b*2+2,1),label:BIM[b]+" "+y}}
+const pts=a=>a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
+function ranking(sec,mode){if(mode==="year")return annual(sec);const{from,to}=period("bim");return rankRange(sec,from,to)}
+/* Anual: en cada bimestre los 10 primeros reciben 10, 9, 8… 1 puntos de liga */
+const LEAGUE=[10,9,8,7,6,5,4,3,2,1];
+function annual(sec,y=new Date().getFullYear()){const now=new Date(),cy=now.getFullYear(),cur=y<cy?5:Math.floor(now.getMonth()/2),by={};
+  for(let b=0;b<=cur;b++){rankRange(sec,new Date(y,b*2,1),new Date(y,b*2+2,1)).forEach((x,i)=>{
+    const o=by[x.id]=by[x.id]||{id:x.id,name:x.name,p:0,vp:0,hist:[]};o.vp+=x.p;
+    if(i<10){o.p+=LEAGUE[i];o.hist.push({b,pos:i+1,live:y===cy&&b===cur})}})}
+  return Object.values(by).filter(o=>o.hist.length).sort((a,b)=>b.p-a.p||b.vp-a.vp)}
+function rankRange(sec,from,to){const best={};
+  S.asc.forEach(a=>{if(a.sec!==sec)return;const t=new Date(a.at);if(t<from||t>=to)return;const k=a.u+"|"+a.route;const p=pts(a);if(!best[k]||best[k]<p)best[k]=p});
+  const by={};for(const k in best){const u=k.split("|")[0];(by[u]=by[u]||{p:0,n:0}).p+=best[k];by[u].n++}
+  return S.users.map(u=>({...u,...(by[u.id]||{p:0,n:0})})).filter(x=>x.n).sort((a,b)=>b.p-a.p||b.n-a.n)}
+const myAsc=rid=>{const k=bimKey(new Date());return S.asc.find(a=>a.u===S.me&&a.route===rid&&bimKey(new Date(a.at))===k)};
+const routesOf=num=>S.routes.filter(r=>r.sec===S.sec&&r.line===num&&r.active).sort((a,b)=>GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade));
+/* Vías y bloques nuevos: montados en los últimos NEW_DAYS días según su fecha de creación */
+const NEW_DAYS=10;
+const isNew=r=>{if(!r.created)return false;const[y,m,d]=r.created.split("-").map(Number);return(Date.now()-new Date(y,m-1,d))/864e5<NEW_DAYS};
+const newOf=sec=>S.routes.filter(r=>r.sec===sec&&r.active&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")||(a.line||0)-(b.line||0));
+const zoneOf=r=>r.sec==="boulder"?r.zone:LINES[r.line]?.zone;
+const NEWB='<span class="new">Nueva</span>',NEWBM='<span class="new">Nuevo</span>';
+function newsBox(){const ns=newOf(S.sec);if(!ns.length)return"";const bl=S.sec==="boulder",max=30;
+  return `<section class="news" aria-label="Novedades"><header><h3>Novedades</h3><span class="sub">${ns.length} ${bl?(ns.length===1?"bloque montado":"bloques montados"):(ns.length===1?"vía montada":"vías montadas")} en los últimos ${NEW_DAYS} días</span></header>
+  ${ns.slice(0,max).map(r=>bl?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${BCOL[r.color]?.[1]}"></span><span><b>${BCOL[r.color]?.[0]||""}</b><br><span class="sub">${BSECT.find(z=>z.id===r.zone)?.name||""} · ${fdate(r.created)}</span></span></button>`
+   :`<button class="nit" data-nr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}<br><span class="sub">${ZONES[S.sec]?.find(z=>z.id===zoneOf(r))?.name||""} · ${fdate(r.created)}</span></span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}
+  ${ns.length>max?`<p class="sub" style="margin:6px 0 0">Y ${ns.length-max} más. Toca una pared para verlas todas.</p>`:""}</section>`}
+function bindNews(view){document.querySelectorAll("[data-nr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.nr);if(!r)return;
+  S.zone=zoneOf(r);S.open=r.id;S.arm=null;view();document.querySelector(`[data-r="${r.id}"]`)?.scrollIntoView({behavior:"smooth",block:"center"})})}
+const daysLeft=()=>Math.ceil((period("bim").to-new Date())/864e5);
+const fmt=n=>n.toLocaleString("es-ES");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const gcol=g=>{const i=GRADES.indexOf(g);return i<4?"var(--g1)":i<10?"var(--g2)":i<14?"var(--g3)":"var(--g4)"};
+const $=s=>document.querySelector(s);
+const me=()=>S.users.find(u=>u.id===S.me);
+
+/* ---------- Pantallas ---------- */
+function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;({home,rules,perfil,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+function loadingView(){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`}
+function errorView(){$("#app").innerHTML=`<article class="rl"><h2>No se ha podido cargar</h2><p>Comprueba la conexión y vuelve a intentarlo.</p><p class="sub">${esc(S.err)}</p><button class="pri" id="re">Reintentar</button></article>`;$("#re").onclick=()=>{S.view="loading";start()}}
+function setupView(){$("#app").innerHTML=`<article class="rl"><h2>Falta conectar Supabase</h2><p>Abre <b>index.html</b> y pega la dirección del proyecto y la clave pública (anon) de Supabase donde pone PEGA_AQUI.</p></article>`}
+function login(){
+  const reg=!!S.reg;
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><article class="rl"><h2>${reg?"Crear cuenta":"Entrar"}</h2>
+  <p class="sub">${reg?"Con tu cuenta podrás marcar tus vías y bloques y salir en el ranking.":"Entra para marcar tus vías y bloques."}</p>
+  <form id="lf" class="stack" novalidate>
+  ${reg?`<label class="fl" for="ln">Nombre en el ranking<input id="ln" required minlength="2" maxlength="30" autocomplete="nickname"></label>`:""}
+  <label class="fl" for="le">Correo<input id="le" type="email" required autocomplete="email"></label>
+  <label class="fl" for="lp">Contraseña${reg?" (mínimo 6 caracteres)":""}<input id="lp" type="password" required minlength="6" autocomplete="${reg?"new-password":"current-password"}"></label>
+  <span class="err" id="lerr" role="alert" hidden></span>
+  <button class="pri" type="submit" id="lgo">${reg?"Crear cuenta":"Entrar"}</button></form>
+  <button id="sw" class="link">${reg?"Ya tengo cuenta: entrar":"No tengo cuenta: crear una"}</button></article>`;
+  $("#bk").onclick=()=>{S.view=S.back||"home";render()};
+  $("#sw").onclick=()=>{S.reg=!reg;login()};
+  const err=t=>{const e=$("#lerr");e.textContent=t;e.hidden=false};
+  $("#lf").onsubmit=async e=>{e.preventDefault();const em=$("#le").value.trim(),pw=$("#lp").value,nm=reg?$("#ln").value.trim():"";
+    if(reg&&nm.length<2)return err("Escribe un nombre de al menos 2 letras.");
+    if(!em.includes("@"))return err("Escribe un correo válido.");
+    if(pw.length<6)return err("La contraseña necesita al menos 6 caracteres.");
+    if(reg&&S.users.some(u=>u.name.toLowerCase()===nm.toLowerCase()))return err("Ese nombre ya lo usa otro escalador. Elige otro.");
+    $("#lgo").disabled=true;
+    const r=reg?await sb.auth.signUp({email:em,password:pw,options:{data:{name:nm}}}):await sb.auth.signInWithPassword({email:em,password:pw});
+    $("#lgo").disabled=false;
+    if(r.error)return err(/Invalid login/i.test(r.error.message)?"Correo o contraseña incorrectos.":/registered/i.test(r.error.message)?"Ya hay una cuenta con ese correo. Pulsa “Ya tengo cuenta: entrar”.":r.error.message);
+    if(reg&&!r.data.session)err("Te hemos mandado un correo para confirmar la cuenta. Ábrelo y después entra aquí.");
+  };
+}
+function nameView(){
+  $("#app").innerHTML=`<article class="rl"><h2>¿Cómo te llamamos?</h2><p class="sub">Es el nombre que verán los demás en el ranking.</p>
+  <form id="nf" class="stack" novalidate><label class="fl" for="nn">Nombre en el ranking<input id="nn" required minlength="2" maxlength="30" autocomplete="nickname"></label>
+  <span class="err" id="nerr" role="alert" hidden></span><button class="pri" type="submit">Guardar</button></form>
+  <button id="out" class="link">Salir de la cuenta</button></article>`;
+  $("#out").onclick=()=>sb.auth.signOut();
+  $("#nf").onsubmit=async e=>{e.preventDefault();const nm=$("#nn").value.trim(),er=t=>{$("#nerr").textContent=t;$("#nerr").hidden=false};
+    if(nm.length<2)return er("Escribe un nombre de al menos 2 letras.");
+    const{error}=await sb.from("liga_players").insert({user_id:S.me,name:nm});
+    if(error)return er(/duplicate|unique/i.test(error.message)?"Ese nombre ya lo usa otro escalador. Elige otro.":error.message);
+    S.view="home";await refresh()};
+}
+function openRules(){S.back=S.view;S.view="rules";S.scrollTop=true;render()}
+function rules(){
+  const ex=Math.round(GP["6b"]*1.3);
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
+  <article class="rl"><h2>Cómo se puntúa</h2>
+  <p>La liga tiene tres secciones: <b>Cuerda</b>, <b>Autoseguro</b> y <b>Boulder</b>. Cada una tiene su propio ranking y los puntos de una no cuentan en las otras.</p>
+  <h3>Ranking bimestral</h3>
+  <ul>
+   <li>El año se divide en seis bimestres: ${BIM.join(", ")}. El día 1 de cada bimestre el ranking empieza de cero.</li>
+   <li>Cada vía que encadenas suma los puntos de su grado multiplicados por cómo la hiciste.</li>
+   <li>Cada vía cuenta una sola vez por bimestre. Si la vuelves a marcar, se queda lo último que marques.</li>
+   <li>Si una vía se desmonta, los puntos que ya sumaste con ella se mantienen.</li>
+  </ul>
+  <div class="mult">${STYLES.map(([s,m])=>`<div><b>×${String(m).replace(".",",")}</b><span>${s}</span></div>`).join("")}</div>
+  <p class="sub">Ejemplo: un 6b a vista da ${GP["6b"]} × 1,3 = ${ex} puntos.</p>
+  <h3>Cuerda y autoseguro: puntos por grado</h3>
+  <div class="gpt">${GRADES.map(g=>`<div><b style="color:${gcol(g)}">${g}</b><span>${GP[g]}</span></div>`).join("")}</div>
+  <h3>Boulder: puntos por color</h3>
+  <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×1,2.</p>
+  <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
+  <h3>Ranking anual</h3>
+  <ul>
+   <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
+   <li>El ranking anual suma esos puntos de liga de los seis bimestres.</li>
+   <li>El bimestre en curso ya aparece en el anual, pero de forma provisional hasta que termine.</li>
+   <li>Si dos escaladores empatan, va delante quien haya sumado más puntos de vías en el año.</li>
+  </ul></article>`;
+  $("#bk").onclick=()=>{S.view=S.back||"home";S.scrollTop=true;render()};
+}
+
+/* ---------- Perfil de un escalador ---------- */
+function openProfile(id){S.pid=id;if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
+const ord=n=>n?n+".º":"–";
+function bestOf(as,sec){if(!as.length)return"–";
+  if(sec==="boulder"){const k=as.map(a=>a.grade).sort((a,b)=>BKEYS.indexOf(b)-BKEYS.indexOf(a))[0];return BCOL[k]?`<i class="pip" style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}`:"–"}
+  const g=as.map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];return `<span style="color:${gcol(g)}">${g}</span>`}
+function ascDesc(a){const r=S.routes.find(x=>x.id===a.route);
+  if(a.sec==="boulder")return `${r?BSECT.find(z=>z.id===r.zone)?.name||"Boulder":"Bloque desmontado"} · ${BCOL[a.grade]?.[0]||a.grade}`;
+  return r?`Línea ${r.line} · ${HOLDS[r.hold]?.[0]||""} · ${a.grade}`:`Vía desmontada · ${a.grade}`}
+function perfil(){
+  const u=S.users.find(x=>x.id===S.pid);if(!u){S.view="home";return render()}
+  const now=new Date(),y=now.getFullYear(),cb=Math.floor(now.getMonth()/2);
+  const mine=S.asc.filter(a=>a.u===u.id),yr=mine.filter(a=>new Date(a.at).getFullYear()===y);
+  const cur=period("bim");
+  const cards=SECTIONS.map(s=>{const as=yr.filter(a=>a.sec===s.id);
+    const br=rankRange(s.id,cur.from,cur.to),bi=br.findIndex(x=>x.id===u.id);
+    const ar=annual(s.id),ai=ar.findIndex(x=>x.id===u.id);
+    return `<div class="pfc"><h3>${s.name}</h3><div class="kv">
+      <span>Este bimestre</span><b>${bi>=0?`${ord(bi+1)} · ${fmt(br[bi].p)} pts`:"–"}</b>
+      <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
+      <span>${s.id==="boulder"?"Bloques":"Vías"} encadenad${s.id==="boulder"?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
+      <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
+  const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${SECTIONS.map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
+  const last=[...mine].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,25);
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button>${u.id===S.me?'<span class="tag">Tu perfil</span>':""}</div>
+  <h2>${esc(u.name)}</h2><div class="sub" style="margin-bottom:12px">Temporada ${y}</div>
+  <div class="pf-grid">${cards}</div>
+  <h3 class="pfh">Puestos por bimestre</h3>
+  <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${SECTIONS.map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+  <h3 class="pfh">Últimos encadenes</h3>
+  ${last.length?`<div class="lc">${last.map(a=>`<div class="ai"><span class="ad">${new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</span><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}</div>`
+   :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}`;
+  $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
+}
+
+function whoBar(){
+  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:""}<button id="myp">Mi perfil</button><button id="out">Salir</button></div>`
+  :`<div class="who"><span class="sub" style="flex:1">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}
+function bindWho(){if(S.me){$("#out").onclick=()=>sb.auth.signOut();$("#myp").onclick=()=>openProfile(S.me)}else $("#lin").onclick=()=>{S.reg=false;needLogin()}}
+
+function home(){
+  const p=period("bim");
+  $("#app").innerHTML=`<div class="top"><div><h1>Liga del Rocódromo</h1><div class="sub">Bimestre ${p.label} · termina en ${daysLeft()} días</div></div></div>
+  ${whoBar()}
+  <div class="stack">${SECTIONS.map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),mine=i>=0?r[i]:null;
+    const nn=newOf(s.id).length,bl=s.id==="boulder";
+    return `<button class="sec" data-s="${s.id}"><span><b>${s.name}</b>${nn?`<span class="tag nwtag">${nn} ${bl?(nn===1?"bloque nuevo":"bloques nuevos"):(nn===1?"vía nueva":"vías nuevas")}</span>`:""}</span>
+    <span class="sub">${mine?`Vas ${i+1}.º de ${r.length} este bimestre`:r.length?(r.length===1?"1 escalador puntuando":`${r.length} escaladores puntuando`):"Aún nadie ha puntuado"}</span>
+    <span class="pts">${mine?fmt(mine.p):"0"}<small>tus puntos</small></span></button>`}).join("")}</div>
+  <button class="rbtn" id="rls">Cómo se puntúa</button>`;
+  bindWho();$("#rls").onclick=openRules;
+  document.querySelectorAll(".sec").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.s;S.tab=(ZONES[S.sec]||S.sec==="boulder")?"mapa":"ranking";S.zone=null;S.open=null;S.scrollTop=true;render()});
+}
+
+function section(){
+  const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder";
+  $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${hasMap&&S.owner?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
+  <h2>${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
+  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
+  <div id="body"></div>`;
+  $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
+  if(hasMap&&S.owner)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;section()};
+  $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
+  S.tab==="mapa"?(S.sec==="boulder"?boulderView():mapView()):rankView();
+}
+
+/* ---------- Boulder: plano de la sala, sectores y bloques por color ---------- */
+function bSvg(){
+  const zs=BSECT.map(z=>{const sel=S.zone===z.id;return `<g class="zone bz ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, ${bOf(z.id).length} bloques">
+    <path class="bwall" d="${z.d}"/><path d="${z.d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="round"/><g class="bdots"></g>
+    <text class="zlab ${sel?"sel":""}" x="${z.lab[0]}" y="${z.lab[1]}" text-anchor="${z.lab[2]}">${z.short||z.name}</text></g>`}).join("");
+  return `<svg viewBox="92 0 568 690" role="img" aria-label="Plano de la sala de boulder">
+   <path class="floor" d="${BFLOOR}"/>
+   <path class="island" d="${ISLAND}"/>
+   ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
+   <text class="area" x="358" y="140" text-anchor="middle">BLOQUE</text><text class="area" x="358" y="157" text-anchor="middle">CENTRAL</text>
+   <path class="door" d="M306 22 L414 22"/><text class="area" x="360" y="14" text-anchor="middle">ACCESO</text>
+   <path class="door" d="M329 522 L614 452"/><text class="area" x="500" y="512" text-anchor="middle" transform="rotate(-14 500 512)">ACCESO</text>
+   ${zs}</svg>`}
+function placeBDots(){
+  document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
+    bs.forEach((b,i)=>{const pt=p.getPointAtLength(L*(i+.5)/bs.length),c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",8.5);c.setAttribute("fill",BCOL[b.color][1]);c.setAttribute("class","bdot"+(isNew(b)?" nw":"")+(myAsc(b.id)?" dn":""));box.appendChild(c)})})}
+const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
+function boulderView(){
+  const z=BSECT.find(x=>x.id===S.zone);
+  $("#body").innerHTML=`<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${BCOL[k][1]}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
+  placeBDots();
+  document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+  if(!z){$("#zp").innerHTML=`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
+  const bs=bOf(z.id);
+  $("#zp").innerHTML=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
+   <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
+   ${S.edit?`<button class="addr" id="badd" style="margin-top:12px">Añadir bloque en ${z.name}</button>`:""}</section>`;
+  bindB(z);
+}
+function bRow(b){
+  const c=BCOL[b.color],a=myAsc(b.id),open=S.open===b.id;
+  return `<div class="rt"><button class="hd" data-r="${b.id}" aria-expanded="${open}"><span class="bsw" style="background:${c[1]}"></span>
+  <span><b>${c[0]}</b>${isNew(b)?NEWBM:""}${b.created?` <span class="sub">· creado el ${fdate(b.created)}</span>`:""}<br>${HOLDS[b.hold]?`<span class="hold"><i style="background:${HOLDS[b.hold][1]}"></i>Presas: ${HOLDS[b.hold][0].toLowerCase()}</span><br>`:`<span class="sub">Presas: sin indicar</span><br>`}${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
+  <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
+  ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
+  <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
+  ${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
+  ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
+  <label>Color de presas<select id="bh"><option value="">Sin indicar</option>${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
+  <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
+  <span class="err full" id="eerr" role="alert" hidden></span>
+  <button class="pri" id="esv">Guardar cambios</button><button class="dng" id="edl">${S.arm==="del"?"Pulsa otra vez: desmontar":"Desmontar bloque"}</button>
+  <span class="sub full">Cuando se quite el bloque, usa “Desmontar bloque”: los encadenes que ya tenía siguen contando en el ranking.</span></div>`:""}
+  </div>`:""}</div>`}
+function bindB(z){
+  document.querySelectorAll(".hd").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.r?null:b.dataset.r;S.arm=null;boulderView()});
+  if($("#badd"))$("#badd").onclick=()=>{S.arm=null;addRoute({sec:"boulder",zone:z.id,grade:"blanco",created:isoDay(new Date())})};
+  const b=S.routes.find(x=>x.id===S.open);if(!b)return;
+  document.querySelectorAll("[data-st]").forEach(x=>x.onclick=()=>markAscent(b,x.dataset.st));
+  if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return boulderView()}S.arm=null;unmark(b)};
+  if(S.edit){
+    $("#esv").onclick=()=>{const color=$("#bc").value,created=$("#ec").value;
+      if(S.routes.some(x=>x!==b&&x.active&&x.sec==="boulder"&&x.zone===b.zone&&x.color===color&&(x.created||"")===created)){const e=$("#eerr");e.textContent=`Ya hay un bloque ${BCOL[color][0].toLowerCase()} en ${z.name} con esa fecha de creación. Cambia el color o la fecha.`;e.hidden=false;return}
+      updRoute(b.id,{grade:color,created:created||null,hold:$("#bh").value||null})};
+    $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return boulderView()}S.arm=null;S.open=null;updRoute(b.id,{active:false})}}
+}
+
+function mapSvg(){
+  if(!ZONES[S.sec])return `<div class="hint">${S.sec==="autoseguro"?"Autoseguro usará las paredes del mapa de cuerda.":"El mapa de boulder llegará más adelante."}</div>`;
+  let g="";
+  const f=v=>v.toFixed(1);
+  ZONES[S.sec].forEach(z=>{const sel=S.zone===z.id;const[p,q]=z.pts;const L=Math.hypot(q[0]-p[0],q[1]-p[1]);const dx=(q[0]-p[0])/L,dy=(q[1]-p[1])/L;
+    const s=[p[0]+dx*GAP,p[1]+dy*GAP],e=[q[0]-dx*GAP,q[1]-dy*GAP],d=`M${f(s[0])} ${f(s[1])} L${f(e[0])} ${f(e[1])}`;
+    let dots="";for(let i=0;i<z.n;i++){const num=z.nums[i];const[x,y]=lerp(p,q,(i+.5)/z.n);const rs=routesOf(num),dn=rs.some(r=>myAsc(r.id)),nw=rs.some(isNew);
+      const off=isOff(num);
+      dots+=`<circle class="ldot ${nw?"nw":""} ${dn?"dn":""} ${rs.length?"":"none"} ${off?"off":""}" cx="${f(x)}" cy="${f(y)}" r="11"/><text class="lnum ${off?"off":""}" x="${f(x)}" y="${f(y+4.5)}" text-anchor="middle">${num}</text>${off?`<line class="strike" x1="${f(x-9)}" y1="${f(y)}" x2="${f(x+9)}" y2="${f(y)}"/>`:""}`}
+    const nx=-dy*z.side,ny=dx*z.side,m=lerp(p,q,.5),lx=m[0]+nx*24,ly=m[1]+ny*24+4,anc=nx>.3?"start":nx<-.3?"end":"middle";
+    g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}
+    <text class="zlab ${sel?"sel":""}" x="${f(lx)}" y="${f(ly)}" text-anchor="${anc}">${z.name.replace("Exterior · ","")}</text></g>`});
+  return `<svg viewBox="0 0 ${VB.w} ${VB.h}" role="img" aria-label="Vista cenital de la zona de cuerda">
+    <text class="area" x="${(WX[0]+WX[1])/2}" y="20" text-anchor="middle">INTERIOR</text>
+    <rect class="inset" x="${BOX.x}" y="${BOX.y}" width="${BOX.w}" height="${BOX.h}" rx="6"/>
+    <text class="area" x="${BOX.x+12}" y="${BOX.y+20}">ZONA EXTERIOR</text>${g}</svg>`}
+
+function mapView(){
+  const z=ZONES[S.sec]?.find(x=>x.id===S.zone);
+  $("#body").innerHTML=`<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
+  document.querySelectorAll(".zone").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;mapView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+  if(!ZONES[S.sec])return;
+  if(!z){$("#zp").innerHTML=`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}`;bindNews(mapView);return}
+  let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>`;
+  for(const num of [...z.nums].sort((a,b)=>a-b)){const rs=routesOf(num);
+    if(isOff(num)&&!rs.length){html+=`<section class="lc off" aria-label="Línea ${num}, no se usa"><header><span class="num">${num}</span><b><s>Línea ${num}</s></b><span class="sub">· No se usa</span></header></section>`;continue}
+    html+=`<section class="lc" aria-label="Línea ${num}"><header><span class="num">${num}</span><b>Línea ${num}</b><span class="sub">· ${rs.length} ${rs.length===1?"vía":"vías"}</span></header>
+    ${rs.map(routeRow).join("")||`<div class="rt"><div class="hint" style="padding:10px">Sin vías montadas.</div></div>`}
+    ${S.edit?`<button class="addr" data-add="${num}">Añadir vía a la línea ${num}</button>`:""}</section>`}
+  $("#zp").innerHTML=html;
+  bindRoutes();
+}
+function routeRow(r){
+  const h=HOLDS[r.hold],a=myAsc(r.id),open=S.open===r.id;
+  return `<div class="rt"><button class="hd" data-r="${r.id}" aria-expanded="${open}"><span class="sw" style="background:${h[1]}"></span>
+  <span><b>${h[0]}</b>${isNew(r)?NEWB:""}${r.created?` <span class="sub">· creada el ${fdate(r.created)}</span>`:""}<br>${a?`<span class="done">${a.style} · +${pts(a)} pts</span>`:`<span class="sub">Sin hacer este bimestre</span>`}</span>
+  <span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>
+  ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
+  <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
+  ${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
+  <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
+  <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
+  <span class="err full" id="eerr" role="alert" hidden></span>
+  <button class="pri" id="esv">Guardar cambios</button><button class="dng" id="edl">${S.arm==="del"?"Pulsa otra vez: desmontar":"Desmontar vía"}</button>
+  <span class="sub full">Corrige el grado o el color con “Guardar cambios”. Cuando se quite la vía de la pared, usa “Desmontar vía”: los encadenes que ya tenía siguen contando en el ranking.</span></div>`:""}
+  </div>`:""}</div>`}
+function bindRoutes(){
+  document.querySelectorAll(".hd").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.r?null:b.dataset.r;S.arm=null;mapView()});
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const num=+b.dataset.add;const used=new Set(routesOf(num).map(r=>r.hold));const hold=Object.keys(HOLDS).find(k=>!used.has(k))||"amarilla";
+    S.arm=null;addRoute({sec:S.sec,line:num,grade:"6a",hold,created:isoDay(new Date())})});
+  const r=S.routes.find(x=>x.id===S.open);if(!r)return;
+  document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>markAscent(r,b.dataset.st));
+  if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return mapView()}S.arm=null;unmark(r)};
+  if(S.edit){
+    $("#esv").onclick=()=>{const hold=$("#eh").value,created=$("#ec").value;
+      const twin=S.routes.find(x=>x!==r&&x.active&&x.sec===r.sec&&x.line===r.line&&x.hold===hold&&(x.created||"")===created);
+      if(twin){const e=$("#eerr");e.textContent=`Ya hay una vía ${HOLDS[hold][0].toLowerCase()} en la línea ${r.line} con esa fecha de creación. Cambia el color o la fecha.`;e.hidden=false;return}
+      updRoute(r.id,{grade:$("#eg").value,hold,created:created||null})};
+    $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return mapView()}S.arm=null;S.open=null;updRoute(r.id,{active:false})}}
+}
+
+const unit=(n,sec)=>`${n} ${sec==="boulder"?(n===1?"bloque":"bloques"):(n===1?"vía":"vías")}`;
+function rkList(r,year){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}"><span class="pos">${i+1}</span><span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
+function podium(r,year){return `<div class="pod">${[0,1,2].map(i=>{const x=r[i];return x?`<button class="pc p${i+1}" data-u="${x.id}"><span class="pos">${i+1}.º</span><b>${esc(x.name)}</b><small>${fmt(x.p)} ${year?"pts de liga":"pts"}</small></button>`:`<div class="pc nope"><span class="pos">${i+1}.º</span><small>Sin puntuar</small></div>`}).join("")}</div>`}
+const years=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
+function closedBims(y){const n=new Date(),cy=n.getFullYear();return Array.from({length:y<cy?6:y===cy?Math.floor(n.getMonth()/2):0},(_,b)=>b)}
+function hcard(title,r,year,k){const open=S.hopen===k;
+  return `<section class="hc"><header><b>${title}</b><span class="sub">${r.length?(r.length===1?"1 escalador":r.length+" escaladores"):"Nadie puntuó"}</span></header>
+  ${r.length?podium(r,year)+(r.length>3?`<button class="link" data-hk="${k}" aria-expanded="${open}">${open?"Ocultar clasificación":"Ver clasificación completa"}</button>${open?rkList(r,year):""}`:""):""}</section>`}
+function histHtml(){
+  const cy=new Date().getFullYear(),y=S.hy||cy,ys=years(),bs=closedBims(y).reverse();
+  let h=ys.length>1?`<div class="ychips">${ys.map(v=>`<button data-hy="${v}" class="${v===y?"on":""}">${v}</button>`).join("")}</div>`:"";
+  h+=`<p class="sub" style="margin:0 0 10px">Clasificación final de cada bimestre ya terminado. Toca un nombre para ver su perfil.</p>`;
+  if(y<cy)h+=hcard(`Anual ${y} · clasificación final`,annual(S.sec,y),true,"a"+y);
+  if(!bs.length)h+=`<div class="empty">Aún no ha terminado ningún bimestre en ${y}. Cuando acabe ${BIM[0]}, su podio aparecerá aquí.</div>`;
+  bs.forEach(b=>{h+=hcard(`${BIM[b]} ${y}`,rankRange(S.sec,new Date(y,b*2,1),new Date(y,b*2+2,1)),false,y+"-"+b)});
+  return h}
+function rankView(){
+  let html;
+  if(S.rmode==="hist")html=histHtml();
+  else{const p=period(S.rmode),r=ranking(S.sec,S.rmode);
+    html=`<div class="sub" style="margin-bottom:10px">${p.label}${S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
+    ${r.length?rkList(r,S.rmode==="year"):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. Marca tus vías desde el mapa.</div>`}`}
+  $("#body").innerHTML=`<div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
+  $("#rls").onclick=openRules;
+  $("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
+  document.querySelectorAll("#body [data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u));
+  document.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>{S.hopen=S.hopen===b.dataset.hk?null:b.dataset.hk;rankView()});
+  document.querySelectorAll("[data-hy]").forEach(b=>b.onclick=()=>{S.hy=+b.dataset.hy;S.hopen=null;rankView()});
+}
+start();
+</script>
+<script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+</body>
+</html>
