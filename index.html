@@ -596,7 +596,7 @@ function bSvg(){
    <path class="island" d="${ISLAND}"/>
    ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
    <text class="area" x="358" y="140" text-anchor="middle">BLOQUE</text><text class="area" x="358" y="157" text-anchor="middle">CENTRAL</text>
-   <path class="door" d="M306 22 L414 22"/><text class="area" x="360" y="14" text-anchor="middle">ACCESO</text>
+   <path class="door" d="M306 22 L414 22"/>
    <path class="door" d="M329 522 L614 452"/><text class="area" x="500" y="512" text-anchor="middle" transform="rotate(-14 500 512)">ACCESO</text>
    ${zs}</svg>`}
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
