@@ -159,6 +159,11 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .ai>span{min-width:0}
 .ad{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
 .ap{font:700 20px/1 var(--disp);color:var(--g1);font-variant-numeric:tabular-nums}
+.apr{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line)}
+.apr:first-child{border-top:0}
+.apr>span{min-width:0}
+.aprb{display:flex;gap:6px;flex:none}
+.cnt{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--acc);color:#fff;font-size:12px;font-weight:700;margin-left:4px}
 .rbtn{width:100%;margin-top:14px;background:none;border-style:dashed;color:var(--red);font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
 .rbtn::before,.rbtn::after{color:var(--gold);font-size:15px;letter-spacing:-1px}
 .rbtn::before{content:"\25B6\25B6"}
@@ -293,20 +298,21 @@ function bimKey(d){return d.getFullYear()+"-"+Math.floor(d.getMonth()/2)}
 /* ---------- Supabase: datos compartidos por todos ---------- */
 const READY=!/PEGA_AQUI/.test(CFG.url+CFG.key)&&typeof supabase!=="undefined";
 const sb=READY?supabase.createClient(CFG.url,CFG.key):null;
-const S={users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
+const S={people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
 function save(){}
 async function fetchAll(build){let out=[];for(let from=0;;from+=1000){const{data,error}=await build().range(from,from+999);if(error)throw error;out=out.concat(data);if(data.length<1000)return out}}
 async function loadAll(){
   const q=t=>sb.from(t).select("*").then(x=>{if(x.error)throw x.error;return x.data});
   const[p,r,a,gp,st]=await Promise.all([
-    fetchAll(()=>sb.from("liga_players").select("*").order("user_id")),
+    fetchAll(()=>sb.from("liga_people").select("*").order("user_id")),
     fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
     fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
     q("liga_points"),q("liga_styles")]);
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
   STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
-  S.users=p.map(x=>({id:x.user_id,name:x.name}));
+  S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));
+  S.users=S.people.filter(x=>x.ok);
   S.routes=r.map(x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active}));
   S.asc=a.map(x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at}));
 }
@@ -315,22 +321,27 @@ async function refresh(){
   S.me=session?.user?.id||null;S.owner=false;
   if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data}
   await loadAll();
-  if(S.me&&!S.users.some(u=>u.id===S.me)){
-    const nm=(session.user.user_metadata?.name||"").trim();
-    if(nm.length>=2){const{error}=await sb.from("liga_players").insert({user_id:S.me,name:nm});if(!error)await loadAll()}
-  }
-  if(S.me&&!S.users.some(u=>u.id===S.me))S.view="name";
-  else if(["loading","login","name"].includes(S.view))S.view=S.back&&S.back!=="login"?S.back:"home";
+  const md=session?.user?.user_metadata||{};
+  if(S.me&&!S.people.some(u=>u.id===S.me)&&(md.name||"").trim().length>=2){
+    const{error}=await sb.rpc("liga_join",{p_name:md.name.trim(),p_invited:(md.invited_by||"").trim()});if(!error)await loadAll()}
+  const mine=S.people.find(u=>u.id===S.me);
+  if(S.me&&!mine)S.view="name";
+  else if(S.me&&!mine.ok&&!S.owner)S.view="pending";
+  else if(["loading","login","name","pending"].includes(S.view))S.view=S.back&&!["login","pending","name"].includes(S.back)?S.back:"home";
+  if(S.owner)await loadPending();
   render();
 }
-let bt;function bump(){clearTimeout(bt);bt=setTimeout(async()=>{try{await loadAll()}catch(e){return}if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},350)}
+/* Solicitudes de alta: solo el administrador las ve */
+async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
+const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
+let bt;function bump(){clearTimeout(bt);bt=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}if(!(S.edit&&S.open)&&!S.busy&&!["login","name"].includes(S.view))render()},350)}
 function toast(t){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,4000)}
 function needLogin(){S.back=S.view==="login"?"home":S.view;S.view="login";S.scrollTop=true;render()}
 async function act(fn){if(S.busy)return;S.busy=true;
   try{const r=await fn();if(r&&r.error)throw r.error;await loadAll()}
   catch(e){toast("No se ha podido guardar: "+(e.message||e))}
   S.busy=false;render()}
-function markAscent(route,style){if(!S.me)return needLogin();const a=myAsc(route.id);
+function markAscent(route,style){if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
   return act(()=>a?sb.from("liga_ascents").update({style}).eq("id",a.id):sb.from("liga_ascents").insert({route_id:route.id,style}))}
 function unmark(route){const a=myAsc(route.id);if(a)return act(()=>sb.from("liga_ascents").delete().eq("id",a.id))}
 function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select("id").single();if(r.error)throw r.error;S.open=r.data.id})}
@@ -344,7 +355,7 @@ async function start(){
     await refresh();
     sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},bump)
       .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},bump)
-      .on("postgres_changes",{event:"*",schema:"public",table:"liga_players"},bump).subscribe();
+      .on("postgres_changes",{event:"*",schema:"public",table:"players"},bump).subscribe();
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)bump()});
   }catch(e){showErr(e)}
 }
@@ -390,16 +401,17 @@ const $=s=>document.querySelector(s);
 const me=()=>S.users.find(u=>u.id===S.me);
 
 /* ---------- Pantallas ---------- */
-function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;({home,rules,perfil,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;({home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 function loadingView(){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`}
 function errorView(){$("#app").innerHTML=`<article class="rl"><h2>No se ha podido cargar</h2><p>Comprueba la conexión y vuelve a intentarlo.</p><p class="sub">${esc(S.err)}</p><button class="pri" id="re">Reintentar</button></article>`;$("#re").onclick=()=>{S.view="loading";start()}}
 function setupView(){$("#app").innerHTML=`<article class="rl"><h2>Falta conectar Supabase</h2><p>Abre <b>index.html</b> y pega la dirección del proyecto y la clave pública (anon) de Supabase donde pone PEGA_AQUI.</p></article>`}
 function login(){
   const reg=!!S.reg;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><article class="rl"><h2>${reg?"Crear cuenta":"Entrar"}</h2>
-  <p class="sub">${reg?"Con tu cuenta podrás marcar tus vías y bloques y salir en el ranking.":"Entra para marcar tus vías y bloques."}</p>
+  <p class="sub">${reg?"Es la misma cuenta que en «El grado es subjetivo». Cuando la crees, el administrador tiene que aprobarla antes de que puedas marcar vías.":"Entra con la misma cuenta que usas en «El grado es subjetivo»."}</p>
   <form id="lf" class="stack" novalidate>
-  ${reg?`<label class="fl" for="ln">Nombre en el ranking<input id="ln" required minlength="2" maxlength="30" autocomplete="nickname"></label>`:""}
+  ${reg?`<label class="fl" for="ln">Nombre en el ranking<input id="ln" required minlength="2" maxlength="30" autocomplete="nickname"></label>
+  <label class="fl" for="li">¿Quién te invita?<input id="li" required maxlength="60" placeholder="Nombre de quien te ha pasado el enlace"></label>`:""}
   <label class="fl" for="le">Correo<input id="le" type="email" required autocomplete="email"></label>
   <label class="fl" for="lp">Contraseña${reg?" (mínimo 6 caracteres)":""}<input id="lp" type="password" required minlength="6" autocomplete="${reg?"new-password":"current-password"}"></label>
   <span class="err" id="lerr" role="alert" hidden></span>
@@ -408,29 +420,56 @@ function login(){
   $("#bk").onclick=()=>{S.view=S.back||"home";render()};
   $("#sw").onclick=()=>{S.reg=!reg;login()};
   const err=t=>{const e=$("#lerr");e.textContent=t;e.hidden=false};
-  $("#lf").onsubmit=async e=>{e.preventDefault();const em=$("#le").value.trim(),pw=$("#lp").value,nm=reg?$("#ln").value.trim():"";
+  $("#lf").onsubmit=async e=>{e.preventDefault();const em=$("#le").value.trim(),pw=$("#lp").value,nm=reg?$("#ln").value.trim():"",iv=reg?$("#li").value.trim():"";
     if(reg&&nm.length<2)return err("Escribe un nombre de al menos 2 letras.");
+    if(reg&&iv.length<2)return err("Escribe quién te ha invitado.");
     if(!em.includes("@"))return err("Escribe un correo válido.");
     if(pw.length<6)return err("La contraseña necesita al menos 6 caracteres.");
-    if(reg&&S.users.some(u=>u.name.toLowerCase()===nm.toLowerCase()))return err("Ese nombre ya lo usa otro escalador. Elige otro.");
+    if(reg&&S.people.some(u=>u.name.toLowerCase()===nm.toLowerCase()))return err("Ese nombre ya lo usa otro escalador. Elige otro.");
     $("#lgo").disabled=true;
-    const r=reg?await sb.auth.signUp({email:em,password:pw,options:{data:{name:nm}}}):await sb.auth.signInWithPassword({email:em,password:pw});
+    const r=reg?await sb.auth.signUp({email:em,password:pw,options:{data:{name:nm,invited_by:iv}}}):await sb.auth.signInWithPassword({email:em,password:pw});
     $("#lgo").disabled=false;
     if(r.error)return err(/Invalid login/i.test(r.error.message)?"Correo o contraseña incorrectos.":/registered/i.test(r.error.message)?"Ya hay una cuenta con ese correo. Pulsa “Ya tengo cuenta: entrar”.":r.error.message);
     if(reg&&!r.data.session)err("Te hemos mandado un correo para confirmar la cuenta. Ábrelo y después entra aquí.");
   };
 }
 function nameView(){
-  $("#app").innerHTML=`<article class="rl"><h2>¿Cómo te llamamos?</h2><p class="sub">Es el nombre que verán los demás en el ranking.</p>
+  $("#app").innerHTML=`<article class="rl"><h2>¿Cómo te llamamos?</h2><p class="sub">Es el nombre que verán los demás en el ranking, aquí y en «El grado es subjetivo». Después el administrador tiene que aprobar tu cuenta.</p>
   <form id="nf" class="stack" novalidate><label class="fl" for="nn">Nombre en el ranking<input id="nn" required minlength="2" maxlength="30" autocomplete="nickname"></label>
-  <span class="err" id="nerr" role="alert" hidden></span><button class="pri" type="submit">Guardar</button></form>
+  ${S.owner?"":`<label class="fl" for="ni">¿Quién te invita?<input id="ni" required maxlength="60" placeholder="Nombre de quien te ha pasado el enlace"></label>`}
+  <span class="err" id="nerr" role="alert" hidden></span><button class="pri" type="submit">Enviar</button></form>
   <button id="out" class="link">Salir de la cuenta</button></article>`;
   $("#out").onclick=()=>sb.auth.signOut();
-  $("#nf").onsubmit=async e=>{e.preventDefault();const nm=$("#nn").value.trim(),er=t=>{$("#nerr").textContent=t;$("#nerr").hidden=false};
+  $("#nf").onsubmit=async e=>{e.preventDefault();const nm=$("#nn").value.trim(),iv=S.owner?"":$("#ni").value.trim(),er=t=>{$("#nerr").textContent=t;$("#nerr").hidden=false};
     if(nm.length<2)return er("Escribe un nombre de al menos 2 letras.");
-    const{error}=await sb.from("liga_players").insert({user_id:S.me,name:nm});
+    if(!S.owner&&iv.length<2)return er("Escribe quién te ha invitado.");
+    if(S.people.some(u=>u.name.toLowerCase()===nm.toLowerCase()))return er("Ese nombre ya lo usa otro escalador. Elige otro.");
+    const{error}=await sb.rpc("liga_join",{p_name:nm,p_invited:iv});
     if(error)return er(/duplicate|unique/i.test(error.message)?"Ese nombre ya lo usa otro escalador. Elige otro.":error.message);
-    S.view="home";await refresh()};
+    await refresh()};
+}
+function pendingView(){
+  const u=S.people.find(x=>x.id===S.me);
+  $("#app").innerHTML=`<article class="rl"><h2>Cuenta pendiente de aprobar</h2>
+  <p>Hola, ${esc(u?.name||"")}. Tu solicitud está enviada. El administrador tiene que aprobarla antes de que puedas marcar vías y salir en el ranking.</p>
+  <p class="sub">Es la misma aprobación que en «El grado es subjetivo»: en cuanto te aprueben, podrás entrar en las dos apps.</p>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="pri" id="rt">Comprobar de nuevo</button><button id="see">Ver la liga sin marcar</button><button id="out">Salir</button></div></article>`;
+  $("#rt").onclick=async()=>{$("#rt").disabled=true;await refresh()};
+  $("#see").onclick=()=>{S.view="home";S.peek=true;render()};
+  $("#out").onclick=()=>sb.auth.signOut();
+}
+/* Administrador: aprobar o quitar escaladores (compartido con «El grado es subjetivo») */
+function approvals(){
+  const ps=S.pend||[],pe=ps.filter(p=>!p.approved&&p.user_id!==S.me),ap=ps.filter(p=>p.approved&&p.user_id!==S.me);
+  const row=(p,btns)=>`<div class="apr"><span><b>${esc(p.name)}</b>${p.invited_by?`<br><span class="sub">Invitado por ${esc(p.invited_by)}</span>`:""}</span><span class="aprb">${btns}</span></div>`;
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Escaladores</h2>
+  <p class="sub" style="margin:4px 0 12px">Las aprobaciones valen para las dos apps.</p>
+  <h3 class="pfh">Pendientes</h3>${pe.length?`<div class="lc">${pe.map(p=>row(p,`<button class="pri" data-ok="${p.user_id}">Aprobar</button>`)).join("")}</div>`:`<div class="empty">No hay solicitudes pendientes.</div>`}
+  <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
+  $("#bk").onclick=()=>{S.view="home";S.arm=null;render()};
+  const setOk=async(id,ok)=>{const{error}=await sb.rpc("liga_set_approved",{p_user:id,p_ok:ok});if(error)return toast("No se ha podido guardar: "+error.message);await loadAll();await loadPending();approvals()};
+  document.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>{b.disabled=true;setOk(b.dataset.ok,true)});
+  document.querySelectorAll("[data-no]").forEach(b=>b.onclick=()=>{const k="no"+b.dataset.no;if(S.arm!==k){S.arm=k;return approvals()}S.arm=null;setOk(b.dataset.no,false)});
 }
 function openRules(){S.back=S.view;S.view="rules";S.scrollTop=true;render()}
 function rules(){
@@ -498,9 +537,11 @@ function perfil(){
 }
 
 function whoBar(){
-  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:""}<button id="myp">Mi perfil</button><button id="out">Salir</button></div>`
+  const mine=S.people.find(u=>u.id===S.me);
+  if(S.me&&mine&&!mine.ok&&!S.owner)return `<div class="who"><span class="sub" style="flex:1">${esc(mine.name)}: tu cuenta está pendiente de aprobar.</span><button id="out">Salir</button></div>`;
+  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:""}<button id="myp">Mi perfil</button>${S.owner?`<button id="apv">Escaladores${pendCount()?` <span class="cnt">${pendCount()}</span>`:""}</button>`:""}<button id="out">Salir</button></div>`
   :`<div class="who"><span class="sub" style="flex:1">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}
-function bindWho(){if(S.me){$("#out").onclick=()=>sb.auth.signOut();$("#myp").onclick=()=>openProfile(S.me)}else $("#lin").onclick=()=>{S.reg=false;needLogin()}}
+function bindWho(){if(S.me){$("#out").onclick=()=>sb.auth.signOut();if($("#myp"))$("#myp").onclick=()=>openProfile(S.me);if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()}}else $("#lin").onclick=()=>{S.reg=false;needLogin()}}
 
 function home(){
   const p=period("bim");
