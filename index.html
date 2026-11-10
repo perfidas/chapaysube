@@ -280,6 +280,43 @@ button.on{color:#fff}
 .pjs{color:var(--gold);margin-left:6px;font-size:15px}
 .hd.tbl .pjs{color:#c79400}
 #bkp{align-self:center;display:block;margin:10px auto 0;color:var(--mut)}
+/* Barra de navegación inferior */
+body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#0b1118;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+.bnav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--mut);padding:6px 0 4px;min-height:54px;border-radius:10px}
+.bnav button svg{width:24px;height:24px}
+.bnav button.on{color:var(--acc)}
+.bnav button.on::before{content:"";width:28px;height:3px;border-radius:99px;background:var(--acc);margin:-6px 0 3px}
+.toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+/* Cabecera del perfil tipo cromo */
+.cromo{border-radius:14px;overflow:hidden;background:linear-gradient(160deg,#20303d,#121b24 60%);border:1px solid #2c3d4b;position:relative;margin:0 0 14px}
+.cromo::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 8px,transparent 8px 16px);pointer-events:none}
+.cromo .hd{display:flex;gap:14px;align-items:center;padding:16px;position:relative}
+.cromo .av{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font:900 34px/1 var(--disp);color:#0f1720;border:3px solid var(--gold);flex:none;box-shadow:0 0 0 4px rgba(255,197,61,.18)}
+.cromo .cwho{min-width:0;flex:1}
+.cromo .nm{font:900 30px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;overflow-wrap:anywhere;margin:0}
+.cromo .ctag{display:inline-block;margin-top:6px;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,197,61,.5);border-radius:99px;padding:2px 8px}
+.cromo .ctag.plain{color:var(--mut);border-color:var(--line)}
+.cstats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #2c3d4b;position:relative}
+.cstats>div{padding:12px 4px;text-align:center;min-width:0}
+.cstats>div+div{border-left:1px solid #2c3d4b}
+.cstats b{display:block;font:900 26px/1 var(--disp);font-variant-numeric:tabular-nums}
+.cstats>div>span{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.cstats .g b{color:var(--gold)}
+.cstats .mx{display:grid;place-items:center;padding:8px 4px}
+.cmini{background:#f4f4f1;color:#1b2226;border-radius:6px;padding:5px 7px 5px 5px;display:grid;grid-template-columns:6px auto;gap:6px;align-items:center}
+.cmini i{align-self:stretch;border-radius:99px;background:#1d1d1d}
+.cmini small{display:block;font:600 9px var(--body);letter-spacing:.06em;text-transform:uppercase;color:#5d6a70}
+.cmini b{font:900 24px/.9 var(--disp);color:#1b2226;text-transform:none;letter-spacing:0}
+/* Pantalla de carga: el cohete despega del podio */
+.boot{min-height:calc(100vh - 80px);display:grid;place-items:center;background:radial-gradient(circle at 50% 70%,#1a2d40,transparent 65%)}
+.boot svg{width:220px;height:280px;overflow:visible}
+.boot .rk{animation:lift 2.6s cubic-bezier(.5,0,.6,1) infinite}
+.boot .fl{transform-box:fill-box;transform-origin:50% 0;animation:flame .18s ease-in-out infinite alternate}
+@keyframes lift{0%,15%{transform:translateY(0)}55%{transform:translateY(-30px)}85%,100%{transform:translateY(-260px);opacity:0}}
+@keyframes flame{from{transform:scaleY(.8)}to{transform:scaleY(1.25)}}
+@media (prefers-reduced-motion:reduce){.boot .rk,.boot .fl{animation:none}}
 </style>
 
 </head>
@@ -536,8 +573,26 @@ const $=s=>document.querySelector(s);
 const me=()=>S.users.find(u=>u.id===S.me);
 
 /* ---------- Pantallas ---------- */
-function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;({forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
-function loadingView(){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`}
+/* Barra de navegación inferior: Inicio, Mapa, Ranking y Perfil */
+const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',Mapa:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',Ranking:'<path d="M3 20v-6h5v6M9.5 20V9h5v11M16 20v-8h5v8"/>',Perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
+  let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
+  if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
+  const sec=!["home","rules","perfil","approvals"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Mapa"):"";
+  n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
+  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
+    if(k==="Inicio"){S.view="home";S.edit=false;return render()}
+    if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
+    if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Mapa"?"mapa":"ranking";render()})}
+function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+function loadingView(){$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
+  <g class="rk"><path class="fl" d="M114 290 Q128 340 142 290 Z" fill="#ffb83d"/><path class="fl" d="M120 290 Q128 318 136 290 Z" fill="#fff3c4"/>
+  <path d="M128 40 C96 78 92 160 98 240 H158 C164 160 160 78 128 40Z" fill="#fff"/><path d="M98 196 L70 252 L100 242Z M158 196 L186 252 L156 242Z" fill="#fff"/>
+  <rect x="112" y="240" width="32" height="18" fill="#dfe7ee"/><text x="128" y="160" text-anchor="middle" font-family="Rubik,sans-serif" font-weight="700" font-size="34" fill="#2f7db8">SC</text>
+  <line x1="104" y1="214" x2="152" y2="214" stroke="#b9d4ea" stroke-width="3"/></g>
+  <rect x="40" y="276" width="56" height="30" rx="5" fill="#9dc0de"/><rect x="96" y="262" width="64" height="44" rx="5" fill="#ffc53d"/><rect x="160" y="282" width="56" height="24" rx="5" fill="#7aa8d0"/>
+  <text x="128" y="294" text-anchor="middle" font-family="Big Shoulders Display,sans-serif" font-weight="900" font-size="26" fill="#2f5d86">1</text>
+  <text x="128" y="326" text-anchor="middle" font-family="Big Shoulders Display,sans-serif" font-weight="800" font-size="18" letter-spacing="3" fill="#8ea0ad">CARGANDO LA LIGA</text></svg></div>`}
 function errorView(){$("#app").innerHTML=`<article class="rl"><h2>No se ha podido cargar</h2><p>Comprueba la conexión y vuelve a intentarlo.</p><p class="sub">${esc(S.err)}</p><button class="pri" id="re">Reintentar</button></article>`;$("#re").onclick=()=>{S.view="loading";start()}}
 function setupView(){$("#app").innerHTML=`<article class="rl"><h2>Falta conectar Supabase</h2><p>Abre <b>index.html</b> y pega la dirección del proyecto y la clave pública (anon) de Supabase donde pone PEGA_AQUI.</p></article>`}
 function login(){
@@ -678,6 +733,20 @@ function projHtml(){const rs=S.routes.filter(r=>S.proj.has(r.id)&&r.active);
   ${rs.length?`<section class="news">${SECTIONS.map(s=>rs.filter(r=>r.sec===s.id).sort((a,b)=>(a.line||0)-(b.line||0)||(a.zone||"").localeCompare(b.zone||"")).map(item).join("")).join("")}</section>`
    :`<div class="empty">Aún no tienes proyectos. Abre una vía o un bloque y pulsa «☆ Añadir a mis proyectos».</div>`}
   ${gone?`<p class="sub" style="margin:4px 0 0">${gone===1?"1 proyecto se ha desmontado":gone+" proyectos se han desmontado"} y ya no sale.</p>`:""}`}
+/* Cabecera del perfil tipo cromo: avatar, grado máximo como tablilla, puesto y números */
+const AVC=["#7ad3ff","#ff9fbf","#ffd36e","#8ef0b8","#c9a7ff","#ffb08a","#9fe3e0","#f5f08a"];
+const avColor=n=>{let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))>>>0;return AVC[h%AVC.length]};
+const initials=n=>{const w=String(n).replace(/[._-]+/g," ").trim().split(/\s+/);return((w[0]?.[0]||"")+(w[1]?.[0]||w[0]?.[1]||"")).toUpperCase()};
+function cromo(u,y,cur){const yr=S.asc.filter(a=>a.u===u.id&&new Date(a.at).getFullYear()===y);
+  const vg=yr.filter(a=>a.sec!=="boulder").map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];
+  const pos=SECTIONS.map(s=>{const r=rankRange(s.id,cur.from,cur.to),i=r.findIndex(x=>x.id===u.id);return{s,i,p:i>=0?r[i].p:0}});
+  const best=pos.filter(x=>x.i>=0).sort((a,b)=>a.i-b.i)[0],lead=pos.filter(x=>x.i===0).map(x=>x.s.name.toLowerCase());
+  const n=new Set(yr.map(a=>a.route)).size,tot=pos.reduce((t,x)=>t+x.p,0);
+  return `<section class="cromo" aria-label="Ficha de ${esc(u.name)}"><div class="hd"><span class="av" style="background:${avColor(u.name)}" aria-hidden="true">${esc(initials(u.name))}</span>
+   <span class="cwho"><h2 class="nm">${esc(u.name)}</h2>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:`<span class="ctag plain">Temporada ${y}${u.id===S.me?" · Tu perfil":""}</span>`}</span></div>
+   <div class="cstats"><div class="mx">${vg?`<span class="cmini"><i></i><span><small>Grado máx.</small><b>${vg}</b></span></span>`:`<span><b>–</b><span>Grado máx.</span></span>`}</div>
+    <div class="${best&&best.i===0?"g":""}"><b>${best?ord(best.i+1):"–"}</b><span>${best?best.s.name:"Puesto"}</span></div>
+    <div><b>${n}</b><span>${n===1?"Vía":"Vías"} ${y}</span></div><div><b>${fmt(tot)}</b><span>Puntos bim.</span></div></div></section>`}
 function perfil(){
   const u=S.users.find(x=>x.id===S.pid);if(!u){S.view="home";return render()}
   const now=new Date(),y=now.getFullYear(),cb=Math.floor(now.getMonth()/2);
@@ -712,8 +781,8 @@ function perfil(){
   const pyr=idx.length?keys.slice(Math.min(...idx),Math.max(...idx)+1).reverse().map(g=>{const n=cnt[g]||0;
     return `<div class="pr ${n?"":"z"}"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gcol(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gcol(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
-  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button>${u.id===S.me?'<span class="tag">Tu perfil</span>':""}</div>
-  <h2>${esc(u.name)}</h2><div class="sub" style="margin-bottom:12px">Temporada ${y}</div>
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
+  ${cromo(u,y,cur)}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml():""}
   <h3 class="pfh">${BIM[cb]} frente a ${pb}</h3>
@@ -772,6 +841,7 @@ function home(){
 }
 
 function section(){
+  navBar();
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
   if(!canEdit)S.edit=false;
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
