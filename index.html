@@ -1237,7 +1237,7 @@ function section(){
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
   <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
-  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Zona"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
+  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Mapa"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
