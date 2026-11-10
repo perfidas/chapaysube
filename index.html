@@ -525,25 +525,26 @@ const angM=a=>a>=50?1.2:a>=40?1.1:1;
 const kpts=(g,an,st)=>Math.round((KGP[g]||0)*angM(an)*(BSM[st]||1));
 const isBl=sec=>sec==="boulder"||sec==="kilter";
 const BSECT=[
- {id:"b5a",name:"Sector 1.1",short:"1.1",d:"M254 528 L314 528",lab:[284,516,"middle"]},
- {id:"b5b",name:"Sector 1.2",short:"1.2",d:"M322 536 L322 646",lab:[306,595,"end"]},
- {id:"b5g",name:"Sector 1.3",short:"1.3",d:"M322 658 L322 768",lab:[306,717,"end"]},
- {id:"b5c",name:"Sector 1.4",short:"1.4",d:"M314 776 L229 776",lab:[271,762,"middle"]},
- {id:"b5d",name:"Sector 1.5",short:"1.5",d:"M217 776 L133 776",lab:[175,762,"middle"]},
- {id:"b5e",name:"Sector 1.6",short:"1.6",d:"M125 768 L125 578",lab:[140,680,"start"]},
- {id:"b5f",name:"Sector 1.7",short:"1.7",d:"M125 566 L125 488",lab:[140,530,"start"]},
+ {id:"b5a",name:"Sector 1.1",short:"1.1",d:"M355 742 L415 742",lab:[385,732,"middle"]},
+ {id:"b5b",name:"Sector 1.2",short:"1.2",d:"M425 752 L425 843",lab:[411,802,"end"]},
+ {id:"b5g",name:"Sector 1.3",short:"1.3",d:"M425 857 L425 948",lab:[411,908,"end"]},
+ {id:"b5c",name:"Sector 1.4",short:"1.4",d:"M417 958 L281 958",lab:[349,944,"middle"]},
+ {id:"b5d",name:"Sector 1.5",short:"1.5",d:"M269 958 L133 958",lab:[201,944,"middle"]},
+ {id:"b5e",name:"Sector 1.6",short:"1.6",d:"M125 948 L125 747",lab:[140,852,"start"]},
+ {id:"b5f",name:"Sector 1.7",short:"1.7",d:"M125 732 L125 677",lab:[140,710,"start"]},
+ {id:"b1x",name:"Sector 4.4",short:"4.4",d:"M425 22 L425 70",lab:[437,58,"start"]},
 ];
 /* Sectores 2–7: cada muro se parte en subsecciones de igual longitud, numeradas en sentido horario */
-const BMAIN=[{t:"Sector 1",x:222,y:650,a:"middle"},{t:"Oeste",x:298,y:236,a:"start"},{t:"Este",x:418,y:236,a:"end"},{t:"Sur",x:358,y:412,a:"middle"}];
+const BMAIN=[{t:"Oeste",x:315,y:344,a:"start"},{t:"Este",x:435,y:344,a:"end"},{t:"Sur",x:375,y:593,a:"middle"}];
 /* Isla central: lados rectos y fondo redondeado */
-const ISLAND="M296 66 L420 66 Q430 66 430 78 L430 370 Q430 440 358 440 Q286 440 286 370 L286 78 Q286 66 296 66 Z";
+const ISLAND="M313 128 L437 128 Q447 128 447 140 L447 554 Q447 624 375 624 Q303 624 303 554 L303 140 Q303 128 313 128 Z";
 const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i/n,u=1-t;return[u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]]});
 (()=>{
-  const defs=[["b6",2,[[125,470],[125,306]],2,[1,0]],["b7",3,[[125,288],[125,66]],3,[1,0]],["b1",4,[[125,48],[125,22],[298,22]],3,[0,1]],
-    ["b2",5,[[422,22],[620,22],[620,66]],3,[0,1]],["b3",6,[[620,84],[620,282]],3,[-1,0]],["b4",7,[[620,302],[620,448]],2,[-1,0]],
-    ["i2","Isla este",[[430,84],[430,378]],3,[1,0],1],
-    ["i3","Isla sur",[...qpts([430,370],[430,440],[358,440],.15,1,10),...qpts([358,440],[286,440],[286,370],0,.85,10).slice(1)],3,[0,1],1,[0,.25,.5,1],["i3-1","i3-3","i3-2"]],
-    ["i4","Isla oeste",[[286,378],[286,84]],3,[-1,0],1]];
+  const defs=[["b6",2,[[125,663],[125,444]],2,[1,0]],["b7",3,[[125,423],[125,80]],3,[1,0]],["b1",4,[[125,56],[125,22],[413,22]],3,[0,1]],
+    ["b2",5,[[482,22],[620,22],[620,80]],3,[0,1]],["b3",6,[[620,96],[620,363]],3,[-1,0]],["b4",7,[[620,387],[620,658]],2,[-1,0]],
+    ["i2","Isla este",[[447,146],[447,562]],3,[1,0],1],
+    ["i3","Isla sur",[...qpts([447,554],[447,624],[375,624],.15,1,10),...qpts([375,624],[303,624],[303,554],0,.85,10).slice(1)],4,[0,1],1,[0,.25,.5,.75,1],["i3-1","i3-3","i3-2","i3-4"]],
+    ["i4","Isla oeste",[[303,562],[303,146]],3,[-1,0],1]];
   const subs=[],lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
   /* cuts/ids opcionales: cortes a medida (S1 partido en dos) y conservar los ids viejos para que los bloques no cambien de sitio */
   defs.forEach(([id,num,pts,k,[nx,ny],isl,cuts,ids])=>{
@@ -554,10 +555,11 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
       for(let j=0;j<L.length-1;j++){acc+=L[j];if(acc>a&&acc<b)p.push(pts[j+1])}p.push(at(b));
       const[lx,ly]=lp(at((a+b)/2),16);
       subs.push({id:ids?ids[i]:id+"-"+(i+1),name:isl?`${num} ${i+1}`:`Sector ${num}.${i+1}`,short:isl?num.split(" ")[1][0].toUpperCase()+(i+1):`${num}.${i+1}`,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[lx,ly,anc]})}
-    if(!isl){let[mx,my]=lp(at(tot/2),70);if(anc==="middle")mx=Math.min(510,Math.max(240,mx));BMAIN.push({t:"Sector "+num,x:mx,y:my,a:anc})}});
+    /* sin rótulos «Sector N»: cada pared ya lleva su número (2.1, 3.2…) */
+  });
   BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
 })();
-const BFLOOR="M125 22 L620 22 L620 450 L322 525 L322 776 L125 776 Z";
+const BFLOOR="M125 22 L620 22 L620 668 L425 742 L425 958 L125 958 Z";
 const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Dic"];
 
 /* ---------- Mapa cenital de Cuerda: W con los fondos rectos + L exterior ---------- */
@@ -1568,13 +1570,12 @@ function bSvg(){
   const zs=BSECT.map(z=>{const sel=S.zone===z.id;return `<g class="zone bz ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, ${bOf(z.id).length} bloques">
     <path class="bwall" d="${z.d}"/><path d="${z.d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="round"/><g class="bdots"></g>
     <text class="zlab ${sel?"sel":""}" x="${z.lab[0]}" y="${z.lab[1]}" text-anchor="${z.lab[2]}">${z.short||z.name}</text></g>`}).join("");
-  return `<svg viewBox="92 0 568 806" role="img" aria-label="Plano de la sala de boulder" class="${S.edit&&S.zone?"has":""}"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
+  return `<svg viewBox="100 0 545 986" role="img" aria-label="Plano de la sala de boulder" class="${S.edit&&S.zone?"has":""}"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
    ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
-   <text class="area" x="358" y="140" text-anchor="middle">BLOQUE</text><text class="area" x="358" y="157" text-anchor="middle">CENTRAL</text>
-   <path class="door" d="M306 22 L414 22"/>
-   <path class="door" d="M329 522 L614 452"/><text class="area" x="500" y="512" text-anchor="middle" transform="rotate(-14 500 512)">ACCESO</text>
+   <text class="area" x="375" y="198" text-anchor="middle">BLOQUE</text><text class="area" x="375" y="215" text-anchor="middle">CENTRAL</text>
+   <path class="door" d="M425 22 L470 22"/>
    ${zs}</svg>`}
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
