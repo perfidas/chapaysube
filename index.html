@@ -473,6 +473,24 @@ p.rnb{margin:-6px 0 14px}
 .tfr{position:absolute;border:2px solid #2fe0e6;box-shadow:0 0 0 9999px rgba(0,0,0,.5);cursor:move}
 .th{position:absolute;width:30px;height:30px;border-radius:50%;background:#2fe0e6;border:3px solid #0b1118}
 .th.tl{left:-15px;top:-15px}.th.tr{right:-15px;top:-15px}.th.bl{left:-15px;bottom:-15px}.th.br{right:-15px;bottom:-15px}
+
+/* Seguir escaladores */
+.folw{display:flex;flex-direction:column;gap:6px;margin:10px 0 4px}
+.folb{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;width:100%}
+.folb svg{width:18px;height:18px}
+.folb.on{background:transparent;border-color:#2fe0e6;color:#2fe0e6}
+.fw{border:1px solid #23495a;background:linear-gradient(90deg,rgba(47,224,230,.10),transparent 80%),#131d26;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.fw h4{margin:0;font:800 16px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;color:#2fe0e6;display:flex;align-items:center;gap:6px}
+.fw h4 svg{width:15px;height:15px}
+.fwr{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:14px}
+.fwr .ic{width:24px;height:24px;border-radius:6px;display:grid;place-items:center}.fwr .ic svg{width:15px;height:15px}
+.fwr .ic.av{background:#173a4a;color:#7ee8ff}.fwr .ic.fl{background:#3a3313;color:var(--gold)}.fwr .ic.en{background:#1e2c38;color:#c9d6df}
+.fwr small{color:var(--mut);font-size:12px}
+.fwn{font-size:13px;color:var(--mut)}
+.fol-l{display:flex;flex-direction:column;gap:5px}
+.fol-r{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.fol-r .lk{background:none;border:0;padding:0;min-height:36px;text-align:left;font-weight:600}
+.fol-r .mini{min-height:34px;padding:4px 10px;font-size:13px;border-color:#2fe0e6;color:#2fe0e6;background:transparent}
 </style>
 
 </head>
@@ -599,7 +617,7 @@ const READY=!/PEGA_AQUI/.test(CFG.url+CFG.key)&&typeof supabase!=="undefined";
 const sb=READY?supabase.createClient(CFG.url,CFG.key):null;
 /* Si se abre desde el enlace del correo de «He olvidado mi contraseña», se pide la nueva */
 const REC=/type=recovery/.test(location.hash);
-const S={rec:REC,proj:new Set(),people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
+const S={rec:REC,proj:new Set(),fol:new Set(),people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
 async function fetchAll(build){let out=[];for(let from=0;;from+=1000){const{data,error}=await build().range(from,from+999);if(error)throw error;out=out.concat(data);if(data.length<1000)return out}}
 async function loadAll(){
   const q=t=>sb.from(t).select("*").then(x=>{if(x.error)throw x.error;return x.data});
@@ -612,7 +630,7 @@ async function loadAll(){
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
   STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
   setPeople(p);S.routes=r.map(mapR).filter(okR);
-  if(S.me){const{data}=await sb.from("liga_projects").select("route_id");S.proj=new Set((data||[]).map(x=>x.route_id))}else S.proj=new Set();S.asc=a.map(mapA);
+  if(S.me){const[{data},f]=await Promise.all([sb.from("liga_projects").select("route_id"),sb.from("liga_follows").select("followee")]);S.proj=new Set((data||[]).map(x=>x.route_id));S.fol=new Set((f.data||[]).map(x=>x.followee))}else{S.proj=new Set();S.fol=new Set()}S.asc=a.map(mapA);
 }
 /* Carga por partes: después de la carga inicial, solo viajan las filas que cambian (tiempo real o la respuesta de lo que guardas) */
 const mapR=x=>{if(x.sec==="kilter")KANG[x.id]=x.angle;return{id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active,name:x.name||"",angle:x.angle??null}};
@@ -1078,6 +1096,29 @@ function rules(){
   $("#bk").onclick=()=>{S.view=S.back||"home";S.scrollTop=true;render()};
 }
 
+
+/* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
+const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+ ok:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'};
+function toggleFollow(uid){if(!S.me)return needLogin();const on=S.fol.has(uid),nm=S.users.find(u=>u.id===uid)?.name||"";
+  return act(async()=>{const q=on?await sb.from("liga_follows").delete().eq("user_id",S.me).eq("followee",uid):await sb.from("liga_follows").insert({followee:uid});
+    if(!q.error){on?S.fol.delete(uid):S.fol.add(uid);toast(on?`Has dejado de seguir a ${nm}.`:`Sigues a ${nm}. Verás lo que ha hecho al abrir una vía o un bloque.`)}return q})}
+function fwHtml(r){if(!S.me)return"";const bl=isBl(r.sec),fem=!bl;
+  if(!S.fol.size)return `<div class="fw"><h4>${FICO.eyes}De los que sigues</h4><div class="fwn">Sigue a otros escaladores desde su perfil para ver aquí quién ${fem?"la":"lo"} ha hecho.</div></div>`;
+  const last={};S.asc.forEach(a=>{if(a.route===r.id&&S.fol.has(a.u)&&(!last[a.u]||last[a.u].at<a.at))last[a.u]=a});
+  const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),done=Object.values(last).filter(a=>nm[a.u]).sort((a,b)=>b.at.localeCompare(a.at));
+  const not=[...S.fol].filter(id=>nm[id]&&!last[id]).map(id=>nm[id]);
+  const ic=st=>st==="A vista"?["av",STY["A vista"][1]]:st==="Flash"?["fl",STY.Flash[1]]:["en",STY.Encadenada[1]];
+  const when=t=>{const d=(Date.now()-new Date(t))/864e5;return d<1?"hoy":d<2?"ayer":d<7?`hace ${Math.floor(d)} días`:new Date(t).toLocaleDateString("es-ES",{day:"numeric",month:"short"})};
+  return `<div class="fw"><h4>${FICO.eyes}De los que sigues${done.length?`, ${fem?"la":"lo"} ${done.length===1?"ha":"han"} hecho`:""}</h4>
+   ${done.map(a=>{const c=ic(a.style);return `<div class="fwr"><span class="ic ${c[0]}">${c[1]}</span><span><b>${esc(nm[a.u])}</b> · ${esc(a.style.toLowerCase())}</span><small>${when(a.at)}</small></div>`}).join("")}
+   ${!done.length?`<div class="fwn">Ninguno de los que sigues ${fem?"la":"lo"} ha hecho todavía. ¡Estréna${fem?"la":"lo"} tú!</div>`:not.length?`<div class="fwn">${not.length<=3?esc(not.join(", ").replace(/, ([^,]*)$/," y $1"))+(not.length===1?" todavía no":" todavía no"):`${not.length} de los que sigues todavía no`} ${fem?"la":"lo"} ${not.length===1?"ha":"han"} hecho.</div>`:""}</div>`}
+function folBtn(u){const on=S.fol.has(u.id);return `<div class="folw"><button class="folb ${on?"on":"pri"}" id="folb" aria-pressed="${on}">${on?FICO.ok+"Siguiendo":FICO.plus+"Seguir"}</button><span class="sub">${on?`Verás qué vías y bloques ha hecho ${esc(u.name)} cuando abras uno. Solo tú sabes a quién sigues.`:`Sigue a ${esc(u.name)} para ver qué vías y bloques ha hecho cuando abras uno.`}</span></div>`}
+function folListHtml(){const ls=S.users.filter(u=>S.fol.has(u.id)).sort((a,b)=>a.name.localeCompare(b.name));
+  return `<h3 class="pfh">Sigues a <span class="sub" style="text-transform:none;letter-spacing:0">· ${ls.length}</span></h3>
+  ${ls.length?`<div class="fol-l">${ls.map(u=>`<div class="fol-r"><button class="lk" data-fp="${u.id}">${esc(u.name)}</button><button class="mini" data-fu="${u.id}">${S.arm==="fu"+u.id?"Pulsa otra vez":"Dejar de seguir"}</button></div>`).join("")}</div>`
+   :`<div class="empty">Todavía no sigues a nadie. Entra en el perfil de un escalador desde el ranking y pulsa «Seguir».</div>`}`}
 /* ---------- Perfil de un escalador ---------- */
 async function loadNameNext(){if(!S.me)return;const{data}=await sb.rpc("liga_name_next");S.nameNext=data||null}
 function openProfile(id){S.pid=id;S.ren=false;if(id===S.me)loadNameNext().then(()=>{if(S.view==="perfil"&&S.pid===S.me&&!S.ren)perfil()}).catch(()=>{});if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
@@ -1144,9 +1185,10 @@ function perfil(){
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}
+  ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   <div class="pf-grid">${cards}</div>
-  ${u.id===S.me?projHtml():""}
+  ${u.id===S.me?projHtml()+folListHtml():""}
   ${vitrinaHtml(u.id)}
   <h3 class="pfh">${BIM[cb]} frente a ${pb}</h3>
   <p class="sub" style="margin:-4px 0 8px">El bimestre en curso cuenta hasta hoy.</p>
@@ -1162,6 +1204,9 @@ function perfil(){
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
   ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
+  if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);
+  document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
+  document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
   if($("#bkp"))$("#bkp").onclick=backup;if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
@@ -1309,7 +1354,7 @@ const kWho=rid=>{const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),seen
 function kRow(r,a){const p=a?pts(a):kpts(r.grade,r.angle,"Encadenado"),d=a?new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"}):"";
   return `<button class="kb ${S.open===r.id?"op":""}" data-kr="${r.id}" aria-expanded="${S.open===r.id}"><span class="g">${esc(r.grade)}<small>${r.angle}°</small></span><span><b>${esc(r.name)}</b><span class="s">${a?`${esc(a.style)} · ${d}`:`${kWho(r.id).length} en la liga`}</span></span><span class="p">${a?"+":""}${fmt(p)}<small>pts</small></span></button>`}
 function kDetail(r){const who=kWho(r.id),mine=myAsc(r.id);
-  return `<div class="kd" id="kd"><div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
+  return `<div class="kd" id="kd">${fwHtml(r)}<div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
    ${who.length?`<div class="kwho">${who.map(w=>`<span>${esc(w.n)}${w.fl?" · flash":""}</span>`).join("")}</div>`:""}
    ${S.me?`<div class="sub">${mine?"Tu encadene de este bimestre:":"¿Lo has hecho tú también?"}</div>
    <div class="kst2">${BSTYLES.map(([st])=>`<button data-kst="${st}" class="${mine?.style===st?"on":""}">${st} · ${fmt(kpts(r.grade,r.angle,st))}</button>`).join("")}</div>
@@ -1571,7 +1616,7 @@ function bRow(b){
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
   <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
-  ${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
+  ${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
   <label>Color de presas<select id="bh"><option value="">Sin indicar</option>${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
   <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
@@ -1670,7 +1715,7 @@ function routeRow(r){
   <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
-  ${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
   <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
