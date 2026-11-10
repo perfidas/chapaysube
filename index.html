@@ -491,6 +491,9 @@ p.rnb{margin:-6px 0 14px}
 .fol-r{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
 .fol-r .lk{background:none;border:0;padding:0;min-height:36px;text-align:left;font-weight:600}
 .fol-r .mini{min-height:34px;padding:4px 10px;font-size:13px;border-color:#2fe0e6;color:#2fe0e6;background:transparent}
+.rsrch{margin:0 0 10px}.rsrch input{width:100%;font-size:16px}
+.rsr{display:flex;flex-direction:column;gap:5px;margin-top:6px}.rsr:empty{display:none}
+.rsi{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 10px;text-align:left;width:100%}
 </style>
 
 </head>
@@ -662,7 +665,7 @@ async function refresh(){
 /* Solicitudes de alta: solo el administrador las ve */
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
-let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&(S.kq||S.tq))&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
+let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&(S.kq||S.tq))&&!["rsq","ksq"].includes(document.activeElement?.id)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
@@ -1765,8 +1768,14 @@ function rankView(){
   else{const p=period(S.rmode),r=ranking(S.sec,S.rmode);
     html=`<div class="sub" style="margin-bottom:10px">${p.label}${S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
     ${r.length?rkList(r,S.rmode==="year",S.rmode==="bim"?moves(S.sec):null):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. ${S.sec==="kilter"?"Sube la captura de un bloque desde «Mis bloques».":"Marca tus vías desde el mapa."}</div>`}`}
-  $("#body").innerHTML=`<div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
+  $("#body").innerHTML=`<div class="rsrch"><input type="search" id="rsq" placeholder="Buscar escalador" aria-label="Buscar un escalador por nombre" autocomplete="off" value="${esc(S.rsq||"")}"><div id="rsr" class="rsr"></div></div><div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;
+  const sq=$("#rsq"),fill=()=>{const v=sq.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");S.rsq=sq.value;const box=$("#rsr");
+    if(!v){box.innerHTML="";return}
+    const bim=ranking(S.sec,"bim"),hits=S.users.filter(u=>u.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(v)).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,8);
+    box.innerHTML=hits.length?hits.map(u=>{const i=bim.findIndex(x=>x.id===u.id);return `<button class="rsi" data-u="${u.id}"><b>${esc(u.name)}</b>${S.fol.has(u.id)?' <span class="sub">· la sigues</span>':""}<span class="sub">${i>=0?`${i+1}.º en ${SECTIONS.find(x=>x.id===S.sec).name.toLowerCase()} · ${fmt(bim[i].p)} pts`:"Sin puntos este bimestre"}</span></button>`}).join(""):`<div class="sub" style="padding:6px 2px">Nadie se llama así en la liga.</div>`;
+    box.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u))};
+  sq.oninput=fill;fill();
   $("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
   document.querySelectorAll("#body [data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u));
   document.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>{S.hopen=S.hopen===b.dataset.hk?null:b.dataset.hk;rankView()});
