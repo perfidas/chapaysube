@@ -311,9 +311,9 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* Pantalla de carga: el cohete despega del podio */
 .boot{min-height:calc(100vh - 80px);display:grid;place-items:center;background:radial-gradient(circle at 50% 70%,#1a2d40,transparent 65%)}
 .boot svg{width:220px;height:280px;overflow:visible}
-.boot .rk{animation:lift 2.6s cubic-bezier(.5,0,.6,1) infinite}
+.boot .rk{animation:lift 4.6s cubic-bezier(.45,0,.6,1) infinite}
 .boot .fl{transform-box:fill-box;transform-origin:50% 0;animation:flame .18s ease-in-out infinite alternate}
-@keyframes lift{0%,15%{transform:translateY(0)}55%{transform:translateY(-30px)}85%,100%{transform:translateY(-260px);opacity:0}}
+@keyframes lift{0%,22%{transform:translateY(0)}60%{transform:translateY(-34px)}92%,100%{transform:translateY(-280px);opacity:0}}
 @keyframes flame{from{transform:scaleY(.8)}to{transform:scaleY(1.25)}}
 @media (prefers-reduced-motion:reduce){.boot .rk,.boot .fl{animation:none}}
 </style>
@@ -514,8 +514,12 @@ function goRoute(r){S.view="sec";S.sec=r.sec;S.tab="mapa";S.zone=zoneOf(r);S.ope
 function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select().single();if(r.error)throw r.error;applyRows(r.data);S.open=r.data.id})}
 function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id).select())}
 let wired=false;
+/* Pantalla de carga del cohete: como mucho una vez cada 24 h, y se mantiene al menos un despegue completo */
+const SPLASH_KEY="liga-splash",SPLASH_MS=4600;
+function splashDue(){try{const t=+localStorage.getItem(SPLASH_KEY)||0;if(Date.now()-t<864e5)return false;localStorage.setItem(SPLASH_KEY,String(Date.now()));return true}catch(e){return false}}
 async function start(){
   if(!READY){S.view="setup";return render()}
+  if(!wired&&splashDue()){S.splash=true;S.holdSplash=true;setTimeout(()=>{S.holdSplash=false;render()},SPLASH_MS)}
   render();
   try{
     session=(await sb.auth.getSession()).data.session;S.me=session?.user?.id||null;
@@ -583,8 +587,9 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Mapa"?"mapa":"ranking";render()})}
-function render(){if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
-function loadingView(){$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
+function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
+  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+function loadingView(){if(!S.splash){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`;return}if($("#app .boot"))return;$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
   <g class="rk"><path class="fl" d="M114 290 Q128 340 142 290 Z" fill="#ffb83d"/><path class="fl" d="M120 290 Q128 318 136 290 Z" fill="#fff3c4"/>
   <path d="M128 40 C96 78 92 160 98 240 H158 C164 160 160 78 128 40Z" fill="#fff"/><path d="M98 196 L70 252 L100 242Z M158 196 L186 252 L156 242Z" fill="#fff"/>
   <rect x="112" y="240" width="32" height="18" fill="#dfe7ee"/><text x="128" y="160" text-anchor="middle" font-family="Rubik,sans-serif" font-weight="700" font-size="34" fill="#2f7db8">SC</text>
