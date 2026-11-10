@@ -908,18 +908,18 @@ function vitrinaHtml(uid){return `<h3 class="pfh">Vitrina</h3>${seasonYears().ma
   return `<div class="vt">${cur?'<span class="season">En juego</span>':""}<div class="vth"><b>${y}</b><span>${l.length} de ${LCAT.length}</span></div>
    ${l.length?`<div class="ltiers">${[...LORDER].reverse().map(t=>`<span><i style="background:linear-gradient(135deg,${LTIER[t][0]},${LTIER[t][1]})"></i>${l.filter(c=>c.t===t).length}</span>`).join("")}</div><div class="shelf">${l.map(c=>`<span title="${esc(c.n)} · ${c.secName}">${medal(c.p,c.t)}</span>`).join("")}</div>`:`<div class="sub">${cur?"Aún sin logros esta temporada.":"Sin logros esa temporada."}</div>`}</div>`}).join("")}`}
 
-/* Barra de navegación inferior: Inicio, Mapa, Ranking, Logros y Perfil */
-const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',Mapa:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',Ranking:'<path d="M3 20v-6h5v6M9.5 20V9h5v11M16 20v-8h5v8"/>',Logros:'<path d="M12 2l8 4.6v9.2L12 20.4 4 15.8V6.6z"/><path d="M12 7l1.6 3.2 3.4.5-2.5 2.4.6 3.4-3.1-1.6-3.1 1.6.6-3.4L7 10.7l3.4-.5z"/>',Perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+/* Barra de navegación inferior: Inicio, Zona, Ranking, Logros y Perfil */
+const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',Zona:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',Ranking:'<path d="M3 20v-6h5v6M9.5 20V9h5v11M16 20v-8h5v8"/>',Logros:'<path d="M12 2l8 4.6v9.2L12 20.4 4 15.8V6.6z"/><path d="M12 7l1.6 3.2 3.4.5-2.5 2.4.6 3.4-3.1-1.6-3.1 1.6.6-3.4L7 10.7l3.4-.5z"/>',Perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
 function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
   let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
   if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
-  const sec=!["home","rules","perfil","approvals","logros"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Mapa"):"";
+  const sec=!["home","rules","perfil","approvals","logros"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
   n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
   n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
     if(k==="Logros"){S.view="logros";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
-    if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Mapa"?"mapa":"ranking";render()})}
+    if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
   if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
@@ -1237,7 +1237,7 @@ function section(){
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
   <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
-  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Mapa"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
+  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Zona"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
