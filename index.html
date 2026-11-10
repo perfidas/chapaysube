@@ -334,7 +334,7 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .lbadges{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
 .lbd{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:#131d26;border:1px solid var(--line);border-radius:10px;padding:10px 6px 9px;min-width:0}
 .lbd .med{width:56px;height:56px}
-.lbd .nm{font:800 15px/1.05 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.lbd .nm{font:800 15px/1.05 var(--disp);text-transform:uppercase;letter-spacing:.03em}.lbd .nm.lw{font-size:13px;letter-spacing:0}.lbd .nm{max-width:100%;overflow-wrap:anywhere}
 .lbd .ds{font-size:11px;color:var(--mut)}
 .lbd.off .med{filter:grayscale(1) brightness(.45)}.lbd.off .nm{color:var(--mut)}
 .lbd .pg{width:100%;font-size:10px;color:var(--mut);font-variant-numeric:tabular-nums}
@@ -749,6 +749,12 @@ const LPICT={
  ac:lT("A→C",17),x10:lT("×10",22),x25:lT("×25",22),seven2:lT("7a²",24),three:lT("3×1",20),
  tri:'<path d="M-12 10h24M-12 10l6-12M12 10l-6-12M0 10V-12" stroke="#0f1720" stroke-width="3.4" stroke-linecap="round"/>',
  scale:'<path d="M0-13v25M-11 12h22M-14-6h28" stroke="#0f1720" stroke-width="3" stroke-linecap="round"/><path d="M-14-6l-5 9h10zM14-6l-5 9h10z" fill="#0f1720"/>',
+ board:'<rect x="-13" y="-13" width="26" height="26" rx="3" fill="#0f1720"/><g fill="#fff"><circle cx="-6" cy="-6" r="2"/><circle cx="6" cy="-6" r="2"/><circle cx="0" cy="0" r="2.4" fill="#2fe0e6"/><circle cx="-6" cy="6" r="2"/><circle cx="6" cy="6" r="2"/></g>',
+ k6a:lT("6A"),k6b:lT("6B"),k6c:lT("6C"),k7a:lT("7A"),k7b:lT("7B"),k7c:lT("7C"),k8a:lT("8A"),
+ a50:lT("50°",22),a60:lT("60°",22),a70:lT("70°",22),
+ bolt:'<path d="M3-15L-9 2h8l-3 13L10-3H2z" fill="#0f1720" stroke="#0f1720" stroke-width="1.5" stroke-linejoin="round"/>',
+ prot:'<path d="M-14 9a14 14 0 0 1 28 0z" fill="none" stroke="#0f1720" stroke-width="3" stroke-linejoin="round"/><path d="M0 9L-7-3M0 9L0-5M0 9L7-3" stroke="#0f1720" stroke-width="2.4" stroke-linecap="round"/>',
+ four:lT("4/4",22),bk:lT("B+K",19),
  blades:'<path d="M-12-12L12 12M12-12L-12 12" stroke="#0f1720" stroke-width="4" stroke-linecap="round"/><circle r="4" fill="#0f1720"/>'};
 let lmid=0;
 function medal(p,tier,cls="med"){const[a,b]=LTIER[tier],id="lm"+(lmid++),hex="M0-29L25-14.5V14.5L0 29-25 14.5V-14.5Z";
@@ -766,9 +772,13 @@ const L_VIA=[["first","Bautismo de magnesio","Tu primera vía","rope","bronce"],
 const L_BOU=[["first","Despegue","Tu primer bloque","hold","bronce"],["azul","Blues","Tu primer bloque azul","hblue","plata"],["rojo","Alerta roja","Tu primer bloque rojo","hred","oro"],["negro","El lado oscuro","Tu primer bloque negro","hblack","platino"],["dorado","Jaque mate","Un bloque blanco y negro","bw","diamante"],["all","Caja de ceras","Un bloque de cada color","rainbow","plata"],["w4","Pegado a la presa","Encadenar algo 4 semanas seguidas","fire","bronce"],
  ["b20","Bicho de bloque","20 bloques en un bimestre","cal","plata"],["n100","Picapiedra","100 bloques en la temporada","c100","oro"],["open","Primera huella","Ser el primero en hacer un bloque","first","plata"],["pod","Al cajón","Acabar en el podio de un bimestre","podium","plata"],["win","Rey de la colchoneta","Ganar un bimestre","crown","oro"],["year","Señor de los bloques","Ganar el ranking anual","crown2","diamante"]];
 const L_MIX=[["pair1","Dos por uno","La misma vía, primero en autoseguro y después en cuerda","ac","bronce"],["pair10","Ensayo general","10 vías hechas primero en autoseguro y después en cuerda","x10","plata"],["pair25","Sin red","25 vías hechas primero en autoseguro y después en cuerda","x25","oro"],["pair7a","Séptimo cielo al cuadrado","Un 7a, primero en autoseguro y después en cuerda","seven2","rubi"],
- ["day3","Tres en raya","Encadenar en las tres secciones el mismo día","three","bronce"],["bim3","Todoterreno","Puntuar en las tres secciones el mismo bimestre","tri","plata"],["bal","Equilibrista","10 encadenes en cada sección el mismo bimestre","scale","oro"],["edge","Doble filo","Un 7a en cuerda y un bloque negro el mismo bimestre","blades","esmeralda"],
- ["pod3","Tres medallas","Podio en las tres secciones el mismo bimestre","podium","rubi"],["win3","Triple corona","Ganar el mismo bimestre en las tres secciones","crown","platino"],["jaque","Jaque a la octava","Un 8a en cuerda y un bloque blanco y negro","bw","diamante"],["king","Rey absoluto","Ganar el ranking anual en las tres secciones","crown2","diamante"]];
-const LSECS=[["cuerda","Cuerda",L_VIA,"C"],["autoseguro","Autoseguro",L_VIA,"A"],["boulder","Boulder",L_BOU,"B"],["mix","Combinados",L_MIX,"X"]];
+ ["day3","Tres en raya","Encadenar en tres secciones distintas el mismo día","three","bronce"],["bim3","Todoterreno","Puntuar en cuerda, autoseguro y boulder el mismo bimestre","tri","plata"],["bim4","Cuatro de cuatro","Puntuar en las cuatro secciones, Kilter incluida, el mismo bimestre","four","oro"],["bal","Equilibrista","10 encadenes en cuerda, autoseguro y boulder el mismo bimestre","scale","oro"],["kb","Del muro al tablero","Un bloque negro en boulder y un 7A en la Kilter el mismo bimestre","bk","esmeralda"],["edge","Doble filo","Un 7a en cuerda y un bloque negro el mismo bimestre","blades","esmeralda"],
+ ["pod3","Tres medallas","Podio en cuerda, autoseguro y boulder el mismo bimestre","podium","rubi"],["win3","Triple corona","Ganar el mismo bimestre en cuerda, autoseguro y boulder","crown","platino"],["win4","Póquer de coronas","Ganar el mismo bimestre en las cuatro secciones","crown2","diamante"],["jaque","Jaque a la octava","Un 8a en cuerda y un bloque blanco y negro","bw","diamante"],["king","Rey absoluto","Ganar el ranking anual en cuerda, autoseguro y boulder","crown2","diamante"]];
+const L_KIL=[["first","Enchufado","Tu primer bloque en la Kilter","board","bronce"],["6A","Luz verde","Tu primer 6A en la Kilter","k6a","bronce"],["6B","Modo fosforito","Tu primer 6B en la Kilter","k6b","plata"],["6C","Chispazo","Tu primer 6C en la Kilter","k6c","oro"],["7A","Alto voltaje","Tu primer 7A en la Kilter","k7a","esmeralda"],["7B","Fundido a negro","Tu primer 7B en la Kilter","k7b","rubi"],["7C","Apagón general","Tu primer 7C en la Kilter","k7c","platino"],["8A","Tablero en llamas","Tu primer 8A en la Kilter","k8a","diamante"],
+ ["a50","Cuesta arriba","Un bloque a 50° o más","a50","plata"],["a60","Mirando al techo","Un bloque a 60° o más","a60","oro"],["a70","Desplome total","Un bloque a 70°","a70","esmeralda"],["fl7a","Rayo","Un 7A al flash en la Kilter","bolt","rubi"],["ang3","Tres en uno","El mismo bloque a tres ángulos distintos","prot","oro"],
+ ["w4","Pegado al tablero","Encadenar algo en la Kilter 4 semanas seguidas","fire","bronce"],["b20","Ratón de tablero","20 bloques de Kilter en un bimestre","cal","plata"],["n100","Cien bombillas","100 bloques de Kilter en la temporada","c100","oro"],["open","Pionero","Ser el primero de la liga en subir un bloque","first","plata"],
+ ["pod","Al cajón","Acabar en el podio de un bimestre de Kilter","podium","plata"],["win","Rey del tablero","Ganar un bimestre de Kilter","crown","oro"],["year","Señor de los LED","Ganar el ranking anual de Kilter","crown2","diamante"]];
+const LSECS=[["cuerda","Cuerda",L_VIA,"C"],["autoseguro","Autoseguro",L_VIA,"A"],["boulder","Boulder",L_BOU,"B"],["kilter","Kilter",L_KIL,"K"],["mix","Combinados",L_MIX,"X"]];
 const LCAT=LSECS.flatMap(([sec,name,arr,k])=>arr.map((x,i)=>({id:sec+":"+x[0],key:x[0],sec,secName:name,num:k+(i+1),n:x[1],d:x[2],p:x[3],t:x[4]})));
 
 /* ---- Cálculo ---- */
@@ -791,13 +801,17 @@ function computeLogros(y){
   /* primeros en hacer cada vía o bloque (en toda la historia) */
   const firstBy={};[...S.asc].sort((a,b)=>a.at.localeCompare(b.at)).forEach(a=>{if(!firstBy[a.route])firstBy[a.route]=a});
   /* rankings de bimestres cerrados de la temporada, y anual si la temporada está cerrada */
-  const bims=[];for(let b=0;b<6;b++){const f=new Date(y,b*2,1),t=new Date(y,b*2+2,1);if(t<=now)bims.push({b,f,t,end:t.toISOString(),r:Object.fromEntries(["cuerda","autoseguro","boulder"].map(s=>[s,rankRange(s,f,t).map(x=>x.id)]))})}
-  const closed=to<=now,yr=closed?Object.fromEntries(["cuerda","autoseguro","boulder"].map(s=>[s,annual(s,y)[0]?.id])):{};
+  const bims=[];for(let b=0;b<6;b++){const f=new Date(y,b*2,1),t=new Date(y,b*2+2,1);if(t<=now)bims.push({b,f,t,end:t.toISOString(),r:Object.fromEntries(["cuerda","autoseguro","boulder","kilter"].map(s=>[s,rankRange(s,f,t).map(x=>x.id)]))})}
+  const closed=to<=now,yr=closed?Object.fromEntries(["cuerda","autoseguro","boulder","kilter"].map(s=>[s,annual(s,y)[0]?.id])):{};
   users.forEach(u=>{
     const mine=asc.filter(a=>a.u===u),bySec=s=>mine.filter(a=>a.sec===s);
-    for(const s of ["cuerda","autoseguro","boulder"]){const L=bySec(s),bl=s==="boulder",P=s+":";
+    for(const s of ["cuerda","autoseguro","boulder","kilter"]){const L=bySec(s),bl=s==="boulder",kl=s==="kilter",P=s+":";
       set(u,P+"first",L.length,L[0]?.at,L.length?1:0,1);
-      if(!bl){["6a","6b","6c","7a","7b","7c","8a"].forEach(g=>{const gi=GRADES.indexOf(g),a=L.find(x=>GRADES.indexOf(x.grade)>=gi);set(u,P+g,a,a?.at,a?1:0,1)});
+      if(kl){["6A","6B","6C","7A","7B","7C","8A"].forEach(g=>{const gi=KGRADES.indexOf(g),a=L.find(x=>KGRADES.indexOf(x.grade)>=gi);set(u,P+g,a,a?.at,a?1:0,1)});
+        [50,60,70].forEach(v=>{const a=L.find(x=>(R[x.route].angle||0)>=v);set(u,P+"a"+v,a,a?.at,a?1:0,1)});
+        const f7=L.find(x=>x.style==="Flash"&&KGRADES.indexOf(x.grade)>=KGRADES.indexOf("7A"));set(u,P+"fl7a",f7,f7?.at,f7?1:0,1);
+        const ang={};let a3=null,mx=0;L.forEach(a=>{const r=R[a.route],k=r.name.toLowerCase();(ang[k]=ang[k]||new Set()).add(r.angle);mx=Math.max(mx,ang[k].size);if(!a3&&ang[k].size>=3)a3=a.at});set(u,P+"ang3",a3,a3,mx,3)}
+      else if(!bl){["6a","6b","6c","7a","7b","7c","8a"].forEach(g=>{const gi=GRADES.indexOf(g),a=L.find(x=>GRADES.indexOf(x.grade)>=gi);set(u,P+g,a,a?.at,a?1:0,1)});
         const av=L.find(x=>x.style==="A vista"&&GRADES.indexOf(x.grade)>=GRADES.indexOf("7a"));set(u,P+"av7a",av,av?.at,av?1:0,1);
         set(u,P+"n500",L.length>=500,L[499]?.at,L.length,500);
         /* paredes: las que tienen alguna vía montada en esta sección */
@@ -809,7 +823,7 @@ function computeLogros(y){
         set(u,P+"wall",wOk,wOk,bestW,bestM)}
       else{["azul","rojo","negro","dorado"].forEach(c=>{const ci=BKEYS.indexOf(c),a=L.find(x=>BKEYS.indexOf(x.grade)>=ci);set(u,P+c,a,a?.at,a?1:0,1)});
         const cols=new Set(L.map(a=>a.grade));let at=null;{const seen=new Set();for(const a of L){seen.add(a.grade);if(seen.size===BKEYS.length){at=a.at;break}}}set(u,P+"all",at,at,cols.size,BKEYS.length)}
-      const sk=streak(L,4);set(u,P+"w4",sk.best>=4,sk.at,sk.best,4);if(!bl){const s12=streak(L,12);set(u,P+"w12",s12.best>=12,s12.at,s12.best,12)}
+      const sk=streak(L,4);set(u,P+"w4",sk.best>=4,sk.at,sk.best,4);if(!bl&&!kl){const s12=streak(L,12);set(u,P+"w12",s12.best>=12,s12.at,s12.best,12)}
       const perB={};let b20=null;L.forEach(a=>{const k=bimKey(new Date(a.at));perB[k]=(perB[k]||0)+1;if(perB[k]===20&&!b20)b20=a.at});set(u,P+"b20",b20,b20,Math.max(0,...Object.values(perB)),20);
       set(u,P+"n100",L.length>=100,L[99]?.at,L.length,100);
       const op=L.find(a=>firstBy[a.route]?.id===a.id);set(u,P+"open",op,op?.at,op?1:0,1);
@@ -821,16 +835,19 @@ function computeLogros(y){
     const pairs=[];C.forEach(c=>{const a=A.find(a=>twin(a,c)&&a.at<c.at);if(a&&!pairs.some(p=>p.c.route===c.route))pairs.push({a,c})});
     set(u,"mix:pair1",pairs[0],pairs[0]?.c.at,pairs.length,1);set(u,"mix:pair10",pairs.length>=10,pairs[9]?.c.at,pairs.length,10);set(u,"mix:pair25",pairs.length>=25,pairs[24]?.c.at,pairs.length,25);
     const p7=pairs.find(p=>GRADES.indexOf(R[p.c.route].grade)>=GRADES.indexOf("7a"));set(u,"mix:pair7a",p7,p7?.c.at,p7?1:0,1);
-    const days={};mine.forEach(a=>{const k=dayKey(new Date(a.at));(days[k]=days[k]||{})[a.sec]=a.at});const d3=Object.values(days).find(d=>Object.keys(d).length===3);
+    const days={};mine.forEach(a=>{const k=dayKey(new Date(a.at));(days[k]=days[k]||{})[a.sec]=a.at});const d3=Object.values(days).find(d=>Object.keys(d).length>=3);
     set(u,"mix:day3",d3,d3?Object.values(d3).sort().pop():null,d3?1:0,1);
-    const bk={};mine.forEach(a=>{const k=bimKey(new Date(a.at));const o=bk[k]=bk[k]||{cuerda:0,autoseguro:0,boulder:0,last:a.at,c7:false,bn:false};o[a.sec]++;o.last=a.at;
+    const bk={};mine.forEach(a=>{const k=bimKey(new Date(a.at));const o=bk[k]=bk[k]||{cuerda:0,autoseguro:0,boulder:0,kilter:0,last:a.at,c7:false,bn:false,k7:false,bnAt:null,k7At:null};o[a.sec]++;o.last=a.at;if(a.sec==="kilter"&&KGRADES.indexOf(a.grade)>=KGRADES.indexOf("7A")){o.k7=true;o.k7At=o.k7At||a.at}if(a.sec==="boulder"&&BKEYS.indexOf(a.grade)>=BKEYS.indexOf("negro"))o.bnAt=o.bnAt||a.at;
       if(a.sec==="cuerda"&&GRADES.indexOf(a.grade)>=GRADES.indexOf("7a"))o.c7=true;if(a.sec==="boulder"&&BKEYS.indexOf(a.grade)>=BKEYS.indexOf("negro"))o.bn=true});
     const bv=Object.values(bk),b3=bv.find(o=>o.cuerda&&o.autoseguro&&o.boulder),bal=bv.find(o=>o.cuerda>=10&&o.autoseguro>=10&&o.boulder>=10),ed=bv.find(o=>o.c7&&o.bn);
     set(u,"mix:bim3",b3,b3?.last,Math.max(0,...bv.map(o=>(o.cuerda>0)+(o.autoseguro>0)+(o.boulder>0))),3);
     set(u,"mix:bal",bal,bal?.last,Math.max(0,...bv.map(o=>(o.cuerda>=10)+(o.autoseguro>=10)+(o.boulder>=10))),3);
     set(u,"mix:edge",ed,ed?.last,ed?1:0,1);
+    const b4=bv.find(o=>o.cuerda&&o.autoseguro&&o.boulder&&o.kilter);set(u,"mix:bim4",b4,b4?.last,Math.max(0,...bv.map(o=>(o.cuerda>0)+(o.autoseguro>0)+(o.boulder>0)+(o.kilter>0))),4);
+    const kb=bv.find(o=>o.k7&&o.bn);set(u,"mix:kb",kb,kb?(kb.k7At>kb.bnAt?kb.k7At:kb.bnAt):null,Math.max(0,...bv.map(o=>(o.k7?1:0)+(o.bn?1:0))),2);
     const p3=bims.find(b=>["cuerda","autoseguro","boulder"].every(s=>{const i=b.r[s].indexOf(u);return i>-1&&i<3})),w3=bims.find(b=>["cuerda","autoseguro","boulder"].every(s=>b.r[s][0]===u));
     set(u,"mix:pod3",p3,p3?.end,p3?1:0,1);set(u,"mix:win3",w3,w3?.end,Math.max(0,...bims.map(b=>["cuerda","autoseguro","boulder"].filter(s=>b.r[s][0]===u).length)),3);
+    const w4=bims.find(b=>["cuerda","autoseguro","boulder","kilter"].every(s=>b.r[s][0]===u));set(u,"mix:win4",w4,w4?.end,Math.max(0,...bims.map(b=>["cuerda","autoseguro","boulder","kilter"].filter(s=>b.r[s][0]===u).length)),4);
     const c8=C.find(a=>GRADES.indexOf(a.grade)>=GRADES.indexOf("8a")),bd=B.find(a=>a.grade==="dorado");set(u,"mix:jaque",c8&&bd,c8&&bd?(c8.at>bd.at?c8.at:bd.at):null,(c8?1:0)+(bd?1:0),2);
     const kn=closed?["cuerda","autoseguro","boulder"].filter(s=>yr[s]===u).length:0;set(u,"mix:king",kn===3,to.toISOString(),kn,3)});
   LCACHE={k:key,v:out};return out}
@@ -872,7 +889,7 @@ function logrosView(){
   <div class="lladder">${LORDER.map(t=>`<span>${medal("crown",t)}<b>${LTIER[t][2]}</b></span>`).join("")}</div>
   ${near?`<div class="lnext">${medal(near.p,near.t)}<div><small>Lo tienes cerca</small><div><b>${esc(near.n)}</b> · <span class="sub">${near.secName} · ${esc(near.d)}</span></div><div class="lbar"><span style="width:${mine[near.id].v/mine[near.id].m*100}%"></span></div><div class="sub">${mine[near.id].v} de ${mine[near.id].m}</div></div></div>`:""}
   <div class="lchips" role="tablist">${LSECS.map(([k,n])=>`<button role="tab" aria-selected="${k===f}" class="${k===f?"on":""}" data-ls="${k}">${n} · ${got.filter(c=>c.sec===k).length}/${LCAT.filter(c=>c.sec===k).length}</button>`).join("")}</div>
-  <div class="lbadges">${LCAT.filter(c=>c.sec===f).map(c=>{const x=mine[c.id]||{v:0,m:1};return `<button class="lbd ${x.ok?"":"off"} ${recent(c.id)?"new":""}" data-lg="${c.id}">${medal(c.p,c.t)}<span class="nm">${esc(c.n)}</span>${x.ok?`<span class="ds">${recent(c.id)?"¡Nueva!":LTIER[c.t][2]}</span>`:`<span class="pg">${x.v} / ${x.m}<span class="lbar"><span style="width:${x.v/x.m*100}%"></span></span></span>`}</button>`}).join("")}</div>
+  <div class="lbadges">${LCAT.filter(c=>c.sec===f).map(c=>{const x=mine[c.id]||{v:0,m:1};return `<button class="lbd ${x.ok?"":"off"} ${recent(c.id)?"new":""}" data-lg="${c.id}">${medal(c.p,c.t)}<span class="nm ${c.n.split(" ").some(w=>w.length>11)?"lw":""}">${esc(c.n)}</span>${x.ok?`<span class="ds">${recent(c.id)?"¡Nueva!":LTIER[c.t][2]}</span>`:`<span class="pg">${x.v} / ${x.m}<span class="lbar"><span style="width:${x.v/x.m*100}%"></span></span></span>`}</button>`}).join("")}</div>
   <h3 class="pfh">Lo último en la liga</h3>
   <div class="lfeed">${feed.slice(0,12).map(e=>`<button class="lfi" data-lg="${e.c.id}">${medal(e.c.p,e.c.t)}<span><b>${esc(nm[e.uid]||"")}</b> ha conseguido <b style="color:${LTIER[e.c.t][0]}">${esc(e.c.n)}</b> <span class="sub">· ${e.c.secName}</span></span><small>${ago(e.at)}</small></button>`).join("")||'<div class="empty">Todavía nadie ha conseguido logros esta temporada.</div>'}</div>
   <div id="lsheet"></div>`;
