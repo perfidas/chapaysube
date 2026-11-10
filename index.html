@@ -377,6 +377,10 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .secsw button{border:0;background:none;border-radius:7px;min-height:42px;padding:6px 4px;font:900 18px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
 .secsw button.on{background:var(--acc);color:#fff}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* Animación al cambiar de sección deslizando */
+@media (prefers-reduced-motion:no-preference){#body.swl{animation:swl .28s ease-out}#body.swr{animation:swr .28s ease-out}
+@keyframes swl{from{transform:translateX(40px);opacity:.3}}@keyframes swr{from{transform:translateX(-40px);opacity:.3}}}
+main{overflow-x:clip}
 </style>
 
 </head>
@@ -1084,6 +1088,14 @@ function home(){
   document.querySelectorAll(".sec").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.s;S.tab=(ZONES[S.sec]||S.sec==="boulder")?"mapa":"ranking";S.zone=null;S.open=null;S.scrollTop=true;render()});
 }
 
+/* Deslizar el dedo a izquierda o derecha en Mapa o Ranking cambia de sección */
+(()=>{let x0=0,y0=0,t0=0,ok=false;
+  document.addEventListener("touchstart",e=>{if(S.view!=="sec"||S.edit||e.touches.length!==1)return ok=false;
+    const t=e.target;ok=!t.closest("input,select,textarea,.lchips,.chips,[data-noswipe]");const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now()},{passive:true});
+  document.addEventListener("touchend",e=>{if(!ok||S.view!=="sec"||S.edit)return;ok=false;const p=e.changedTouches[0],dx=p.clientX-x0,dy=p.clientY-y0;
+    if(Date.now()-t0>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.5)return;
+    const ids=SECTIONS.map(x=>x.id),i=ids.indexOf(S.sec),j=i+(dx<0?1:-1);if(j<0||j>=ids.length)return;
+    S.sec=S.lastSec=ids[j];S.zone=null;S.open=null;S.arm=null;S.swdir=dx<0?"l":"r";section()},{passive:true})})();
 function section(){
   navBar();
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
@@ -1092,7 +1104,7 @@ function section(){
   <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
   <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
-  <div id="body"></div>`;
+  <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
   document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{if(b.dataset.sw===S.sec)return;S.sec=S.lastSec=b.dataset.sw;S.zone=null;S.open=null;S.edit=false;S.arm=null;section()});
