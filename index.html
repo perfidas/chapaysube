@@ -454,6 +454,25 @@ p.rnb{margin:-6px 0 14px}
 .kcalc b{font:900 26px/1 var(--disp);color:var(--gold)}
 .ksrch{width:100%;font-size:16px;margin:4px 0 6px}
 @media (prefers-reduced-motion:reduce){.kscan,.kstate i{animation:none}}
+
+/* Foto de tablilla: filas leídas y cambios propuestos */
+.tup{margin-bottom:12px}
+.tq{margin-bottom:12px}
+.trow{display:grid;grid-template-columns:56px 1.25fr 1fr 40px;gap:6px;align-items:end;background:#131d26;border:1px solid var(--line);border-radius:8px;padding:8px;position:relative}
+.trow label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut);min-width:0}
+.trow label:nth-child(4){grid-column:1/4}
+.trow input,.trow select{width:100%;font-size:16px;min-width:0}
+.trow .bad{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.tdel{min-height:42px;padding:4px;grid-column:4;grid-row:1/3;align-self:stretch}
+.tplan{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.tpi{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;background:#131d26;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+.tpi.tp-add{border-left-color:var(--g1)}.tpi.tp-upd{border-left-color:var(--gold)}.tpi.tp-del{border-left-color:var(--g3)}.tpi.tp-same{opacity:.7}
+.tpi input{width:20px;height:20px}.tck{text-align:center;color:var(--g1)}
+.tcb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;border-radius:10px;border:1px solid var(--line)}
+.tcb img{display:block;width:100%;height:auto;pointer-events:none}
+.tfr{position:absolute;border:2px solid #2fe0e6;box-shadow:0 0 0 9999px rgba(0,0,0,.5);cursor:move}
+.th{position:absolute;width:30px;height:30px;border-radius:50%;background:#2fe0e6;border:3px solid #0b1118}
+.th.tl{left:-15px;top:-15px}.th.tr{right:-15px;top:-15px}.th.bl{left:-15px;bottom:-15px}.th.br{right:-15px;bottom:-15px}
 </style>
 
 </head>
@@ -607,9 +626,9 @@ function applyRows(data){if(!data)return;(Array.isArray(data)?data:[data]).forEa
 const dropAsc=id=>{S.asc=S.asc.filter(a=>a.id!==id)};
 let session=null;
 async function refresh(){
-  S.me=session?.user?.id||null;S.owner=false;S.bed=false;
+  S.me=session?.user?.id||null;S.owner=false;S.bed=false;S.ved=false;
   if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data;
-    if(!S.owner){const r=await sb.rpc("liga_is_boulder_editor");S.bed=!r.error&&!!r.data}}
+    if(!S.owner){const[r,v]=await Promise.all([sb.rpc("liga_is_boulder_editor"),sb.rpc("liga_is_route_editor")]);S.bed=!r.error&&!!r.data;S.ved=!v.error&&!!v.data}}
   await loadAll();
   const md=session?.user?.user_metadata||{};
   if(S.me&&!S.people.some(u=>u.id===S.me)&&(md.name||"").trim().length>=2){
@@ -625,7 +644,7 @@ async function refresh(){
 /* Solicitudes de alta: solo el administrador las ve */
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
-let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&S.kq)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
+let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&(S.kq||S.tq))&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
@@ -1015,13 +1034,14 @@ function approvals(){
   const ps=S.pend||[],pe=ps.filter(p=>!p.approved&&p.user_id!==S.me),ap=ps.filter(p=>p.approved&&p.user_id!==S.me);
   const row=(p,btns)=>`<div class="apr"><span><b>${esc(p.name)}</b>${p.invited_by?`<br><span class="sub">Invitado por ${esc(p.invited_by)}</span>`:""}</span><span class="aprb">${btns}</span></div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Escaladores</h2>
-  <p class="sub" style="margin:4px 0 12px">Las aprobaciones valen para las dos apps. «Monta boulder» deja a ese escalador añadir, cambiar y desmontar bloques de boulder, y nada más.</p>
+  <p class="sub" style="margin:4px 0 12px">Las aprobaciones valen para las dos apps. «Monta vías» deja a ese escalador añadir, cambiar y desmontar vías de cuerda y autoseguro, también subiendo la foto de la tablilla. «Monta boulder» hace lo mismo con los bloques de boulder.</p>
   <h3 class="pfh">Pendientes</h3>${pe.length?`<div class="lc">${pe.map(p=>row(p,`<button class="pri" data-ok="${p.user_id}">Aprobar</button>`)).join("")}</div>`:`<div class="empty">No hay solicitudes pendientes.</div>`}
-  <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="${p.boulder?"pri":""}" data-bo="${p.user_id}" data-v="${p.boulder?0:1}" title="Puede montar y desmontar bloques de boulder">${p.boulder?"Monta boulder ✓":"Monta boulder"}</button><button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
+  <h3 class="pfh">Aprobados</h3>${ap.length?`<div class="lc">${ap.map(p=>row(p,`<button class="${p.vias?"pri":""}" data-vi="${p.user_id}" data-v="${p.vias?0:1}" title="Puede montar y desmontar vías de cuerda y autoseguro">${p.vias?"Monta vías ✓":"Monta vías"}</button><button class="${p.boulder?"pri":""}" data-bo="${p.user_id}" data-v="${p.boulder?0:1}" title="Puede montar y desmontar bloques de boulder">${p.boulder?"Monta boulder ✓":"Monta boulder"}</button><button class="dng" data-no="${p.user_id}">${S.arm==="no"+p.user_id?"Pulsa otra vez":"Quitar"}</button>`)).join("")}</div>`:`<div class="empty">Aún no has aprobado a nadie.</div>`}`;
   $("#bk").onclick=()=>{S.view="home";S.arm=null;render()};
   const setOk=async(id,ok)=>{const{error}=await sb.rpc("liga_set_approved",{p_user:id,p_ok:ok});if(error)return toast("No se ha podido guardar: "+error.message);await loadPeople();await loadPending();approvals()};
   document.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>{b.disabled=true;setOk(b.dataset.ok,true)});
   document.querySelectorAll("[data-bo]").forEach(b=>b.onclick=async()=>{b.disabled=true;const{error}=await sb.rpc("liga_set_boulder",{p_user:b.dataset.bo,p_ok:b.dataset.v==="1"});if(error)toast("No se ha podido guardar: "+error.message);await loadPending();approvals()});
+  document.querySelectorAll("[data-vi]").forEach(b=>b.onclick=async()=>{b.disabled=true;const{error}=await sb.rpc("liga_set_route_editor",{p_user:b.dataset.vi,p_ok:b.dataset.v==="1"});if(error)toast("No se ha podido guardar: "+error.message);await loadPending();approvals()});
   document.querySelectorAll("[data-no]").forEach(b=>b.onclick=()=>{const k="no"+b.dataset.no;if(S.arm!==k){S.arm=k;return approvals()}S.arm=null;setOk(b.dataset.no,false)});
 }
 function openRules(){S.back=S.view;S.view="rules";S.scrollTop=true;render()}
@@ -1166,9 +1186,9 @@ async function backup(){const b=$("#bkp");b.disabled=true;b.textContent="Prepara
       "Grado o dificultad":r.sec==="boulder"?BCOL[r.color]?.[0]||r.grade:r.grade,"Presas":HOLDS[r.hold]?.[0]||"","Montada el":r.created||"","Estado":r.active?"Montada":"Desmontada","Id":r.id}));
     const enc=[...S.asc].sort((a,b)=>a.at.localeCompare(b.at)).map(a=>{const r=rt[a.route],d=new Date(a.at);return{"Fecha":d.toLocaleString("es-ES"),"Escalador":nm[a.u]||a.u,"Sección":sn(a.sec),
       "Vía":where(r),"Grado":a.sec==="boulder"?BCOL[a.grade]?.[0]||a.grade:a.grade,"Estilo":a.style,"Puntos":pts(a),"Bimestre":BIM[Math.floor(d.getMonth()/2)]+" "+d.getFullYear()}});
-    const esc_=(S.pend&&S.pend.length?S.pend:S.people.map(p=>({name:p.name,approved:p.ok}))).map(p=>({"Nombre":p.name,"Aprobado":p.approved?"Sí":"No","Invitado por":p.invited_by||"","Monta boulder":p.boulder?"Sí":""}));
+    const esc_=(S.pend&&S.pend.length?S.pend:S.people.map(p=>({name:p.name,approved:p.ok}))).map(p=>({"Nombre":p.name,"Aprobado":p.approved?"Sí":"No","Invitado por":p.invited_by||"","Monta vías":p.vias?"Sí":"","Monta boulder":p.boulder?"Sí":""}));
     const wb=XLSX.utils.book_new(),add=(rows,n,w)=>{const ws=XLSX.utils.json_to_sheet(rows);ws["!cols"]=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,n)};
-    add(vias,"Vías y bloques",[12,16,22,16,10,12,12,38]);add(enc,"Encadenes",[20,18,12,16,14,12,8,14]);add(esc_,"Escaladores",[22,10,24,14]);
+    add(vias,"Vías y bloques",[12,16,22,16,10,12,12,38]);add(enc,"Encadenes",[20,18,12,16,14,12,8,14]);add(esc_,"Escaladores",[22,10,24,12,14]);
     XLSX.writeFile(wb,`chapa-y-sube-copia-${isoDay(new Date())}.xlsx`);toast(`Copia descargada: ${vias.length} vías y bloques, ${enc.length} encadenes.`)}
   catch(e){toast("No se ha podido hacer la copia: "+(e.message||e))}
   b.disabled=false;b.textContent="Descargar copia de seguridad (Excel)"}
@@ -1232,7 +1252,7 @@ function home(){
     S.sec=S.lastSec=ids[j];S.zone=null;S.open=null;S.arm=null;S.swdir=dx<0?"l":"r";section()},{passive:true})})();
 function section(){
   navBar();
-  const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
+  const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder")||(S.ved&&(S.sec==="cuerda"||S.sec==="autoseguro")));
   if(!canEdit)S.edit=false;
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
   <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
@@ -1358,6 +1378,136 @@ function kilterView(){
       toast(`Guardado: ${n} a ${a}°, +${fmt(pts(mapA(data.ascent)))} puntos`)}
     catch(err){S.busy=false;$("#ksv").disabled=false;$("#ksv").textContent="Guardar encadene";return er("No se ha podido guardar: "+(err.message||err))}
     S.busy=false;kilterView()}}
+
+/* ---------- Foto de tablilla (administrador y «monta vías») ---------- */
+/* Lectura de la foto de una tablilla: palabras con posición de dos pasadas (texto libre y solo cifras/grados) → filas */
+const TCOL=[[/^amaril|^.?.?arill|marill|ritlo$|rillo$/,"amarilla"],[/^verd|^erde/,"verde"],[/^azu/,"azul"],[/^roj/,"roja"],[/^negr|^egro/,"negra"],[/^blan|^lanc/,"blanca"],[/^ment/,"menta"],[/^rosa/,"rosa"],[/^mora|^orad/,"morada"]];
+const tColor=t=>{t=t.toLowerCase().normalize("NFD").replace(/[^a-z]/g,"");if(t.length<4)return null;for(const[re,k]of TCOL)if(re.test(t))return k;return null};
+function tGrade1(t){const m=t.match(/^([4-8])([abc])?(t?\+|[t*])?[.,']?$/i);if(!m)return null;const d=m[1],l=(m[2]||"").toLowerCase(),p=m[3]?"+":"";
+  if(d==="4")return"4";if(!l)return null;const g=d+l+(d==="5"?"":p);return GRADES.includes(g)?g:null}
+/* La barra de color de la izquierda a veces se lee como «J», «1» o «|» pegada al grado; la «T» o la «J» sueltas suelen ser un 7 */
+function tGrade(t){t=t.replace(/\s/g,"");return tGrade1(t)||tGrade1(t.replace(/^[TJ/]/,"7"))||tGrade1(t.slice(1))||tGrade1(t.slice(1).replace(/^[TJ/]/,"7"))}
+function tDate(t){const m=t.match(/(\d{2})[.,:](\d{2})(?:[.,:]+(\d{2,4}))?/);if(!m||(!m[3]&&!/[.,:]$/.test(t)))return null;let d=+m[1],mo=+m[2],y=+(m[3]||0);
+  if(d>31&&/[47]/.test(m[1][0]))d=10+(d%10);if(d>31||mo>12||!d||!mo)return null;
+  const cy=new Date().getFullYear();if(y<100)y+=2000;if(y<2015||y>cy)y=cy;return `${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
+function tParse(A,B,W){/* A: pasada libre, B: pasada de cifras. Cada palabra {t,x0,y0,x1,y1} */
+  const cy=w=>(w.y0+w.y1)/2,hh=w=>w.y1-w.y0,all=A.concat(B);
+  let hd=[];all.forEach(w=>{const m=w.t.match(/^(\d{1,2})[.,](\d)/);if(!m||tDate(w.t))return;const ln=+m[1];if(!LINES[ln]||hh(w)<12||w.x0>W*.6)return;
+    if(hd.some(h=>h.line===ln&&Math.abs(cy(h.w)-cy(w))<hh(w)))return;hd.push({line:ln,n:+m[2],w})});
+  /* filas cuya cabecera no se ha leído pero sí el color: se les pone la línea de las demás */
+  const mode=hd.length?Object.entries(hd.reduce((o,h)=>(o[h.line]=(o[h.line]||0)+1,o),{})).sort((a,b)=>b[1]-a[1])[0][0]:"";
+  A.forEach(w=>{if(!tColor(w.t)||w.x0>W*.6||hd.some(h=>Math.abs(cy(h.w)-cy(w))<Math.max(hh(h.w),hh(w))))return;hd.push({line:mode?+mode:"",n:0,w,orphan:1})});
+  const grades=B.concat(A).map(w=>({w,g:tGrade(w.t)})).filter(x=>x.g),dates=all.map(w=>({w,d:tDate(w.t)})).filter(x=>x.d);
+  hd.sort((a,b)=>a.w.y0-b.w.y0);
+  const rows=[];hd.forEach((h,i)=>{const hH=Math.min(hh(h.w),80),top=h.w.y0-hH*.5,bot=i+1<hd.length?hd[i+1].w.y0-hH*.3:h.w.y1+hH*7;
+    /* color: en la propia palabra («45.1Amarillo») o a su derecha en la misma altura */
+    let col=tColor(h.w.t.replace(/^[\d.,]+/,""));
+    if(!col)A.filter(w=>w!==h.w&&Math.abs(cy(w)-cy(h.w))<hH*.8&&w.x0>h.w.x0&&w.x0<h.w.x1+W*.4).sort((a,b)=>a.x0-b.x0).some(w=>(col=tColor(w.t)));
+    const fl=A.some(w=>Math.abs(cy(w)-cy(h.w))<hH*.8&&/^fl[uú]or/i.test(w.t));
+    const gs=grades.filter(x=>cy(x.w)>h.w.y1-2&&cy(x.w)<bot&&hh(x.w)>hH*1.2&&x.w.x0<h.w.x0+W*.25).sort((a,b)=>hh(b.w)-hh(a.w));
+    /* la misma cifra leída en las dos pasadas: si una trae el «+», gana esa */
+    if(gs.length>1){const t=gs[0].w,o=gs.filter(x=>Math.abs(x.w.x0-t.x0)<hH*1.5&&Math.abs(x.w.y0-t.y0)<hH*1.5);o.sort((a,b)=>GRADES.indexOf(b.g)-GRADES.indexOf(a.g));gs[0]=o[0]}
+    const ds=dates.filter(x=>cy(x.w)>top&&cy(x.w)<bot&&x.w.x0>W*.45);
+    if(!col&&!gs.length&&!ds.length)return;
+    rows.push({line:h.line,n:h.n,hold:col||"",grade:gs[0]?.g==="8c"?"":gs[0]?.g||"",created:ds[0]?.d||"",fl})});
+  rows.forEach((r,i)=>{if(!r.n)r.n=i?rows[i-1].n+1:Math.max(1,(rows[1]?.n||2)-1)});
+  const seen=new Set();return rows.filter(r=>{const key=r.line+"."+r.n;if(seen.has(key))return false;seen.add(key);return true})}
+/* Recorte de la tablilla ampliado, suavizado y en blanco y negro con umbral local (aguanta brillos, sombras y la textura de la pared) */
+function tPre(im,cr){const sx=im.naturalWidth*cr.x0,sy=im.naturalHeight*cr.y0,sw=im.naturalWidth*(cr.x1-cr.x0),sh=im.naturalHeight*(cr.y1-cr.y0);
+  const W=1400,H=Math.max(1,Math.round(sh*W/sw)),c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(im,sx,sy,sw,sh,0,0,W,H);
+  const d=x.getImageData(0,0,W,H),p=d.data,g0=new Float64Array(W*H),g=new Float64Array(W*H),I=new Float64Array((W+1)*(H+1));
+  for(let i=0;i<W*H;i++)g0[i]=p[i*4]*.299+p[i*4+1]*.587+p[i*4+2]*.114;
+  for(let y=0;y<H;y++)for(let k=0;k<W;k++){let s=0,n=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const yy=y+dy,xx=k+dx;if(yy>=0&&yy<H&&xx>=0&&xx<W){s+=g0[yy*W+xx];n++}}g[y*W+k]=s/n}
+  for(let y=0;y<H;y++){let s=0;for(let k=0;k<W;k++){s+=g[y*W+k];I[(y+1)*(W+1)+k+1]=I[y*(W+1)+k+1]+s}}
+  const R=30,C=18;for(let y=0;y<H;y++){const a=Math.max(0,y-R),b=Math.min(H,y+R+1);for(let k=0;k<W;k++){const l=Math.max(0,k-R),r=Math.min(W,k+R+1);
+    const m=(I[b*(W+1)+r]-I[a*(W+1)+r]-I[b*(W+1)+l]+I[a*(W+1)+l])/((b-a)*(r-l)),v=g[y*W+k]<m-C?0:255,j=(y*W+k)*4;p[j]=p[j+1]=p[j+2]=v;p[j+3]=255}}
+  x.putImageData(d,0,0);return c}
+const tWords=r=>(r.data.words||[]).map(w=>({t:(w.text||"").trim(),x0:w.bbox.x0,y0:w.bbox.y0,x1:w.bbox.x1,y1:w.bbox.y1})).filter(w=>w.t);
+function tRead(file){const url=URL.createObjectURL(file);S.tq={st:"crop",img:url,crop:{x0:.12,y0:.25,x1:.88,y1:.75}};mapView()}
+async function tOcr(){const q=S.tq,url=q.img,cr={...q.crop};S.tq={...q,st:"read"};mapView();let rows=[],err=false;
+  try{const im=await kImg(url),c=tPre(im,cr);await loadTess();const wk=await Tesseract.createWorker("eng");
+    try{await wk.setParameters({tessedit_pageseg_mode:"11"});const A=tWords(await wk.recognize(c));
+      await wk.setParameters({tessedit_char_whitelist:"0123456789abc+."});const B=tWords(await wk.recognize(c));rows=tParse(A,B,1400)}
+    finally{wk.terminate().catch(()=>{})}}
+  catch(e){err=true}
+  if(!S.tq||S.tq.img!==url)return;
+  if(!rows.length)rows=[{line:"",n:1,hold:"",grade:"",created:""}];
+  S.tq={st:"rows",img:url,crop:cr,rows,also:false,off:new Set(),err,none:!rows[0].line&&!rows[0].hold};mapView()}
+/* Marco para encuadrar la tablilla: se arrastran las esquinas o el marco entero */
+function bindCrop(){const box=$("#tcb"),fr=$("#tfr"),q=S.tq;if(!box||!fr)return;
+  const put=()=>{const c=q.crop;Object.assign(fr.style,{left:c.x0*100+"%",top:c.y0*100+"%",width:(c.x1-c.x0)*100+"%",height:(c.y1-c.y0)*100+"%"})};put();
+  let drag=null;
+  const at=e=>{const r=box.getBoundingClientRect();return[Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))]};
+  box.onpointerdown=e=>{const h=e.target.dataset.h;if(!h&&e.target!==fr)return;e.preventDefault();box.setPointerCapture(e.pointerId);drag={h:h||"m",p:at(e),c:{...q.crop}}};
+  box.onpointermove=e=>{if(!drag)return;const[x,y]=at(e),dx=x-drag.p[0],dy=y-drag.p[1],c={...drag.c},M=.06;
+    if(drag.h==="m"){const w=c.x1-c.x0,h=c.y1-c.y0;c.x0=Math.min(1-w,Math.max(0,c.x0+dx));c.y0=Math.min(1-h,Math.max(0,c.y0+dy));c.x1=c.x0+w;c.y1=c.y0+h}
+    else{if(drag.h.includes("l"))c.x0=Math.min(c.x1-M,Math.max(0,c.x0+dx));if(drag.h.includes("r"))c.x1=Math.max(c.x0+M,Math.min(1,c.x1+dx));
+      if(drag.h.includes("t"))c.y0=Math.min(c.y1-M,Math.max(0,c.y0+dy));if(drag.h.includes("b"))c.y1=Math.max(c.y0+M,Math.min(1,c.y1+dy))}
+    q.crop=c;put()};
+  box.onpointerup=box.onpointercancel=()=>{drag=null}}
+const tOther=()=>S.sec==="cuerda"?"autoseguro":"cuerda";
+/* Qué cambia en cada línea: la tablilla manda. Vía igual (mismo color) se corrige, la nueva se añade y la que ya no está se desmonta */
+function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&&GRADES.includes(r.grade)),secs=[S.sec].concat(q.also?[tOther()]:[]),items=[],notes=[];
+  const lines=[...new Set(ok.map(r=>+r.line))].sort((a,b)=>a-b);
+  for(const sec of secs)for(const ln of lines){if(UNUSED[sec]?.has(ln)){notes.push(`La línea ${ln} está tachada en ${sec}: no se toca.`);continue}
+    const cur=S.routes.filter(r=>r.active&&r.sec===sec&&r.line===ln),used=new Set();
+    ok.filter(r=>+r.line===ln).forEach(t=>{const m=cur.find(c=>!used.has(c.id)&&c.hold===t.hold);
+      if(m){used.add(m.id);const ch={};if(m.grade!==t.grade)ch.grade=t.grade;if(t.created&&m.created!==t.created)ch.created=t.created;
+        if(Object.keys(ch).length)items.push({k:sec+m.id,op:"upd",sec,ln,id:m.id,ch,txt:`${HOLDS[t.hold][0]}: ${ch.grade?`${m.grade} → ${t.grade}`:t.grade}${ch.created?` · fecha ${fdate(t.created)}`:""}`});
+        else items.push({k:sec+m.id,op:"same",sec,ln,txt:`${HOLDS[t.hold][0]} ${t.grade}: ya está igual`})}
+      else items.push({k:sec+ln+t.hold+t.grade+(t.n||""),op:"add",sec,ln,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created||isoDay(new Date())},txt:`${HOLDS[t.hold][0]} ${t.grade}${t.created?" · "+fdate(t.created):""}`})});
+    cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",sec,ln,id:c.id,txt:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: ya no está en la tablilla`}))}
+  return{items,notes,bad:q.rows.length-ok.length}}
+const TOP={add:["Añadir","up"],upd:["Corregir","eq"],del:["Desmontar","dw"],same:["Igual",""]};
+function tPlanHtml(){const{items,notes,bad}=tPlan(),q=S.tq,secs=[...new Set(items.map(i=>i.sec))];
+  const act=items.filter(i=>i.op!=="same"&&!q.off.has(i.k)).length;
+  return `${bad?`<div class="sub" style="color:var(--gold)">${bad===1?"Hay 1 fila":"Hay "+bad+" filas"} sin completar (línea, color o grado). No se aplicará${bad===1?"":"n"} hasta que la${bad===1?"":"s"} completes.</div>`:""}
+   ${secs.map(sec=>`<div class="k" style="margin-top:6px">${SECTIONS.find(s=>s.id===sec).name}</div>${items.filter(i=>i.sec===sec).map(i=>`<label class="tpi ${i.op}">${i.op==="same"?'<span class="tck">✓</span>':`<input type="checkbox" data-tk="${i.k}" ${q.off.has(i.k)?"":"checked"}>`}<span><b>Línea ${i.ln} · ${TOP[i.op][0]}</b><br><span class="sub">${esc(i.txt)}</span></span></label>`).join("")}`).join("")}
+   ${notes.map(n=>`<div class="sub">${esc(n)}</div>`).join("")}
+   ${items.length?"":`<div class="sub">Completa las filas para ver los cambios.</div>`}
+   <button class="pri" id="tap" ${act?"":"disabled"}>${act?`Aplicar ${act} ${act===1?"cambio":"cambios"}`:"No hay cambios que aplicar"}</button>`}
+function tBox(){const q=S.tq;
+  if(!q)return `<label class="kup tup" for="tfile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Subir foto de tablilla</b><span class="sub">Haz la foto de frente y con luz. Después encuadras la tablilla, la app lee las vías y te enseña qué cambia antes de guardar. La foto no se guarda.</span><input type="file" id="tfile" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label>`;
+  if(q.st==="crop")return `<div class="kd"><div class="kstate" style="color:#2fe0e6">Encuadra solo la tablilla: arrastra las esquinas del marco.</div>
+   <div class="tcb" id="tcb"><img src="${q.img}" alt="Tu foto de la tablilla" draggable="false"><div class="tfr" id="tfr">${["tl","tr","bl","br"].map(h=>`<i class="th ${h}" data-h="${h}"></i>`).join("")}</div></div>
+   <button class="pri" id="tgo">Leer la tablilla</button><button id="tx">Cancelar</button></div>`;
+  if(q.st==="read")return `<div class="kd"><div class="kshot"><img src="${q.img}" alt="Tu foto de la tablilla"><div class="kscan"></div></div><div class="kstate"><i></i>Leyendo la tablilla… puede tardar unos segundos.</div><button id="tx">Cancelar</button></div>`;
+  const opt=(v,l,cur)=>`<option value="${v}" ${String(v)===String(cur)?"selected":""}>${l}</option>`;
+  return `<div class="kd tq"><div class="kshot"><img src="${q.img}" alt="Tu foto de la tablilla"></div>
+   <div class="kstate" style="color:${q.none?"var(--gold)":"#2fe0e6"}">${q.none?"No he podido leer la tablilla. Rellena las vías a mano.":"✓ Revisa lo leído: corrige lo que esté mal."}</div>
+   ${q.rows.map((r,i)=>`<div class="trow" data-ti="${i}"><label>Línea<input inputmode="numeric" data-tf="line" value="${esc(r.line)}" class="${LINES[+r.line]?"":"bad"}"></label>
+     <label>Color${r.fl?' <span class="sub">(flúor)</span>':""}<select data-tf="hold" class="${HOLDS[r.hold]?"":"bad"}">${opt("","Elige",r.hold)}${Object.entries(HOLDS).map(([k,v])=>opt(k,v[0],r.hold)).join("")}</select></label>
+     <label>Grado<select data-tf="grade" class="${GRADES.includes(r.grade)?"":"bad"}">${opt("","Elige",r.grade)}${GRADES.map(g=>opt(g,g,r.grade)).join("")}</select></label>
+     <label>Montada<input type="date" data-tf="created" value="${esc(r.created)}" max="${isoDay(new Date())}"></label>
+     <button type="button" class="tdel" data-tdel="${i}" aria-label="Quitar esta fila">✕</button></div>`).join("")}
+   <button type="button" class="link" id="tadd">+ Añadir otra vía</button>
+   <label class="chk"><input type="checkbox" id="talso" ${q.also?"checked":""}> Aplicar también en ${tOther()} (la misma vía está en las dos)</label>
+   <div class="tplan" id="tplan">${tPlanHtml()}</div>
+   <button id="tx">Cancelar</button></div>`}
+function bindTBox(){const q=S.tq;
+  if($("#tfile"))$("#tfile").onchange=e=>{const f=e.target.files[0];if(f)tRead(f)};
+  if($("#tx"))$("#tx").onclick=()=>{if(S.tq?.img)URL.revokeObjectURL(S.tq.img);S.tq=null;mapView()};
+  if(q?.st==="crop"){bindCrop();$("#tgo").onclick=tOcr}
+  if(!q||q.st!=="rows")return;
+  const plan=()=>{$("#tplan").innerHTML=tPlanHtml();bindPlan()};
+  document.querySelectorAll("[data-tf]").forEach(el=>{const i=+el.closest("[data-ti]").dataset.ti,f=el.dataset.tf;el.oninput=el.onchange=()=>{q.rows[i][f]=f==="line"?el.value.replace(/\D/g,""):el.value;
+    el.classList.toggle("bad",f==="line"?!LINES[+q.rows[i].line]:f==="hold"?!HOLDS[el.value]:f==="grade"?!GRADES.includes(el.value):false);plan()}});
+  document.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{q.rows.splice(+b.dataset.tdel,1);if(!q.rows.length)q.rows.push({line:"",n:1,hold:"",grade:"",created:""});mapView()});
+  $("#tadd").onclick=()=>{const l=q.rows[q.rows.length-1];q.rows.push({line:l?.line||"",n:(l?.n||0)+1,hold:"",grade:"",created:l?.created||""});mapView()};
+  $("#talso").onchange=e=>{q.also=e.target.checked;plan()};
+  const bindPlan=()=>{document.querySelectorAll("[data-tk]").forEach(c=>c.onchange=()=>{c.checked?q.off.delete(c.dataset.tk):q.off.add(c.dataset.tk);plan()});
+    $("#tap").onclick=tApply};
+  bindPlan()}
+async function tApply(){if(S.busy)return;const{items}=tPlan(),q=S.tq,todo=items.filter(i=>i.op!=="same"&&!q.off.has(i.k));if(!todo.length)return;
+  S.busy=true;$("#tap").disabled=true;$("#tap").textContent="Guardando…";const n={add:0,upd:0,del:0};let err=null;
+  try{const adds=todo.filter(i=>i.op==="add").map(i=>i.row);
+    if(adds.length){const r=await sb.from("liga_routes").insert(adds).select();if(r.error)throw r.error;applyRows(r.data);n.add=r.data.length}
+    for(const i of todo.filter(i=>i.op!=="add")){const r=await sb.from("liga_routes").update(i.op==="del"?{active:false}:i.ch).eq("id",i.id).select();if(r.error)throw r.error;applyRows(r.data);n[i.op]++}}
+  catch(e){err=e}
+  S.busy=false;const sum=[n.add&&`${n.add} ${n.add===1?"añadida":"añadidas"}`,n.upd&&`${n.upd} ${n.upd===1?"corregida":"corregidas"}`,n.del&&`${n.del} ${n.del===1?"desmontada":"desmontadas"}`].filter(Boolean).join(", ");
+  if(err){toast(`No se ha podido guardar todo: ${err.message||err}${sum?". Hecho: "+sum:""}`);$("#tap").disabled=false;$("#tap").textContent="Reintentar";return}
+  const ln=todo[0].ln;URL.revokeObjectURL(q.img);S.tq=null;S.zone=LINES[ln]?.zone||S.zone;S.open=null;toast("Tablilla aplicada: "+(sum||"sin cambios"));mapView();
+  setTimeout(()=>document.querySelector(`[aria-label="Línea ${ln}"]`)?.scrollIntoView({behavior:"smooth",block:"start"}),60)}
 
 /* ---------- Boulder: plano de la sala, sectores y bloques por color ---------- */
 function bSvg(){
@@ -1492,8 +1642,8 @@ function mapSvg(){
 
 function mapView(){
   const z=ZONES[S.sec]?.find(x=>x.id===S.zone);
-  $("#body").innerHTML=`${ZONES[S.sec]?finderHtml():""}<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
-  if(ZONES[S.sec])bindFinder(mapView);
+  $("#body").innerHTML=`${S.edit&&ZONES[S.sec]?tBox():""}${ZONES[S.sec]?finderHtml():""}<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
+  if(ZONES[S.sec])bindFinder(mapView);if(S.edit)bindTBox();
   document.querySelectorAll(".zone").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;mapView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!ZONES[S.sec])return;
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}`;bindNews(mapView);return}
