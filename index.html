@@ -1787,6 +1787,12 @@ function rankView(){
   document.querySelectorAll("[data-hy]").forEach(b=>b.onclick=()=>{S.hy=+b.dataset.hy;S.hopen=null;rankView()});
 }
 start();
+
+/* Al redibujar una pantalla (marcar, montar, cambiar de muro…) se mantiene donde estabas:
+   mientras se rehace, la página se queda corta un momento y el navegador subía arriba del todo */
+const keepY=fn=>function(...a){const y=scrollY,r=fn.apply(this,a);if(Math.abs(scrollY-y)>1)scrollTo(0,y);return r};
+boulderView=keepY(boulderView);mapView=keepY(mapView);kilterView=keepY(kilterView);
+{const r0=render;render=function(){const top=S.scrollTop,y=scrollY;r0();if(!top&&Math.abs(scrollY-y)>1)scrollTo(0,y)}}
 </script>
 <script>
 /* Actualizaciones: se busca versión nueva al volver a la app y cada 30 min; si la hay, sale un aviso para recargar */
