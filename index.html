@@ -39,7 +39,6 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .stack{display:flex;flex-direction:column;gap:10px}
 .who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 .who select,.who input{flex:1 1 140px}
-.demo{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px dashed var(--g2);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:14px}
 .sec{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
 .sec b{font:700 30px/1 var(--disp)}
 .sec .pts{grid-row:1/3;grid-column:2;text-align:right;font:700 28px/1 var(--disp);font-variant-numeric:tabular-nums}
@@ -330,12 +329,7 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
   BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
 })();
 const BFLOOR="M125 22 L620 22 L620 450 L322 525 L322 660 L125 660 Z";
-let bseed=11;const brnd=()=>(bseed=(bseed*16807)%2147483647)/2147483647;
-function demoBoulders(){const out=[];BSECT.forEach(z=>{const n=z.short?1+Math.floor(brnd()*3):3+Math.floor(brnd()*5);for(let i=0;i<n;i++)out.push({id:newId("b"),sec:"boulder",zone:z.id,color:BKEYS[Math.min(7,Math.floor(brnd()*brnd()*9))],hold:Object.keys(HOLDS)[Math.floor(brnd()*9)],created:isoDay(new Date(Date.now()-Math.floor(brnd()*70)*864e5)),active:true})});return out}
-function demoBAsc(users,bs,asc){const now=new Date();users.forEach((u,k)=>{for(let j=0;j<[10,14,7,11][k%4];j++){const b=bs[Math.floor(brnd()*bs.length)];const back=brnd()<.55?Math.floor(brnd()*6):40+Math.floor(brnd()*200);const at=new Date(now-back*864e5);if(at.getFullYear()!==now.getFullYear())continue;
-  upsert(asc,{u:u.id,route:b.id,sec:"boulder",grade:b.color,style:brnd()<.35?"Flash":"Encadenado",at:at.toISOString()})}})}
 const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Dic"];
-const KEY="liga-rocodromo-v2";
 
 /* ---------- Mapa cenital de Cuerda: W con los fondos rectos + L exterior ---------- */
 /* Escala única: cada línea ocupa SP unidades en todas las paredes, así las longitudes son proporcionales al número de líneas. */
@@ -388,28 +382,16 @@ const FIRST={p4:1,a2:11,p3:15,p2:26,a1:37,p1:42,p1b:55,x1:68,x2:76};
 const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
 /* Autoseguro usa las mismas paredes y líneas que cuerda, con sus propias vías y su propio ranking */
 ZONES.autoseguro=ZONES.cuerda;
-function demoAuto(users,asc){const out=[],hk=Object.keys(HOLDS),now=new Date();const nums=Object.keys(LINES).map(Number).filter(()=>rnd()<.3);
-  nums.forEach(n=>{const k=1+Math.floor(rnd()*2);for(let i=0;i<k;i++)out.push({id:newId("r"),sec:"autoseguro",line:n,grade:GRADES[2+Math.floor(rnd()*8)],hold:hk[Math.floor(rnd()*hk.length)],active:true,created:isoDay(new Date(Date.now()-Math.floor(rnd()*90)*864e5))})});
-  users.forEach((u,k)=>{for(let j=0;j<[6,9,4,7][k%4];j++){const r=out[Math.floor(rnd()*out.length)];const back=rnd()<.55?Math.floor(rnd()*6):40+Math.floor(rnd()*200);const at=new Date(now-back*864e5);if(at.getFullYear()!==now.getFullYear())continue;
-    upsert(asc,{u:u.id,route:r.id,sec:"autoseguro",grade:r.grade,style:STYLES[Math.floor(rnd()*STYLES.length)][0],at:at.toISOString()})}});return out}
-function along(pts,t){let L=[],tot=0;for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);L.push(l);tot+=l}
-  let d=t*tot;for(let i=0;i<L.length;i++){if(d<=L[i]||i===L.length-1)return lerp(pts[i],pts[i+1],Math.min(1,d/L[i]));d-=L[i]}}
 
 /* ---------- Datos ---------- */
-let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-let uid=0;const newId=p=>p+Date.now().toString(36)+(uid++);
-function lineRoutes(L){const out=[],hk=Object.keys(HOLDS),used=new Set();for(let i=0;i<3;i++){let h;do h=hk[Math.floor(rnd()*hk.length)];while(used.has(h));used.add(h);
-    out.push({id:newId("r"),sec:L.sec,line:L.num,grade:GRADES[2+Math.floor(rnd()*10)],hold:h,active:true,created:isoDay(new Date(Date.now()-Math.floor(rnd()*90)*864e5))})}return out}
 function isoDay(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 const fdate=s=>{if(!s)return"";const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})};
-function makeRoutes(){return Object.values(LINES).flatMap(lineRoutes)}
 function bimKey(d){return d.getFullYear()+"-"+Math.floor(d.getMonth()/2)}
 
 /* ---------- Supabase: datos compartidos por todos ---------- */
 const READY=!/PEGA_AQUI/.test(CFG.url+CFG.key)&&typeof supabase!=="undefined";
 const sb=READY?supabase.createClient(CFG.url,CFG.key):null;
 const S={people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
-function save(){}
 async function fetchAll(build){let out=[];for(let from=0;;from+=1000){const{data,error}=await build().range(from,from+999);if(error)throw error;out=out.concat(data);if(data.length<1000)return out}}
 async function loadAll(){
   const q=t=>sb.from(t).select("*").then(x=>{if(x.error)throw x.error;return x.data});
@@ -421,16 +403,17 @@ async function loadAll(){
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
   STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
-  setPeople(p);S.routes=r.map(mapR);S.asc=a.map(mapA);S.synced=Date.now();
+  setPeople(p);S.routes=r.map(mapR).filter(okR);S.asc=a.map(mapA);
 }
 /* Carga por partes: después de la carga inicial, solo viajan las filas que cambian (tiempo real o la respuesta de lo que guardas) */
 const mapR=x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active});
+const okR=r=>r.sec==="boulder"?!!BCOL[r.grade]:GRADES.includes(r.grade);
 const mapA=x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at});
 function setPeople(p){S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));S.users=S.people.filter(x=>x.ok)}
 async function loadPeople(){setPeople(await fetchAll(()=>sb.from("liga_people").select("*").order("user_id")))}
 function putIn(list,row){const i=list.findIndex(x=>x.id===row.id);if(i<0)list.push(row);else list[i]=row}
 function applyRows(data){if(!data)return;(Array.isArray(data)?data:[data]).forEach(x=>{if(!x||!x.id)return;
-  if("route_id" in x)putIn(S.asc,mapA(x));else if("sec" in x&&"active" in x)putIn(S.routes,mapR(x))})}
+  if("route_id" in x)putIn(S.asc,mapA(x));else if("sec" in x&&"active" in x){const r=mapR(x);if(okR(r))putIn(S.routes,r)}})}
 const dropAsc=id=>{S.asc=S.asc.filter(a=>a.id!==id)};
 let session=null;
 async function refresh(){
@@ -456,7 +439,6 @@ let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
 function onRt(p){const t=p.table;
-  if(t==="players"){loadPeople().then(()=>S.owner?loadPending():0).then(redraw,()=>{});return}
   if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_ascents")dropAsc(id);else S.routes=S.routes.filter(r=>r.id!==id)}
   else applyRows(p.new);
   redraw()}
@@ -482,12 +464,12 @@ async function start(){
   render();
   try{
     session=(await sb.auth.getSession()).data.session;
-    sb.auth.onAuthStateChange((ev,s)=>{session=s;if(ev==="SIGNED_IN"||ev==="SIGNED_OUT"||ev==="USER_UPDATED")setTimeout(()=>refresh().catch(showErr),0)});
+    /* Supabase repite SIGNED_IN al volver a la pestaña: solo se recarga todo si cambia la persona o sus datos */
+    sb.auth.onAuthStateChange((ev,s)=>{session=s;if((ev==="SIGNED_IN"&&(s?.user?.id||null)!==S.me)||ev==="SIGNED_OUT"||ev==="USER_UPDATED")setTimeout(()=>refresh().catch(showErr),0)});
     await refresh();
     let wasOn=false,hidAt=0;
     sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},onRt)
       .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},onRt)
-      .on("postgres_changes",{event:"*",schema:"public",table:"players"},onRt)
       .subscribe(st=>{if(st==="SUBSCRIBED"){if(wasOn)bump();wasOn=true}});
     document.addEventListener("visibilitychange",()=>{if(document.hidden)hidAt=Date.now();else if(hidAt&&Date.now()-hidAt>60000)bump()});
   }catch(e){showErr(e)}
@@ -588,7 +570,7 @@ function pendingView(){
   <p class="sub">Es la misma aprobación que en «El grado es subjetivo»: en cuanto te aprueben, podrás entrar en las dos apps.</p>
   <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="pri" id="rt">Comprobar de nuevo</button><button id="see">Ver la liga sin marcar</button><button id="out">Salir</button></div></article>`;
   $("#rt").onclick=async()=>{$("#rt").disabled=true;await refresh()};
-  $("#see").onclick=()=>{S.view="home";S.peek=true;render()};
+  $("#see").onclick=()=>{S.view="home";render()};
   $("#out").onclick=()=>sb.auth.signOut();
 }
 /* Administrador: aprobar o quitar escaladores (compartido con «El grado es subjetivo») */
@@ -809,7 +791,7 @@ function bindB(z){
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return boulderView()}S.arm=null;unmark(b)};
   if(S.edit){
     $("#esv").onclick=()=>{const color=$("#bc").value,created=$("#ec").value;
-      if(S.routes.some(x=>x!==b&&x.active&&x.sec==="boulder"&&x.zone===b.zone&&x.color===color&&(x.created||"")===created)){const e=$("#eerr");e.textContent=`Ya hay un bloque ${BCOL[color][0].toLowerCase()} en ${z.name} con esa fecha de creación. Cambia el color o la fecha.`;e.hidden=false;return}
+      if(S.routes.some(x=>x!==b&&x.active&&x.sec==="boulder"&&x.zone===b.zone&&x.color===color&&(x.hold||"")===($("#bh").value||"")&&(x.created||"")===created)){const e=$("#eerr");e.textContent=`Ya hay un bloque ${BCOL[color][0].toLowerCase()} con esas presas en ${z.name} y esa fecha de creación. Cambia algo.`;e.hidden=false;return}
       updRoute(b.id,{grade:color,created:created||null,hold:$("#bh").value||null})};
     $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return boulderView()}S.arm=null;S.open=null;updRoute(b.id,{active:false})}}
 }
@@ -848,7 +830,6 @@ function resultsHtml(){const hs=fHits();if(!hs)return null;const bl=S.sec==="bou
     :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}`).join("")}</section>`}
 
 function mapSvg(){
-  if(!ZONES[S.sec])return `<div class="hint">${S.sec==="autoseguro"?"Autoseguro usará las paredes del mapa de cuerda.":"El mapa de boulder llegará más adelante."}</div>`;
   let g="";
   const f=v=>v.toFixed(1),hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   ZONES[S.sec].forEach(z=>{const sel=S.zone===z.id;const[p,q]=z.pts;const L=Math.hypot(q[0]-p[0],q[1]-p[1]);const dx=(q[0]-p[0])/L,dy=(q[1]-p[1])/L;
