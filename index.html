@@ -381,6 +381,10 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion:no-preference){#body.swl{animation:swl .28s ease-out}#body.swr{animation:swr .28s ease-out}
 @keyframes swl{from{transform:translateX(40px);opacity:.3}}@keyframes swr{from{transform:translateX(-40px);opacity:.3}}}
 main{overflow-x:clip}
+/* Aviso de versión nueva y botón de actualizar */
+.upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:50;display:flex;gap:12px;align-items:center;background:var(--gold);color:#0f1720;font-weight:600;border-radius:10px;padding:8px 8px 8px 14px;width:max-content;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.upd button{background:#0f1720;color:#fff;border-color:#0f1720;min-height:36px;padding:4px 12px}
+#frf{display:block;margin:6px auto 0;color:var(--mut);font-size:13px}
 </style>
 
 </head>
@@ -1083,8 +1087,10 @@ function home(){
     <span class="pts">${mine?fmt(mine.p):"0"}<small>tus puntos</small></span></button>`}).join("")}</div>
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>
-  ${S.owner?`<button class="link" id="bkp">Descargar copia de seguridad (Excel)</button>`:""}`;
+  ${S.owner?`<button class="link" id="bkp">Descargar copia de seguridad (Excel)</button>`:""}
+  <button class="link" id="frf">Actualizar la app</button>`;
   bindWho();$("#rls").onclick=openRules;if($("#bkp"))$("#bkp").onclick=backup;mountSong();
+  $("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   document.querySelectorAll(".sec").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.s;S.tab=(ZONES[S.sec]||S.sec==="boulder")?"mapa":"ranking";S.zone=null;S.open=null;S.scrollTop=true;render()});
 }
 
@@ -1332,6 +1338,15 @@ function rankView(){
 }
 start();
 </script>
-<script>if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+<script>
+/* Actualizaciones: se busca versión nueva al volver a la app y cada 30 min; si la hay, sale un aviso para recargar */
+function showUpdate(){if(document.getElementById("upd"))return;const d=document.createElement("div");d.id="upd";d.className="upd";d.setAttribute("role","status");
+  d.innerHTML='<span>Hay una versión nueva de la app</span><button id="updgo">Actualizar</button>';document.body.appendChild(d);document.getElementById("updgo").onclick=()=>location.reload()}
+async function forceRefresh(){try{const r=await navigator.serviceWorker?.getRegistration();await r?.update();const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}catch(e){}location.reload()}
+if("serviceWorker" in navigator)window.addEventListener("load",async()=>{try{
+  const had=!!navigator.serviceWorker.controller,reg=await navigator.serviceWorker.register("sw.js",{updateViaCache:"none"});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had)showUpdate()});
+  const check=()=>reg.update().catch(()=>{});document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()});setInterval(check,30*6e4)}catch(e){}});
+</script>
 </body>
 </html>
