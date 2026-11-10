@@ -477,19 +477,21 @@ function goRoute(r){S.view="sec";S.sec=r.sec;S.tab="mapa";S.zone=zoneOf(r);S.ope
   setTimeout(()=>document.querySelector(`[data-r="${r.id}"]`)?.scrollIntoView({behavior:"smooth",block:"center"}),60)}
 function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select().single();if(r.error)throw r.error;applyRows(r.data);S.open=r.data.id})}
 function updRoute(id,o){return act(()=>sb.from("liga_routes").update(o).eq("id",id).select())}
+let wired=false;
 async function start(){
   if(!READY){S.view="setup";return render()}
   render();
   try{
-    session=(await sb.auth.getSession()).data.session;
+    session=(await sb.auth.getSession()).data.session;S.me=session?.user?.id||null;
+    if(wired){await refresh();return}wired=true;
     /* Supabase repite SIGNED_IN al volver a la pestaña: solo se recarga todo si cambia la persona o sus datos */
     sb.auth.onAuthStateChange((ev,s)=>{session=s;if(ev==="PASSWORD_RECOVERY"){S.rec=true;S.view="newpw";render();return}if((ev==="SIGNED_IN"&&(s?.user?.id||null)!==S.me)||ev==="SIGNED_OUT"||ev==="USER_UPDATED")setTimeout(()=>refresh().catch(showErr),0)});
-    await refresh();
     let wasOn=false,hidAt=0;
     sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},onRt)
       .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},onRt)
       .subscribe(st=>{if(st==="SUBSCRIBED"){if(wasOn)bump();wasOn=true}});
     document.addEventListener("visibilitychange",()=>{if(document.hidden)hidAt=Date.now();else if(hidAt&&Date.now()-hidAt>60000)bump()});
+    await refresh();
   }catch(e){showErr(e)}
 }
 function showErr(e){S.view="error";S.err=e.message||String(e);render()}
@@ -630,7 +632,7 @@ function approvals(){
 }
 function openRules(){S.back=S.view;S.view="rules";S.scrollTop=true;render()}
 function rules(){
-  const ex=Math.round(GP["6b"]*1.3);
+  const av=SM["A vista"]||1,ex=Math.round(GP["6b"]*av),dec=n=>String(n).replace(".",",");
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   <article class="rl"><h2>Cómo se puntúa</h2>
   <p>La liga tiene tres secciones: <b>Cuerda</b>, <b>Autoseguro</b> y <b>Boulder</b>. Cada una tiene su propio ranking y los puntos de una no cuentan en las otras.</p>
@@ -643,11 +645,11 @@ function rules(){
    <li>Si haces a vista una vía de cuerda que también está en autoseguro, en autoseguro se te marca sola a vista.</li>
   </ul>
   <div class="mult">${STYLES.map(([s,m])=>`<div><b>×${String(m).replace(".",",")}</b><span>${s}</span></div>`).join("")}</div>
-  <p class="sub">Ejemplo: un 6b a vista da ${GP["6b"]} × 1,3 = ${ex} puntos.</p>
+  <p class="sub">Ejemplo: un 6b a vista da ${GP["6b"]} × ${dec(av)} = ${ex} puntos.</p>
   <h3>Cuerda y autoseguro: puntos por grado</h3>
   <div class="gpt">${GRADES.map(g=>`<div><b style="color:${gcol(g)}">${g}</b><span>${GP[g]}</span></div>`).join("")}</div>
   <h3>Boulder: puntos por color</h3>
-  <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×1,2.</p>
+  <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
   <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
   <h3>Ranking anual</h3>
   <ul>
@@ -777,7 +779,7 @@ function section(){
   <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body"></div>`;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
-  if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;section()};
+  if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
   $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
   S.tab==="mapa"?(S.sec==="boulder"?boulderView():mapView()):rankView();
 }

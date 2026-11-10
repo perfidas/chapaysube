@@ -1,5 +1,5 @@
 // Guarda la app para que abra rápido y funcione sin conexión. Sube la versión al publicar cambios.
-const CACHE = "liga-sc-v42";
+const CACHE = "liga-sc-v43";
 const FILES = ["./", "index.html", "manifest.webmanifest", "iconos/icono-192.png", "iconos/icono-512.png", "iconos/icono-maskable-512.png", "iconos/apple-touch-icon.png", "iconos/favicon-32.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n))))); self.clients.claim(); });
