@@ -385,7 +385,9 @@ main{overflow-x:clip}
 .upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:50;display:flex;gap:12px;align-items:center;background:var(--gold);color:#0f1720;font-weight:600;border-radius:10px;padding:8px 8px 8px 14px;width:max-content;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .upd button{background:#0f1720;color:#fff;border-color:#0f1720;min-height:36px;padding:4px 12px}
 #frf{display:block;margin:6px auto 0;color:var(--mut);font-size:13px}
-.rnb{display:block;margin:-6px 0 14px;font-size:14px}
+.rnb{display:block;margin:-6px 0 2px;font-size:14px}
+.rnh{display:block;margin:0 0 14px;font-size:12px}
+p.rnb{margin:-6px 0 14px}
 .rnf{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:-4px 0 14px;display:flex;flex-direction:column;gap:8px}
 .rnf .row{display:flex;gap:8px}
 </style>
@@ -965,7 +967,8 @@ function rules(){
 }
 
 /* ---------- Perfil de un escalador ---------- */
-function openProfile(id){S.pid=id;S.ren=false;if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
+async function loadNameNext(){if(!S.me)return;const{data}=await sb.rpc("liga_name_next");S.nameNext=data||null}
+function openProfile(id){S.pid=id;S.ren=false;if(id===S.me)loadNameNext().then(()=>{if(S.view==="perfil"&&S.pid===S.me&&!S.ren)perfil()}).catch(()=>{});if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
 const ord=n=>n?n+".º":"–";
 function bestOf(as,sec){if(!as.length)return"–";
   if(sec==="boulder"){const k=as.map(a=>a.grade).sort((a,b)=>BKEYS.indexOf(b)-BKEYS.indexOf(a))[0];return BCOL[k]?`<i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}`:"–"}
@@ -1027,7 +1030,7 @@ function perfil(){
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}
-  ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»)<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button>`):""}
+  ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml():""}
   ${vitrinaHtml(u.id)}
@@ -1049,7 +1052,7 @@ function perfil(){
   if($("#rnf"))$("#rnf").onsubmit=async e=>{e.preventDefault();const v=$("#rnn").value.trim(),er=t=>{$("#rne").textContent=t;$("#rne").hidden=false};
     if(v.length<2||v.length>30)return er("El nombre tiene que tener entre 2 y 30 caracteres.");if(v===me()?.name){S.ren=false;return perfil()}
     $("#rngo").disabled=true;const{error}=await sb.rpc("liga_rename",{p_name:v});$("#rngo").disabled=false;
-    if(error)return er(error.message);S.ren=false;await loadPeople();perfil();toast("Nombre cambiado.")};
+    if(error)return er(error.message);S.ren=false;await loadPeople();await loadNameNext();perfil();toast("Nombre cambiado.")};
   document.querySelectorAll("[data-pr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.pr);if(r)goRoute(r)});
   document.querySelectorAll("[data-ps]").forEach(b=>b.onclick=()=>{S.psec=b.dataset.ps;const y0=scrollY;perfil();scrollTo(0,y0)});
 }
