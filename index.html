@@ -286,7 +286,7 @@ button.on{color:#fff}
 const CFG={url:"https://ctziadohyvkyikcjbepz.supabase.co",key:"sb_publishable_QMkPAjb5L-ZKNXPxX1mDjw_djy4fNKT"};
 const GRADES=["4","5a","5b","5c","6a","6a+","6b","6b+","6c","6c+","7a","7a+","7b","7b+","7c","7c+","8a","8a+","8b"];
 const GP={"4":30,"5a":45,"5b":60,"5c":80,"6a":100,"6a+":120,"6b":150,"6b+":180,"6c":220,"6c+":260,"7a":320,"7a+":380,"7b":450,"7b+":520,"7c":600,"7c+":700,"8a":800,"8a+":920,"8b":1050};
-const STYLES=[["A vista",1.3],["Flash",1.15],["Encadenada",1]];
+const STYLES=[["A vista",1.3],["Encadenada",1]]; /* En vías ya no hay flash; los flash antiguos se siguen mostrando y puntuando */
 const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
 const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"}];
@@ -452,9 +452,9 @@ async function act(fn){if(S.busy)return;S.busy=true;
   S.busy=false;render()}
 function markAscent(route,style){S.jm=route.id;clearTimeout(S.jmt);S.jmt=setTimeout(()=>S.jm=null,1500);if(!S.me)return needLogin();if(!S.owner&&!S.users.some(u=>u.id===S.me))return toast("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás marcar tus vías.");const a=myAsc(route.id);
   return act(async()=>{const r=await(a?sb.from("liga_ascents").update({style}).eq("id",a.id).select():sb.from("liga_ascents").insert({route_id:route.id,style}).select());if(r.error)return r;
-    /* A vista o flash en cuerda: la misma vía de autoseguro se marca sola como flash */
-    if(route.sec==="cuerda"&&(style==="A vista"||style==="Flash")){const tw=S.routes.find(x=>x.active&&x.sec==="autoseguro"&&x.line===route.line&&x.grade===route.grade&&x.hold===route.hold);
-      if(tw&&!myAsc(tw.id)){const r2=await sb.from("liga_ascents").insert({route_id:tw.id,style:"Flash"}).select();if(!r2.error)applyRows(r2.data);if(!r2.error)toast("También se ha marcado como flash en autoseguro")}}
+    /* A vista en cuerda: la misma vía de autoseguro se marca sola a vista */
+    if(route.sec==="cuerda"&&style==="A vista"){const tw=S.routes.find(x=>x.active&&x.sec==="autoseguro"&&x.line===route.line&&x.grade===route.grade&&x.hold===route.hold);
+      if(tw&&!myAsc(tw.id)){const r2=await sb.from("liga_ascents").insert({route_id:tw.id,style:"A vista"}).select();if(!r2.error)applyRows(r2.data);if(!r2.error)toast("También se ha marcado a vista en autoseguro")}}
     return r})}
 function unmark(route){const a=myAsc(route.id);if(a)return act(async()=>{const r=await sb.from("liga_ascents").delete().eq("id",a.id);if(!r.error)dropAsc(a.id);return r})}
 function addRoute(o){return act(async()=>{const r=await sb.from("liga_routes").insert(o).select().single();if(r.error)throw r.error;applyRows(r.data);S.open=r.data.id})}
@@ -599,7 +599,7 @@ function rules(){
    <li>Cada vía que encadenas suma los puntos de su grado multiplicados por cómo la hiciste.</li>
    <li>Cada vía cuenta una sola vez por bimestre. Si la vuelves a marcar, se queda lo último que marques.</li>
    <li>Si una vía se desmonta, los puntos que ya sumaste con ella se mantienen.</li>
-   <li>Si haces a vista o flash una vía de cuerda que también está en autoseguro, en autoseguro se te marca sola como flash.</li>
+   <li>Si haces a vista una vía de cuerda que también está en autoseguro, en autoseguro se te marca sola a vista.</li>
   </ul>
   <div class="mult">${STYLES.map(([s,m])=>`<div><b>×${String(m).replace(".",",")}</b><span>${s}</span></div>`).join("")}</div>
   <p class="sub">Ejemplo: un 6b a vista da ${GP["6b"]} × 1,3 = ${ex} puntos.</p>
