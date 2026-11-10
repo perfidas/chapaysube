@@ -372,6 +372,11 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .songlab{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
 #songbox{min-height:80px;border-radius:12px;overflow:hidden;background:var(--card)}
 #songbox iframe{display:block;border:0;border-radius:12px}
+/* Selector de sección dentro de Mapa y Ranking */
+.secsw{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;margin:4px 0 12px}
+.secsw button{border:0;background:none;border-radius:7px;min-height:42px;padding:6px 4px;font:900 18px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
+.secsw button.on{background:var(--acc);color:#fff}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 
 </head>
@@ -1084,11 +1089,13 @@ function section(){
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
   if(!canEdit)S.edit=false;
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
-  <h2>${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
+  <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.name}</button>`).join("")}</div>
+  <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
   <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body"></div>`;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
+  document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{if(b.dataset.sw===S.sec)return;S.sec=S.lastSec=b.dataset.sw;S.zone=null;S.open=null;S.edit=false;S.arm=null;section()});
   $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
   S.tab==="mapa"?(S.sec==="boulder"?boulderView():mapView()):rankView();
 }
