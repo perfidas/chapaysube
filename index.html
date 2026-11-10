@@ -384,12 +384,45 @@ main{overflow-x:clip}
 /* Aviso de versión nueva y botón de actualizar */
 .upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:50;display:flex;gap:12px;align-items:center;background:var(--gold);color:#0f1720;font-weight:600;border-radius:10px;padding:8px 8px 8px 14px;width:max-content;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .upd button{background:#0f1720;color:#fff;border-color:#0f1720;min-height:36px;padding:4px 12px}
-#frf{display:block;margin:6px auto 0;color:var(--mut);font-size:13px}
 .rnb{display:block;margin:-6px 0 2px;font-size:14px}
 .rnh{display:block;margin:0 0 14px;font-size:12px}
 p.rnb{margin:-6px 0 14px}
 .rnf{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:-4px 0 14px;display:flex;flex-direction:column;gap:8px}
 .rnf .row{display:flex;gap:8px}
+/* Inicio: marcador y directo */
+.hero{border-radius:14px;padding:14px;background:linear-gradient(160deg,#20303d,#121b24 70%);border:1px solid #2c3d4b;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hwho{min-width:0;flex:1}
+.k{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.hello{font:900 32px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;margin:2px 0 0;overflow-wrap:anywhere}
+.hdays{display:flex;gap:4px;align-items:flex-end}.hdays small{font-size:11px;color:var(--mut);margin-left:2px}
+.dg{width:32px;height:46px;border-radius:5px;background:linear-gradient(#1b2530 50%,#141d26 50%);border:1px solid #26333f;display:grid;place-items:center;font:900 36px/1 var(--disp);color:var(--gold);text-shadow:0 0 10px rgba(255,197,61,.45)}
+.hbar{height:6px;border-radius:99px;background:#22303c;overflow:hidden}.hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
+.bcell small{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.bcell em{font-style:normal;font-size:11px;font-weight:600}.bcell .up{color:var(--g1)}.bcell .dw{color:var(--g3)}
+.pendb{width:100%;margin:0 0 12px;border-color:var(--gold);color:var(--gold);font-weight:600}
+.hk{margin:4px 0 6px}
+.live{font:700 10px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:2px 8px}
+.feed2{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:2px 12px;margin-bottom:14px;display:flex;flex-direction:column}
+.fi2{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;text-align:left;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:9px 0;font-size:14px;min-height:0}
+.fi2:first-child{border-top:0}
+.fi2 small{color:var(--mut);font-size:12px;white-space:nowrap}
+.fdot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:1.5px solid rgba(255,255,255,.25)}
+.fdot b{font:900 12px/1 var(--disp);color:#0f1720;background:rgba(255,255,255,.75);border-radius:4px;padding:2px 3px}
+.fdot .crown{width:18px;height:11px;margin:0;color:#0f1720}
+.fdot.new{background:#f4f4f1;color:#0f1720;font:900 15px/1 var(--disp)}
+.fmed{width:32px;height:32px}
+.fmore{align-self:center;margin:4px 0 8px;font-size:13px}
+.hz{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;scrollbar-width:thin}
+.tbm{flex:none;width:124px;background:#f4f4f1;color:#1b2226;border:0;border-radius:8px;padding:8px 9px 8px 7px;display:grid;grid-template-columns:7px 1fr;gap:8px;text-align:left}
+.tbm i{border-radius:99px;min-height:56px}.tbm b{display:block;font:900 32px/.95 var(--disp);color:#1b2226}.tbm .tt{display:block;font-size:11px;color:#5d6a70;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acts{display:flex;flex-direction:column;gap:8px}
+.hero .ctag{display:inline-block;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,197,61,.5);border-radius:99px;padding:2px 8px}
+.hello{font-size:30px}
+.acts button{width:100%;margin:0;align-self:stretch}.acts #bkp{color:var(--ink)}
 </style>
 
 </head>
@@ -1045,7 +1078,11 @@ function perfil(){
   <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${SECTIONS.map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?`<div class="lc">${last.map(a=>`<div class="ai"><span class="ad">${new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</span><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}</div>`
-   :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}`;
+   :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
+  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
+  if($("#bkp"))$("#bkp").onclick=backup;if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
   if($("#rnx"))$("#rnx").onclick=()=>{S.ren=false;perfil()};
@@ -1057,12 +1094,6 @@ function perfil(){
   document.querySelectorAll("[data-ps]").forEach(b=>b.onclick=()=>{S.psec=b.dataset.ps;const y0=scrollY;perfil();scrollTo(0,y0)});
 }
 
-function whoBar(){
-  const mine=S.people.find(u=>u.id===S.me);
-  if(S.me&&mine&&!mine.ok&&!S.owner)return `<div class="who"><span class="sub" style="flex:1">${esc(mine.name)}: tu cuenta está pendiente de aprobar.</span><button id="out">Salir</button></div>`;
-  return S.me?`<div class="who"><span class="sub">Escalando como</span><b style="flex:1">${esc(me()?.name||"")}</b>${S.owner?`<span class="tag">Admin</span>`:S.bed?`<span class="tag">Monta boulder</span>`:""}<button id="myp">Mi perfil</button>${S.owner?`<button id="apv">Escaladores${pendCount()?` <span class="cnt">${pendCount()}</span>`:""}</button>`:""}<button id="out">Salir</button></div>`
-  :`<div class="who"><span class="sub" style="flex:1">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}
-function bindWho(){if(S.me){$("#out").onclick=()=>sb.auth.signOut();if($("#myp"))$("#myp").onclick=()=>openProfile(S.me);if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()}}else $("#lin").onclick=()=>{S.reg=false;needLogin()}}
 
 /* Copia de seguridad para el administrador: todas las vías (también las desmontadas), encadenes y escaladores en un Excel */
 function loadXLSX(){return window.XLSX?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";s.onload=ok;s.onerror=()=>ko(new Error("No se ha podido cargar el generador de Excel. Revisa la conexión."));document.head.appendChild(s)})}
@@ -1089,22 +1120,47 @@ function mountSong(){const box=$("#songbox");if(!box)return;S.songPlaying=false;
   box.innerHTML="<div></div>";window.SPAPI.createController(box.firstChild,{uri:"spotify:track:"+SONG_ID,width:"100%",height:80},c=>{S.songCtl=c;c.addListener("playback_update",e=>{S.songPlaying=!e.data.isPaused})})}
 window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songPlaying)mountSong()};
 (()=>{const sc=document.createElement("script");sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;document.head.appendChild(sc)})();
+/* ---------- Inicio: tu marcador arriba y lo que pasa en la liga debajo ---------- */
+function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),R=Object.fromEntries(S.routes.map(r=>[r.id,r])),ev=[];
+  S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u])return;
+    if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
+    else ev.push({t,dot:`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
+  try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
+  SECTIONS.forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
+    if(last)ev.push({t:new Date(last.at).getTime()+2,dot:`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`,h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
+  const grp={};S.routes.filter(r=>r.active&&isNew(r)).forEach(r=>{const z=r.sec==="boulder"?BSECT.find(x=>x.id===r.zone)?.name:ZONES[r.sec]?.find(x=>x.id===zoneOf(r))?.name,k=r.created+"|"+r.sec+"|"+z;(grp[k]=grp[k]||{n:0,r,z,sec:r.sec}).n++});
+  Object.entries(grp).forEach(([k,g])=>{const[y,m,d]=k.split("|")[0].split("-").map(Number),t=new Date(y,m-1,d,9).getTime(),bl=g.sec==="boulder";if(now-t>wk*2)return;
+    ev.push({t,dot:`<span class="fdot new">+${g.n}</span>`,h:`<b>${g.n} ${bl?(g.n===1?"bloque nuevo":"bloques nuevos"):(g.n===1?"vía nueva":"vías nuevas")}</b> en ${esc(g.z||"")} <span class="sub">· ${SECTIONS.find(s=>s.id===g.sec).name.toLowerCase()}</span>`,r:g.r})});
+  return ev.sort((a,b)=>b.t-a.t)}
+const ago=t=>{const m=(Date.now()-t)/6e4;return m<1?"ahora":m<60?`${Math.round(m)} min`:m<1440?`${Math.round(m/60)} h`:m<2880?"ayer":`${Math.round(m/1440)} días`};
 function home(){
-  const p=period("bim");
-  $("#app").innerHTML=`<div class="top"><div><h1>Liga del Rocódromo</h1><div class="sub">Bimestre ${p.label} · termina en ${daysLeft()} días</div></div></div>
-  ${whoBar()}
-  <div class="stack">${SECTIONS.map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),mine=i>=0?r[i]:null;
-    const nn=newOf(s.id).length,bl=s.id==="boulder";
-    return `<button class="sec" data-s="${s.id}"><span><b>${s.name}</b>${nn?`<span class="tag nwtag">${nn} ${bl?(nn===1?"bloque nuevo":"bloques nuevos"):(nn===1?"vía nueva":"vías nuevas")}</span>`:""}</span>
-    <span class="sub">${mine?`Vas ${i+1}.º de ${r.length} este bimestre`:r.length?(r.length===1?"1 escalador puntuando":`${r.length} escaladores puntuando`):"Aún nadie ha puntuado"}</span>
-    <span class="pts">${mine?fmt(mine.p):"0"}<small>tus puntos</small></span></button>`}).join("")}</div>
+  const p=period("bim"),dl=daysLeft(),tot=(p.to-p.from)/864e5,el=Math.min(100,Math.max(0,(Date.now()-p.from)/864e5/tot*100)),u=me(),pend=S.me&&!u&&!S.owner;
+  const cells=SECTIONS.map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),m=moves(s.id),was=m&&i>=0?m[S.me]:null,d=was?was-(i+1):0;
+    return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}</button>`}).join("");
+  const myTot=SECTIONS.reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=SECTIONS.filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
+  const news=S.routes.filter(r=>r.active&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
+  const ev=feedEvents(),N=S.feedAll?20:6,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
+  $("#app").innerHTML=`<section class="hero"><div class="hrow"><div class="hwho"><div class="k">${p.label}</div><h1 class="hello">${u?"Hola, "+esc(u.name):"Liga del rocódromo"}</h1></div>
+     <div class="hdays" aria-label="Quedan ${dl} días">${String(dl).split("").map(c=>`<span class="dg">${c}</span>`).join("")}<small>${dl===1?"día":"días"}</small></div></div>
+    <div class="hbar" role="img" aria-label="Llevamos el ${Math.round(el)} % del bimestre"><i style="width:${el}%"></i></div>
+    ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
+     :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
+     :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
+  ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
+  <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
+  <section class="feed2">${ev.length?ev.slice(0,N).map((e,k)=>`<button class="fi2" ${e.r?`data-fr="${e.r.id}"`:e.lg?'data-fl="1"':""}>${e.dot}<span>${e.h}</span><small>${ago(e.t)}</small></button>`).join(""):'<div class="empty">Esta semana todavía no ha pasado nada. ¡Estrena tú la liga!</div>'}
+   ${ev.length>6?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
+  ${news.length?`<div class="hrow hk"><span class="k">Recién montadas</span><span class="sub">${news.length}</span></div>
+  <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
-  <button class="rbtn" id="rls">Cómo se puntúa</button>
-  ${S.owner?`<button class="link" id="bkp">Descargar copia de seguridad (Excel)</button>`:""}
-  <button class="link" id="frf">Actualizar la app</button>`;
-  bindWho();$("#rls").onclick=openRules;if($("#bkp"))$("#bkp").onclick=backup;mountSong();
-  $("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
-  document.querySelectorAll(".sec").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.s;S.tab=(ZONES[S.sec]||S.sec==="boulder")?"mapa":"ranking";S.zone=null;S.open=null;S.scrollTop=true;render()});
+  <button class="rbtn" id="rls">Cómo se puntúa</button>`;
+  $("#rls").onclick=openRules;mountSong();
+  if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
+  if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
+  if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
+  document.querySelectorAll("[data-gr]").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.gr;S.tab="ranking";S.rmode="bim";S.zone=null;S.open=null;S.scrollTop=true;render()});
+  document.querySelectorAll("[data-fr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.fr);if(r)goRoute(r)});
+  document.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{S.view="logros";S.scrollTop=true;render()});
 }
 
 /* Deslizar el dedo a izquierda o derecha en Mapa o Ranking cambia de sección */
