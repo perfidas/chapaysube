@@ -283,8 +283,8 @@ button.on{color:#fff}
 /* Barra de navegación inferior */
 body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .bnav{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#0b1118;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
-.bnav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--mut);padding:6px 0 4px;min-height:54px;border-radius:10px}
+.bnav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+.bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mut);padding:6px 0 4px;min-height:54px;border-radius:10px}
 .bnav button svg{width:24px;height:24px}
 .bnav button.on{color:var(--acc)}
 .bnav button.on::before{content:"";width:28px;height:3px;border-radius:99px;background:var(--acc);margin:-6px 0 3px}
@@ -316,6 +316,57 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 @keyframes lift{0%,22%{transform:translateY(0)}60%{transform:translateY(-34px)}92%,100%{transform:translateY(-280px);opacity:0}}
 @keyframes flame{from{transform:scaleY(.8)}to{transform:scaleY(1.25)}}
 @media (prefers-reduced-motion:reduce){.boot .rk,.boot .fl{animation:none}}
+/* Logros */
+.lsum{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:linear-gradient(160deg,#20303d,#121b24 70%);border:1px solid #2c3d4b;border-radius:12px;padding:14px;margin-bottom:10px}
+.ringw{position:relative;width:78px;height:78px}.ringw svg{width:78px;height:78px}
+.ringw b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 26px/1 var(--disp)}
+.ringw b small{font:600 10px var(--body);color:var(--mut)}
+.lsumt{font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.ltiers{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.ltiers span{display:flex;align-items:center;gap:4px;font-size:13px;font-variant-numeric:tabular-nums}.ltiers i{width:12px;height:12px;border-radius:50%}
+.lladder{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 2px;margin-bottom:10px}
+.lladder span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;color:var(--mut);min-width:0}.lladder .med{width:32px;height:32px}.lladder b{font-weight:600}
+.lnext{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;margin-bottom:10px}
+.lnext .med{width:44px;height:44px}.lnext small{font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.lbar{display:block;height:6px;border-radius:99px;background:#22303c;overflow:hidden;margin-top:4px}.lbar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
+.lchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.lchips button{flex:none;min-height:36px;padding:4px 12px;font-size:13px;border-radius:99px}
+.lchips button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.lbadges{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.lbd{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:#131d26;border:1px solid var(--line);border-radius:10px;padding:10px 6px 9px;min-width:0}
+.lbd .med{width:56px;height:56px}
+.lbd .nm{font:800 15px/1.05 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.lbd .ds{font-size:11px;color:var(--mut)}
+.lbd.off .med{filter:grayscale(1) brightness(.45)}.lbd.off .nm{color:var(--mut)}
+.lbd .pg{width:100%;font-size:10px;color:var(--mut);font-variant-numeric:tabular-nums}
+.lbd.new{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}.lbd.new .ds{color:var(--gold);font-weight:700}
+.lfeed{display:flex;flex-direction:column;gap:6px}
+.lfi{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.lfi .med{width:40px;height:40px}.lfi b{font-weight:600}.lfi small{color:var(--mut);font-size:12px;white-space:nowrap}
+.lback{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30}
+.lsheet{position:fixed;left:0;right:0;bottom:0;z-index:31;max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-height:85vh;overflow:auto}
+.lsheet .med{width:110px;height:110px}
+.lsheet .nm{font:900 32px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.tierp{font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;border-radius:99px;padding:3px 10px;border:1px solid}
+.lfacts{display:grid;grid-template-columns:repeat(3,1fr);width:100%;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+.lfacts div{padding:10px 4px}.lfacts div+div{border-left:1px solid var(--line)}
+.lfacts b{display:block;font:900 22px/1 var(--disp)}.lfacts span{font-size:11px;color:var(--mut)}
+.lwho{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.lwho span{font-size:12px;background:#22303c;border-radius:99px;padding:3px 9px}
+.unlock{position:fixed;inset:0;z-index:40;display:grid;place-items:center;text-align:center;padding:24px}
+.unlock .burst{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.unlock .med{width:150px;height:150px;margin:0 auto}
+.unlock .k{font:700 12px var(--body);letter-spacing:.16em;text-transform:uppercase}
+.unlock .nm{font:900 42px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;margin:6px 0}
+.unlock .go{position:relative;max-width:420px}
+.go .med{animation:medin .9s cubic-bezier(.2,1.5,.4,1) both}.go .t1{animation:fadein .5s .5s both}.go .t2{animation:fadein .5s .75s both}
+@keyframes medin{0%{transform:scale(.2) rotate(-25deg);opacity:0}60%{transform:scale(1.12) rotate(4deg);opacity:1}100%{transform:none}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}}
+.shine{animation:shine 2.4s 1s ease-in-out infinite}@keyframes shine{0%,70%{transform:translateX(-140%)}100%{transform:translateX(140%)}}
+.vt{background:linear-gradient(160deg,#20303d,#121b24 70%);border:1px solid #2c3d4b;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.vth{display:flex;justify-content:space-between;align-items:baseline}.vth b{font:900 26px/1 var(--disp)}.vth span{font-size:12px;color:var(--mut)}
+.season{align-self:flex-start;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:2px 9px}
+.shelf{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-radius:8px;background:#0c141b;box-shadow:inset 0 -6px 0 #22303c}
+.shelf .med{width:34px;height:34px;display:block}
+@media (prefers-reduced-motion:reduce){.go .med,.go .t1,.go .t2,.shine{animation:none}}
 </style>
 
 </head>
@@ -576,19 +627,191 @@ const $=s=>document.querySelector(s);
 const me=()=>S.users.find(u=>u.id===S.me);
 
 /* ---------- Pantallas ---------- */
-/* Barra de navegación inferior: Inicio, Mapa, Ranking y Perfil */
-const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',Mapa:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',Ranking:'<path d="M3 20v-6h5v6M9.5 20V9h5v11M16 20v-8h5v8"/>',Perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+/* ================= LOGROS =================
+   Se calculan en el móvil con los encadenes de la temporada (año natural): no hace falta guardar nada.
+   Cuerda y autoseguro tienen logros separados. Los combinados de «misma vía» solo cuentan si el autoseguro
+   se hizo antes que la cuerda (el a vista que la app copia de cuerda a autoseguro nunca va antes). */
+const LTIER={bronce:["#e0955a","#8a4f22","Bronce"],plata:["#dfe7ee","#7d8c97","Plata"],oro:["#ffd36e","#b07a00","Oro"],esmeralda:["#7dffc0","#0b8a52","Esmeralda"],rubi:["#ff8aa4","#a3102f","Rubí"],platino:["#f4fbff","#8fb3c9","Platino"],diamante:["#9ff6ff","#6b5cff","Diamante"]};
+const LORDER=["bronce","plata","oro","esmeralda","rubi","platino","diamante"],LGEM=new Set(["esmeralda","rubi","diamante"]);
+const lT=(t,fs=30)=>`<text y="${fs/3}" text-anchor="middle" font-family="Big Shoulders Display,Arial Narrow,sans-serif" font-weight="900" font-size="${fs}" fill="#0f1720">${t}</text>`;
+const lBlob=c=>`<path d="M-12 4c-2-7 3-13 10-14 8-2 14 2 14 8s-4 9-9 9c-4 1-5 5-10 5-4 0-4-4-5-8z" fill="${c}" stroke="#0f1720" stroke-width="2"/><circle cx="1" cy="0" r="2.4" fill="#0f1720"/>`;
+const LPICT={
+ rope:'<path d="M-9 -12c10 0 10 9 0 9s-10 9 0 9 10 9 0 9" fill="none" stroke="#0f1720" stroke-width="3.6" stroke-linecap="round"/>',
+ g6a:lT("6a"),g6b:lT("6b"),g6c:lT("6c"),g7a:lT("7a"),g7b:lT("7b"),g7c:lT("7c"),g8a:lT("8a"),
+ eye:'<path d="M-14 0s5-9 14-9 14 9 14 9-5 9-14 9-14-9-14-9z" fill="none" stroke="#0f1720" stroke-width="3"/><circle r="4.5" fill="#0f1720"/>',
+ fire:'<path d="M0-14c3 6 10 8 10 16a10 10 0 0 1-20 0c0-5 3-7 5-10 1 4 3 5 5 5-2-4-1-8 0-11z" fill="#0f1720"/>',
+ cal:'<rect x="-12" y="-10" width="24" height="22" rx="3" fill="none" stroke="#0f1720" stroke-width="3"/><path d="M-12-3h24M-6-14v6M6-14v6" stroke="#0f1720" stroke-width="3"/><text y="10" text-anchor="middle" font-family="Rubik,sans-serif" font-weight="700" font-size="10" fill="#0f1720">20</text>',
+ c100:lT("100",24),c500:lT("500",24),
+ wall:'<path d="M-12 12V-8l8-5 8 5 8-5v25" fill="none" stroke="#0f1720" stroke-width="3" stroke-linejoin="round"/><path d="M-6 6l4 3 7-9" fill="none" stroke="#0f1720" stroke-width="3" stroke-linecap="round"/>',
+ map:'<path d="M-13-8l8-3 9 3 9-3v19l-9 3-9-3-8 3z" fill="none" stroke="#0f1720" stroke-width="3" stroke-linejoin="round"/><circle cx="2" cy="1" r="3" fill="#0f1720"/>',
+ first:lT("1.º",20)+'<path d="M-12-12l4 4M12-12l-4 4M0-15v5" stroke="#0f1720" stroke-width="2.4" stroke-linecap="round"/>',
+ podium:'<path d="M-14 12V2h9v10M-5 12V-6h10v18M5 12V5h9v7" fill="#0f1720"/>',
+ crown:'<path d="M-13-4l7 6 6-10 6 10 7-6-3 14h-20z" fill="#0f1720"/>',
+ crown2:'<path d="M-13-6l7 6 6-10 6 10 7-6-3 14h-20z" fill="#0f1720"/><path d="M-10 13h20" stroke="#0f1720" stroke-width="3"/>',
+ hold:lBlob("#0f1720"),hblue:lBlob("#2a6fdb"),hred:lBlob("#d8322a"),hblack:lBlob("#1d1d1d"),
+ bw:'<circle r="11" fill="#fff" stroke="#0f1720" stroke-width="2.4"/><path d="M-8-8a11 11 0 0 1 16 16z" fill="#111"/>',
+ rainbow:'<g fill="none" stroke-width="3.2" stroke-linecap="round"><path d="M-12 8a12 12 0 0 1 24 0" stroke="#d8322a"/><path d="M-8 8a8 8 0 0 1 16 0" stroke="#2a6fdb"/><path d="M-4 8a4 4 0 0 1 8 0" stroke="#2fa35d"/></g>',
+ ac:lT("A→C",17),x10:lT("×10",22),x25:lT("×25",22),seven2:lT("7a²",24),three:lT("3×1",20),
+ tri:'<path d="M-12 10h24M-12 10l6-12M12 10l-6-12M0 10V-12" stroke="#0f1720" stroke-width="3.4" stroke-linecap="round"/>',
+ scale:'<path d="M0-13v25M-11 12h22M-14-6h28" stroke="#0f1720" stroke-width="3" stroke-linecap="round"/><path d="M-14-6l-5 9h10zM14-6l-5 9h10z" fill="#0f1720"/>',
+ blades:'<path d="M-12-12L12 12M12-12L-12 12" stroke="#0f1720" stroke-width="4" stroke-linecap="round"/><circle r="4" fill="#0f1720"/>'};
+let lmid=0;
+function medal(p,tier,cls="med"){const[a,b]=LTIER[tier],id="lm"+(lmid++),hex="M0-29L25-14.5V14.5L0 29-25 14.5V-14.5Z";
+  return `<svg class="${cls}" viewBox="-32 -32 64 64" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${a}"/></linearGradient><clipPath id="${id}c"><path d="${hex}"/></clipPath></defs>
+   <path d="${hex}" fill="url(#${id})" stroke="#0b1118" stroke-width="2"/>
+   ${LGEM.has(tier)?`<path d="${hex}" fill="none" stroke="${a}" stroke-width="3" opacity=".8"/><g stroke="rgba(255,255,255,.45)" stroke-width="1"><path d="M0-29L0-17M25-14.5L14-8M25 14.5L14 8M0 29L0 17M-25 14.5L-14 8M-25-14.5L-14-8"/><path d="M0-17L14-8V8L0 17-14 8V-8Z" fill="rgba(255,255,255,.12)"/></g>`:""}
+   ${tier==="platino"?`<path d="M0-26L22.5-13V13L0 26-22.5 13V-13Z" fill="none" stroke="#fff" stroke-width="1.2" opacity=".8"/>`:""}
+   <path d="M0-23L20-11.5V11.5L0 23-20 11.5V-11.5Z" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.4"/>
+   <g clip-path="url(#${id}c)"><rect class="shine" x="-14" y="-40" width="9" height="80" fill="rgba(255,255,255,.35)" transform="rotate(20)"/></g>${LPICT[p]}</svg>`}
+
+/* Catálogo: [clave, nombre, qué es, pictograma, nivel] */
+const L_VIA=[["first","Bautismo de magnesio","Tu primera vía","rope","bronce"],["6a","Sexto sentido","Tu primer 6a","g6a","bronce"],["6b","Plan B","Tu primer 6b","g6b","plata"],["6c","C de crack","Tu primer 6c","g6c","oro"],["7a","Séptimo cielo","Tu primer 7a","g7a","esmeralda"],["7b","Siete vidas","Tu primer 7b","g7b","rubi"],["7c","Los siete mares","Tu primer 7c","g7c","platino"],["8a","La octava maravilla","Tu primer 8a","g8a","diamante"],
+ ["av7a","Ojo de halcón","Un 7a a vista","eye","rubi"],["w4","Enganchado","Encadenar algo 4 semanas seguidas","fire","bronce"],["w12","Adicto a la resina","Encadenar algo 12 semanas seguidas","fire","platino"],["b20","Rata de rocódromo","20 vías en un bimestre","cal","plata"],["n100","Centurión","100 vías en la temporada","c100","oro"],["n500","Leyenda viva","500 vías en la temporada","c500","diamante"],
+ ["walls","Trotamuros","Al menos una vía en cada pared","map","bronce"],["wall","Limpiaparedes","Todas las vías montadas de una pared","wall","oro"],["open","Abrelatas","Ser el primero en hacer una vía","first","plata"],["pod","Al cajón","Acabar en el podio de un bimestre","podium","plata"],["win","Rey del bimestre","Ganar un bimestre","crown","oro"],["year","El jefe final","Ganar el ranking anual","crown2","diamante"]];
+const L_BOU=[["first","Despegue","Tu primer bloque","hold","bronce"],["azul","Blues","Tu primer bloque azul","hblue","plata"],["rojo","Alerta roja","Tu primer bloque rojo","hred","oro"],["negro","El lado oscuro","Tu primer bloque negro","hblack","platino"],["dorado","Jaque mate","Un bloque blanco y negro","bw","diamante"],["all","Caja de ceras","Un bloque de cada color","rainbow","plata"],["w4","Pegado a la presa","Encadenar algo 4 semanas seguidas","fire","bronce"],
+ ["b20","Bicho de bloque","20 bloques en un bimestre","cal","plata"],["n100","Picapiedra","100 bloques en la temporada","c100","oro"],["open","Primera huella","Ser el primero en hacer un bloque","first","plata"],["pod","Al cajón","Acabar en el podio de un bimestre","podium","plata"],["win","Rey de la colchoneta","Ganar un bimestre","crown","oro"],["year","Señor de los bloques","Ganar el ranking anual","crown2","diamante"]];
+const L_MIX=[["pair1","Dos por uno","La misma vía, primero en autoseguro y después en cuerda","ac","bronce"],["pair10","Ensayo general","10 vías hechas primero en autoseguro y después en cuerda","x10","plata"],["pair25","Sin red","25 vías hechas primero en autoseguro y después en cuerda","x25","oro"],["pair7a","Séptimo cielo al cuadrado","Un 7a, primero en autoseguro y después en cuerda","seven2","rubi"],
+ ["day3","Tres en raya","Encadenar en las tres secciones el mismo día","three","bronce"],["bim3","Todoterreno","Puntuar en las tres secciones el mismo bimestre","tri","plata"],["bal","Equilibrista","10 encadenes en cada sección el mismo bimestre","scale","oro"],["edge","Doble filo","Un 7a en cuerda y un bloque negro el mismo bimestre","blades","esmeralda"],
+ ["pod3","Tres medallas","Podio en las tres secciones el mismo bimestre","podium","rubi"],["win3","Triple corona","Ganar el mismo bimestre en las tres secciones","crown","platino"],["jaque","Jaque a la octava","Un 8a en cuerda y un bloque blanco y negro","bw","diamante"],["king","Rey absoluto","Ganar el ranking anual en las tres secciones","crown2","diamante"]];
+const LSECS=[["cuerda","Cuerda",L_VIA,"C"],["autoseguro","Autoseguro",L_VIA,"A"],["boulder","Boulder",L_BOU,"B"],["mix","Combinados",L_MIX,"X"]];
+const LCAT=LSECS.flatMap(([sec,name,arr,k])=>arr.map((x,i)=>({id:sec+":"+x[0],key:x[0],sec,secName:name,num:k+(i+1),n:x[1],d:x[2],p:x[3],t:x[4]})));
+
+/* ---- Cálculo ---- */
+const isoWeek=d=>{const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()*100+Math.ceil(((t-y0)/864e5+1)/7)};
+const dayKey=d=>d.getFullYear()*1e4+(d.getMonth()+1)*100+d.getDate();
+function streak(list,need){/* semanas ISO seguidas con algún encadene; devuelve {best, at} */
+  const wk=[...new Set(list.map(a=>isoWeek(new Date(a.at))))].sort((a,b)=>a-b);let best=0,run=0,prev=null,at=null;
+  const next=w=>{const y=Math.floor(w/100),n=w%100;const d=new Date(Date.UTC(y,0,4+(n)*7));return isoWeek(new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()))};
+  wk.forEach(w=>{run=prev!==null&&next(prev)===w?run+1:1;prev=w;if(run>best)best=run;if(run>=need&&!at){const a=list.find(x=>isoWeek(new Date(x.at))===w);at=a?.at}});
+  return{best,at}}
+let LCACHE={k:"",v:null};
+/* Para todos los escaladores a la vez: {uid:{id:{ok,at,v,m}}} de la temporada y */
+function computeLogros(y){
+  const key=y+"|"+S.asc.length+"|"+(S.asc[S.asc.length-1]?.id||"")+"|"+S.routes.length+"|"+S.users.length+"|"+Math.floor(Date.now()/36e5);
+  if(LCACHE.k===key)return LCACHE.v;
+  const now=new Date(),from=new Date(y,0,1),to=new Date(y+1,0,1),users=S.users.map(u=>u.id),R=Object.fromEntries(S.routes.map(r=>[r.id,r]));
+  const asc=S.asc.filter(a=>{const t=new Date(a.at);return t>=from&&t<to&&R[a.route]}).sort((a,b)=>a.at.localeCompare(b.at));
+  const out={};users.forEach(u=>out[u]={});
+  const set=(u,id,ok,at,v,m)=>{const o=out[u];if(!o)return;o[id]={ok:!!ok,at:ok?at:null,v:Math.min(v,m),m}};
+  /* primeros en hacer cada vía o bloque (en toda la historia) */
+  const firstBy={};[...S.asc].sort((a,b)=>a.at.localeCompare(b.at)).forEach(a=>{if(!firstBy[a.route])firstBy[a.route]=a});
+  /* rankings de bimestres cerrados de la temporada, y anual si la temporada está cerrada */
+  const bims=[];for(let b=0;b<6;b++){const f=new Date(y,b*2,1),t=new Date(y,b*2+2,1);if(t<=now)bims.push({b,f,t,end:t.toISOString(),r:Object.fromEntries(["cuerda","autoseguro","boulder"].map(s=>[s,rankRange(s,f,t).map(x=>x.id)]))})}
+  const closed=to<=now,yr=closed?Object.fromEntries(["cuerda","autoseguro","boulder"].map(s=>[s,annual(s,y)[0]?.id])):{};
+  users.forEach(u=>{
+    const mine=asc.filter(a=>a.u===u),bySec=s=>mine.filter(a=>a.sec===s);
+    for(const s of ["cuerda","autoseguro","boulder"]){const L=bySec(s),bl=s==="boulder",P=s+":";
+      set(u,P+"first",L.length,L[0]?.at,L.length?1:0,1);
+      if(!bl){["6a","6b","6c","7a","7b","7c","8a"].forEach(g=>{const gi=GRADES.indexOf(g),a=L.find(x=>GRADES.indexOf(x.grade)>=gi);set(u,P+g,a,a?.at,a?1:0,1)});
+        const av=L.find(x=>x.style==="A vista"&&GRADES.indexOf(x.grade)>=GRADES.indexOf("7a"));set(u,P+"av7a",av,av?.at,av?1:0,1);
+        set(u,P+"n500",L.length>=500,L[499]?.at,L.length,500);
+        /* paredes: las que tienen alguna vía montada en esta sección */
+        const zs=ZONES[s].filter(z=>S.routes.some(r=>r.sec===s&&r.active&&LINES[r.line]?.zone===z.id));
+        const doneZ=new Set(L.map(a=>LINES[R[a.route].line]?.zone));const nz=zs.filter(z=>doneZ.has(z.id)).length;
+        set(u,P+"walls",zs.length&&nz===zs.length,L[L.length-1]?.at,nz,zs.length||1);
+        let bestW=0,bestM=1,wOk=null;zs.forEach(z=>{const rs=S.routes.filter(r=>r.sec===s&&r.active&&LINES[r.line]?.zone===z.id),dn=new Set(L.map(a=>a.route)),k=rs.filter(r=>dn.has(r.id)).length;
+          if(k/rs.length>bestW/bestM){bestW=k;bestM=rs.length}if(rs.length&&k===rs.length)wOk=L[L.length-1]?.at});
+        set(u,P+"wall",wOk,wOk,bestW,bestM)}
+      else{["azul","rojo","negro","dorado"].forEach(c=>{const ci=BKEYS.indexOf(c),a=L.find(x=>BKEYS.indexOf(x.grade)>=ci);set(u,P+c,a,a?.at,a?1:0,1)});
+        const cols=new Set(L.map(a=>a.grade));let at=null;{const seen=new Set();for(const a of L){seen.add(a.grade);if(seen.size===BKEYS.length){at=a.at;break}}}set(u,P+"all",at,at,cols.size,BKEYS.length)}
+      const sk=streak(L,4);set(u,P+"w4",sk.best>=4,sk.at,sk.best,4);if(!bl){const s12=streak(L,12);set(u,P+"w12",s12.best>=12,s12.at,s12.best,12)}
+      const perB={};let b20=null;L.forEach(a=>{const k=bimKey(new Date(a.at));perB[k]=(perB[k]||0)+1;if(perB[k]===20&&!b20)b20=a.at});set(u,P+"b20",b20,b20,Math.max(0,...Object.values(perB)),20);
+      set(u,P+"n100",L.length>=100,L[99]?.at,L.length,100);
+      const op=L.find(a=>firstBy[a.route]?.id===a.id);set(u,P+"open",op,op?.at,op?1:0,1);
+      const pod=bims.find(b=>b.r[s].indexOf(u)>-1&&b.r[s].indexOf(u)<3),win=bims.find(b=>b.r[s][0]===u);
+      set(u,P+"pod",pod,pod?.end,pod?1:0,1);set(u,P+"win",win,win?.end,win?1:0,1);set(u,P+"year",closed&&yr[s]===u,to.toISOString(),closed&&yr[s]===u?1:0,1)}
+    /* combinados */
+    const C=bySec("cuerda"),A=bySec("autoseguro"),B=bySec("boulder");
+    const twin=(a,c)=>{const ra=R[a.route],rc=R[c.route];return ra.line===rc.line&&ra.grade===rc.grade&&ra.hold===rc.hold};
+    const pairs=[];C.forEach(c=>{const a=A.find(a=>twin(a,c)&&a.at<c.at);if(a&&!pairs.some(p=>p.c.route===c.route))pairs.push({a,c})});
+    set(u,"mix:pair1",pairs[0],pairs[0]?.c.at,pairs.length,1);set(u,"mix:pair10",pairs.length>=10,pairs[9]?.c.at,pairs.length,10);set(u,"mix:pair25",pairs.length>=25,pairs[24]?.c.at,pairs.length,25);
+    const p7=pairs.find(p=>GRADES.indexOf(R[p.c.route].grade)>=GRADES.indexOf("7a"));set(u,"mix:pair7a",p7,p7?.c.at,p7?1:0,1);
+    const days={};mine.forEach(a=>{const k=dayKey(new Date(a.at));(days[k]=days[k]||{})[a.sec]=a.at});const d3=Object.values(days).find(d=>Object.keys(d).length===3);
+    set(u,"mix:day3",d3,d3?Object.values(d3).sort().pop():null,d3?1:0,1);
+    const bk={};mine.forEach(a=>{const k=bimKey(new Date(a.at));const o=bk[k]=bk[k]||{cuerda:0,autoseguro:0,boulder:0,last:a.at,c7:false,bn:false};o[a.sec]++;o.last=a.at;
+      if(a.sec==="cuerda"&&GRADES.indexOf(a.grade)>=GRADES.indexOf("7a"))o.c7=true;if(a.sec==="boulder"&&BKEYS.indexOf(a.grade)>=BKEYS.indexOf("negro"))o.bn=true});
+    const bv=Object.values(bk),b3=bv.find(o=>o.cuerda&&o.autoseguro&&o.boulder),bal=bv.find(o=>o.cuerda>=10&&o.autoseguro>=10&&o.boulder>=10),ed=bv.find(o=>o.c7&&o.bn);
+    set(u,"mix:bim3",b3,b3?.last,Math.max(0,...bv.map(o=>(o.cuerda>0)+(o.autoseguro>0)+(o.boulder>0))),3);
+    set(u,"mix:bal",bal,bal?.last,Math.max(0,...bv.map(o=>(o.cuerda>=10)+(o.autoseguro>=10)+(o.boulder>=10))),3);
+    set(u,"mix:edge",ed,ed?.last,ed?1:0,1);
+    const p3=bims.find(b=>["cuerda","autoseguro","boulder"].every(s=>{const i=b.r[s].indexOf(u);return i>-1&&i<3})),w3=bims.find(b=>["cuerda","autoseguro","boulder"].every(s=>b.r[s][0]===u));
+    set(u,"mix:pod3",p3,p3?.end,p3?1:0,1);set(u,"mix:win3",w3,w3?.end,Math.max(0,...bims.map(b=>["cuerda","autoseguro","boulder"].filter(s=>b.r[s][0]===u).length)),3);
+    const c8=C.find(a=>GRADES.indexOf(a.grade)>=GRADES.indexOf("8a")),bd=B.find(a=>a.grade==="dorado");set(u,"mix:jaque",c8&&bd,c8&&bd?(c8.at>bd.at?c8.at:bd.at):null,(c8?1:0)+(bd?1:0),2);
+    const kn=closed?["cuerda","autoseguro","boulder"].filter(s=>yr[s]===u).length:0;set(u,"mix:king",kn===3,to.toISOString(),kn,3)});
+  LCACHE={k:key,v:out};return out}
+const seasonYears=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
+const rarity=(all,id)=>{const act=Object.values(all).filter(o=>Object.values(o).some(x=>x.ok));if(!act.length)return 0;return Math.round(100*act.filter(o=>o[id]?.ok).length/act.length)};
+
+/* ---- Desbloqueos: aviso a pantalla completa con lo nuevo desde la última vez ---- */
+function checkUnlocks(){if(!S.me||!me()||S.unl)return;const y=new Date().getFullYear(),mine=computeLogros(y)[S.me];if(!mine)return;
+  const key="liga-logros-"+S.me+"-"+y,got=LCAT.filter(c=>mine[c.id]?.ok).map(c=>c.id);let seen;
+  try{seen=JSON.parse(localStorage.getItem(key)||"null")}catch(e){seen=[]}
+  if(seen===null){try{localStorage.setItem(key,JSON.stringify(got))}catch(e){}return}
+  const nw=got.filter(id=>!seen.includes(id));if(!nw.length)return;
+  try{localStorage.setItem(key,JSON.stringify(got))}catch(e){}
+  S.unlQ=(S.unlQ||[]).concat(nw);showUnlock()}
+function showUnlock(){const id=S.unlQ?.shift();if(!id){S.unl=false;return}S.unl=true;const c=LCAT.find(x=>x.id===id),col=LTIER[c.t][0];
+  let o=$("#unlock");if(!o){o=document.createElement("div");o.id="unlock";o.className="unlock";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");document.body.appendChild(o)}
+  o.style.background=`radial-gradient(circle at 50% 38%,${col}44,transparent 62%),rgba(11,17,24,.97)`;
+  o.innerHTML=`<canvas class="burst"></canvas><div class="go">${medal(c.p,c.t)}<div class="t1"><div class="k" style="color:${col}">Logro ${LTIER[c.t][2].toLowerCase()} · ${c.secName}</div><div class="nm">${esc(c.n)}</div></div>
+   <div class="t2 sub" style="font-size:15px">${esc(c.d)}${c.sec==="cuerda"||c.sec==="autoseguro"?" en "+c.secName.toLowerCase():""}.</div>
+   <button class="t2" id="unok" style="margin-top:16px;background:${col};color:#0f1720;border-color:${col};font-weight:700">Genial</button></div>`;
+  o.hidden=false;$("#unok").focus();$("#unok").onclick=()=>{o.hidden=true;showUnlock()};lburst(o.querySelector("canvas"),[col,LTIER[c.t][1],"#fff"])}
+function lburst(cv,cols){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const r=cv.getBoundingClientRect(),c=cv.getContext("2d");cv.width=r.width*2;cv.height=r.height*2;c.scale(2,2);
+  const cx=r.width/2,cy=r.height*.38,P=Array.from({length:80},()=>{const a=Math.random()*Math.PI*2,v=2+Math.random()*6;return{x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:60+Math.random()*50,c:cols[Math.floor(Math.random()*cols.length)]}});
+  let t=0;(function f(){c.clearRect(0,0,r.width,r.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.vx*=.98;c.globalAlpha=Math.max(0,1-t/p.l);c.fillStyle=p.c;c.beginPath();c.arc(p.x,p.y,2.4,0,7);c.fill()});c.globalAlpha=1;if(++t<120)requestAnimationFrame(f);else c.clearRect(0,0,r.width,r.height)})()}
+
+/* ---- Vista «Logros» ---- */
+function logrosView(){
+  if(!S.me||!me()){$("#app").innerHTML=`<h2>Logros</h2><div class="empty">${S.me?"Tus logros aparecerán cuando el administrador apruebe tu cuenta.":"Entra con tu cuenta para ver tus logros."}</div>${S.me?"":'<button class="pri" id="lg">Entrar</button>'}`;if($("#lg"))$("#lg").onclick=needLogin;return}
+  const y=new Date().getFullYear(),all=computeLogros(y),mine=all[S.me]||{},got=LCAT.filter(c=>mine[c.id]?.ok),R=2*Math.PI*33;
+  const near=LCAT.filter(c=>!mine[c.id]?.ok&&mine[c.id]?.v>0).sort((a,b)=>mine[b.id].v/mine[b.id].m-mine[a.id].v/mine[a.id].m)[0];
+  const f=S.lsec||"cuerda",recent=id=>mine[id]?.ok&&(Date.now()-new Date(mine[id].at))<7*864e5;
+  /* lo último de la liga */
+  const feed=[];for(const uid in all)for(const c of LCAT){const x=all[uid][c.id];if(x?.ok&&x.at)feed.push({uid,c,at:x.at})}
+  feed.sort((a,b)=>b.at.localeCompare(a.at));const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name]));
+  const ago=t=>{const m=(Date.now()-new Date(t))/6e4;return m<60?`hace ${Math.max(1,Math.round(m))} min`:m<1440?`hace ${Math.round(m/60)} h`:m<2880?"ayer":`hace ${Math.round(m/1440)} días`};
+  $("#app").innerHTML=`<h2>Logros ${y}</h2><p class="sub" style="margin:-4px 0 12px">Se ganan solos con lo que marcas. El 1 de enero empiezan de cero y los de cada año quedan en tu vitrina.</p>
+  <div class="lsum"><div class="ringw"><svg viewBox="0 0 78 78"><circle cx="39" cy="39" r="33" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="39" cy="39" r="33" fill="none" stroke="url(#lrg)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${R*got.length/LCAT.length} ${R}" transform="rotate(-90 39 39)"/><defs><linearGradient id="lrg"><stop offset="0" stop-color="#ff3d7f"/><stop offset="1" stop-color="#ffc53d"/></linearGradient></defs></svg><b>${got.length}<small>de ${LCAT.length}</small></b></div>
+   <div><div class="lsumt">Tus insignias</div><div class="ltiers">${[...LORDER].reverse().map(t=>`<span title="${LTIER[t][2]}"><i style="background:linear-gradient(135deg,${LTIER[t][0]},${LTIER[t][1]})"></i>${got.filter(c=>c.t===t).length}</span>`).join("")}</div></div></div>
+  <div class="lladder">${LORDER.map(t=>`<span>${medal("crown",t)}<b>${LTIER[t][2]}</b></span>`).join("")}</div>
+  ${near?`<div class="lnext">${medal(near.p,near.t)}<div><small>Lo tienes cerca</small><div><b>${esc(near.n)}</b> · <span class="sub">${near.secName} · ${esc(near.d)}</span></div><div class="lbar"><span style="width:${mine[near.id].v/mine[near.id].m*100}%"></span></div><div class="sub">${mine[near.id].v} de ${mine[near.id].m}</div></div></div>`:""}
+  <div class="lchips" role="tablist">${LSECS.map(([k,n])=>`<button role="tab" aria-selected="${k===f}" class="${k===f?"on":""}" data-ls="${k}">${n} · ${got.filter(c=>c.sec===k).length}/${LCAT.filter(c=>c.sec===k).length}</button>`).join("")}</div>
+  <div class="lbadges">${LCAT.filter(c=>c.sec===f).map(c=>{const x=mine[c.id]||{v:0,m:1};return `<button class="lbd ${x.ok?"":"off"} ${recent(c.id)?"new":""}" data-lg="${c.id}">${medal(c.p,c.t)}<span class="nm">${esc(c.n)}</span>${x.ok?`<span class="ds">${recent(c.id)?"¡Nueva!":LTIER[c.t][2]}</span>`:`<span class="pg">${x.v} / ${x.m}<span class="lbar"><span style="width:${x.v/x.m*100}%"></span></span></span>`}</button>`}).join("")}</div>
+  <h3 class="pfh">Lo último en la liga</h3>
+  <div class="lfeed">${feed.slice(0,12).map(e=>`<button class="lfi" data-lg="${e.c.id}">${medal(e.c.p,e.c.t)}<span><b>${esc(nm[e.uid]||"")}</b> ha conseguido <b style="color:${LTIER[e.c.t][0]}">${esc(e.c.n)}</b> <span class="sub">· ${e.c.secName}</span></span><small>${ago(e.at)}</small></button>`).join("")||'<div class="empty">Todavía nadie ha conseguido logros esta temporada.</div>'}</div>
+  <div id="lsheet"></div>`;
+  document.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{S.lsec=b.dataset.ls;const y0=scrollY;logrosView();scrollTo(0,y0)});
+  document.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>logroSheet(b.dataset.lg,all))}
+function logroSheet(id,all){const c=LCAT.find(x=>x.id===id),x=all[S.me]?.[id]||{v:0,m:1},col=LTIER[c.t][0],who=Object.entries(all).filter(([u,o])=>o[id]?.ok&&u!==S.me).map(([u])=>S.users.find(v=>v.id===u)?.name).filter(Boolean);
+  const box=$("#lsheet");box.innerHTML=`<div class="lback" id="lbk"></div><div class="lsheet" role="dialog" aria-modal="true" aria-label="${esc(c.n)}">${medal(c.p,c.t)}
+   <span class="tierp" style="color:${col};border-color:${col}">${LTIER[c.t][2]} · ${c.secName}</span><div class="nm">${esc(c.n)}</div><div style="font-size:15px">${esc(c.d)}${c.sec==="cuerda"||c.sec==="autoseguro"?" en "+c.secName.toLowerCase():""}</div>
+   ${c.key.startsWith("pair")?'<div class="sub">El autoseguro tiene que ser anterior a la cuerda. El a vista que se copia solo a autoseguro no cuenta.</div>':""}
+   <div class="lfacts"><div><b>${x.ok?new Date(x.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"}):"—"}</b><span>${x.ok?"Conseguida":"Aún no"}</span></div><div><b>${rarity(all,id)} %</b><span>de la liga la tiene</span></div><div><b>${x.v}/${x.m}</b><span>Tu progreso</span></div></div>
+   ${who.length?`<div class="sub">También la tienen</div><div class="lwho">${who.slice(0,8).map(n=>`<span>${esc(n)}</span>`).join("")}${who.length>8?`<span>+${who.length-8}</span>`:""}</div>`:""}
+   <button id="lclose" style="margin-top:6px">Cerrar</button></div>`;
+  const close=()=>box.innerHTML="";$("#lbk").onclick=close;$("#lclose").onclick=close;$("#lclose").focus()}
+/* Vitrina en el perfil: una estantería por temporada */
+function vitrinaHtml(uid){return `<h3 class="pfh">Vitrina</h3>${seasonYears().map(y=>{const o=computeLogros(y)[uid]||{},l=LCAT.filter(c=>o[c.id]?.ok).sort((a,b)=>LORDER.indexOf(b.t)-LORDER.indexOf(a.t)),cur=y===new Date().getFullYear();
+  return `<div class="vt">${cur?'<span class="season">En juego</span>':""}<div class="vth"><b>${y}</b><span>${l.length} de ${LCAT.length}</span></div>
+   ${l.length?`<div class="ltiers">${[...LORDER].reverse().map(t=>`<span><i style="background:linear-gradient(135deg,${LTIER[t][0]},${LTIER[t][1]})"></i>${l.filter(c=>c.t===t).length}</span>`).join("")}</div><div class="shelf">${l.map(c=>`<span title="${esc(c.n)} · ${c.secName}">${medal(c.p,c.t)}</span>`).join("")}</div>`:`<div class="sub">${cur?"Aún sin logros esta temporada.":"Sin logros esa temporada."}</div>`}</div>`}).join("")}`}
+
+/* Barra de navegación inferior: Inicio, Mapa, Ranking, Logros y Perfil */
+const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',Mapa:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',Ranking:'<path d="M3 20v-6h5v6M9.5 20V9h5v11M16 20v-8h5v8"/>',Logros:'<path d="M12 2l8 4.6v9.2L12 20.4 4 15.8V6.6z"/><path d="M12 7l1.6 3.2 3.4.5-2.5 2.4.6 3.4-3.1-1.6-3.1 1.6.6-3.4L7 10.7l3.4-.5z"/>',Perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
 function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
   let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
   if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
-  const sec=!["home","rules","perfil","approvals"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Mapa"):"";
+  const sec=!["home","rules","perfil","approvals","logros"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Mapa"):"";
   n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
   n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
+    if(k==="Logros"){S.view="logros";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Mapa"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
-  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+/* Tras cada pintado se mira si hay logros nuevos que celebrar */
+const _render=render;render=function(){_render();if(!["loading","error","setup","login","name","forgot","newpw"].includes(S.view))setTimeout(checkUnlocks,350)};
 function loadingView(){if(!S.splash){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`;return}if($("#app .boot"))return;$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
   <g class="rk"><path class="fl" d="M114 290 Q128 340 142 290 Z" fill="#ffb83d"/><path class="fl" d="M120 290 Q128 318 136 290 Z" fill="#fff3c4"/>
   <path d="M128 40 C96 78 92 160 98 240 H158 C164 160 160 78 128 40Z" fill="#fff"/><path d="M98 196 L70 252 L100 242Z M158 196 L186 252 L156 242Z" fill="#fff"/>
@@ -785,6 +1008,7 @@ function perfil(){
   ${cromo(u,y,cur)}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml():""}
+  ${vitrinaHtml(u.id)}
   <h3 class="pfh">${BIM[cb]} frente a ${pb}</h3>
   <p class="sub" style="margin:-4px 0 8px">El bimestre en curso cuenta hasta hoy.</p>
   <div class="cmpw">${cmp}</div>
