@@ -1633,7 +1633,7 @@ function bRow(b){
   <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
   ${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
-  <label>Color de presas<select id="bh"><option value="">Sin indicar</option>${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
+  <label>Color de presas<select id="bh">${HOLDS[b.hold]?"":`<option value="" selected disabled>Elige el color</option>`}${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
   <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
   <span class="err full" id="eerr" role="alert" hidden></span>
   <button class="pri" id="esv">Guardar cambios</button><button class="dng" id="edl">${S.arm==="del"?"Pulsa otra vez: desmontar":"Desmontar bloque"}</button>
@@ -1647,6 +1647,7 @@ function bindB(z){
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return boulderView()}S.arm=null;unmark(b)};
   if(S.edit){
     $("#esv").onclick=()=>{const color=$("#bc").value,created=$("#ec").value;
+      if(!HOLDS[$("#bh").value]){const e=$("#eerr");e.textContent="Elige el color de las presas: sin él no se puede guardar el bloque.";e.hidden=false;return}
       if(S.routes.some(x=>x!==b&&x.active&&x.sec==="boulder"&&x.zone===b.zone&&x.color===color&&(x.hold||"")===($("#bh").value||"")&&(x.created||"")===created)){const e=$("#eerr");e.textContent=`Ya hay un bloque ${BCOL[color][0].toLowerCase()} con esas presas en ${z.name} y esa fecha de creación. Cambia algo.`;e.hidden=false;return}
       updRoute(b.id,{grade:color,created:created||null,hold:$("#bh").value||null})};
     $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return boulderView()}S.arm=null;S.open=null;updRoute(b.id,{active:false})}}
