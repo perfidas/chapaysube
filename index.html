@@ -1136,7 +1136,7 @@ function home(){
     return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}</button>`}).join("");
   const myTot=SECTIONS.reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=SECTIONS.filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
   const news=S.routes.filter(r=>r.active&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
-  const ev=feedEvents(),N=S.feedAll?20:6,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
+  const ev=feedEvents(),N=S.feedAll?20:4,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
   $("#app").innerHTML=`<section class="hero"><div class="hrow"><div class="hwho"><div class="k">${p.label}</div><h1 class="hello">${u?"Hola, "+esc(u.name):"Liga del rocódromo"}</h1></div>
      <div class="hdays" aria-label="Quedan ${dl} días">${String(dl).split("").map(c=>`<span class="dg">${c}</span>`).join("")}<small>${dl===1?"día":"días"}</small></div></div>
     <div class="hbar" role="img" aria-label="Llevamos el ${Math.round(el)} % del bimestre"><i style="width:${el}%"></i></div>
@@ -1146,7 +1146,7 @@ function home(){
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
   <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
   <section class="feed2">${ev.length?ev.slice(0,N).map((e,k)=>`<button class="fi2" ${e.r?`data-fr="${e.r.id}"`:e.lg?'data-fl="1"':""}>${e.dot}<span>${e.h}</span><small>${ago(e.t)}</small></button>`).join(""):'<div class="empty">Esta semana todavía no ha pasado nada. ¡Estrena tú la liga!</div>'}
-   ${ev.length>6?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
+   ${ev.length>4?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
   ${news.length?`<div class="hrow hk"><span class="k">Recién montadas</span><span class="sub">${news.length}</span></div>
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
