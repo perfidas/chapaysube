@@ -516,6 +516,7 @@ p.rnb{margin:-6px 0 14px}
 .dform{display:flex;flex-direction:column;gap:8px;margin:10px 0}.dform label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}.dform select{font-size:16px}
 .dbtn{border-color:var(--acc);color:var(--acc);background:transparent;font-weight:700}
 .king{display:flex;flex-wrap:wrap;gap:6px}.king span{font-size:12.5px;background:#2a2410;border:1px solid #5a4a14;color:#ffe6a3;border-radius:99px;padding:3px 10px}
+.kst3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.kst3 button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.15;padding:6px 4px}.kst3 button small{font-size:11px;opacity:.8}.kst3 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 </style>
 
 </head>
@@ -1130,7 +1131,7 @@ function rules(){
   <p>En Kilter subes la captura del bloque que has hecho en la app de Kilter y la liga lee el nombre, el grado y el ángulo. El mismo bloque a otro ángulo cuenta como otro bloque. Ángulo hasta 35° ×1, de 40° a 45° ×1,1 y de 50° en adelante ×1,2. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
   <div class="gpt">${KGRADES.map(g=>`<div><b style="color:${kgc(g)}">${g}</b><span>${KGP[g]}</span></div>`).join("")}</div>
   <h3>Semana y duelos</h3>
-  <p>El ranking de la semana va de lunes a domingo y sirve para picarse aunque llegues tarde al bimestre; ganarlo da un logro. Desde el perfil de otro escalador puedes retarle a un duelo en una sección, durante una semana o lo que queda de bimestre: gana quien sume más puntos en ese tiempo. Los duelos no cambian el ranking, pero los ganados cuentan para los logros.</p>
+  <p>El ranking de la semana va de lunes a domingo y sirve para picarse aunque llegues tarde al bimestre; ganarlo da un logro. Desde el perfil de otro escalador puedes retarle a un duelo en una sección: solo hoy (para cuando vais juntos a escalar), una semana o lo que queda de bimestre: gana quien sume más puntos en ese tiempo. Los duelos no cambian el ranking, pero los ganados cuentan para los logros.</p>
   <h3>Ranking anual</h3>
   <ul>
    <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
@@ -1185,12 +1186,13 @@ function duelWinner(d){if(!duelOver(d))return null;const[a,b]=duelScore(d);retur
 function duelStats(uid){let w=0,l=0,t=0;(S.duels||[]).forEach(d=>{if(!duelOver(d)||(d.ch!==uid&&d.rv!==uid))return;const x=duelWinner(d);if(x==="empate")t++;else if(x===uid)w++;else l++});return{w,l,t}}
 const left=d=>{const ms=new Date(d.end)-new Date(),dd=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24;return dd>0?`${dd} ${dd===1?"día":"días"}${h?` y ${h} h`:""}`:`${Math.max(1,Math.ceil(ms/36e5))} h`};
 function duelsHtml(){if(!S.me||!me())return"";const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),mine=(S.duels||[]).filter(d=>(d.ch===S.me||d.rv===S.me)&&nm[d.ch===S.me?d.rv:d.ch]);
-  const inv=mine.filter(d=>d.st==="pendiente"&&d.rv===S.me),out=mine.filter(d=>d.st==="pendiente"&&d.ch===S.me),
-    act=mine.filter(d=>d.st==="aceptado"&&!duelOver(d)),fin=mine.filter(d=>duelOver(d)&&new Date()-new Date(d.end)<7*864e5);
+  const stale=d=>d.kind==="dia"&&d.st==="pendiente"&&dayKey(new Date(d.at))!==dayKey(new Date());
+  const inv=mine.filter(d=>d.st==="pendiente"&&d.rv===S.me&&!stale(d)),out=mine.filter(d=>d.st==="pendiente"&&d.ch===S.me&&!stale(d)),
+    act=mine.filter(d=>d.st==="aceptado"&&!duelOver(d)),fin=mine.filter(d=>duelOver(d)&&new Date()-new Date(d.end)<(d.kind==="dia"?2:7)*864e5);
   if(!inv.length&&!out.length&&!act.length&&!fin.length)return"";
-  const kd=d=>d.kind==="semana"?"una semana":"hasta fin de bimestre",ot=d=>d.ch===S.me?d.rv:d.ch;
+  const kd=d=>d.kind==="dia"?"solo hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre",ot=d=>d.ch===S.me?d.rv:d.ch;
   const card=d=>{const[a,b]=duelScore(d),mineP=d.ch===S.me?a:b,theirs=d.ch===S.me?b:a,o=nm[ot(d)],w=duelWinner(d);
-    return `<div class="duel ${w?(w===S.me?"won":w==="empate"?"tie":"lost"):""}"><div class="dsec">${secName(d.sec)} · ${w?(w===S.me?"¡Has ganado!":w==="empate"?"Empate":"Has perdido"):`quedan ${left(d)}`}</div>
+    return `<div class="duel ${w?(w===S.me?"won":w==="empate"?"tie":"lost"):""}"><div class="dsec">${secName(d.sec)}${d.kind==="dia"?" · sesión":""} · ${w?(w===S.me?"¡Has ganado!":w==="empate"?"Empate":"Has perdido"):`quedan ${left(d)}`}</div>
       <div class="dsc"><span class="dme"><small>Tú</small><b>${fmt(mineP)}</b></span><span class="dvs">VS</span><span class="dot"><small>${esc(o)}</small><b>${fmt(theirs)}</b></span></div>
       ${!w?`<div class="dbar"><i style="width:${mineP+theirs?Math.round(mineP/(mineP+theirs)*100):50}%"></i></div>`:""}</div>`};
   return `<div class="hrow hk"><span class="k">Duelos</span></div><section class="duels">
@@ -1206,12 +1208,12 @@ function duelForm(u){const st=duelStats(u.id),f=S.dform;
   if(!f)return `<div class="dform"><button id="dgo" class="dbtn">⚔ Retar a un duelo</button>${rec}</div>`;
   return `<form class="dform kd" id="dfm"><b>Retar a ${esc(u.name)}</b>
    <label>Sección<select id="dsec">${SECTIONS.map(s=>`<option value="${s.id}" ${f.sec===s.id?"selected":""}>${s.name}</option>`).join("")}</select></label>
-   <div class="kst2"><button type="button" data-dk="semana" class="${f.kind==="semana"?"on":""}">Una semana</button><button type="button" data-dk="bimestre" class="${f.kind==="bimestre"?"on":""}">Hasta fin de bimestre</button></div>
-   <span class="sub">Empieza cuando acepte. Gana quien sume más puntos en esa sección durante el duelo.</span>
+   <div class="kst3"><button type="button" data-dk="dia" class="${f.kind==="dia"?"on":""}">Hoy<small>sesión</small></button><button type="button" data-dk="semana" class="${f.kind==="semana"?"on":""}">Una semana</button><button type="button" data-dk="bimestre" class="${f.kind==="bimestre"?"on":""}">Hasta fin de bimestre</button></div>
+   <span class="sub">${f.kind==="dia"?"Para cuando vais juntos: empieza cuando acepte y acaba a las 12 de la noche. Si no lo acepta hoy, caduca.":"Empieza cuando acepte."} Gana quien sume más puntos en esa sección durante el duelo.</span>
    <span class="err" id="derr" hidden></span><button class="pri" type="submit">Enviar reto</button><button type="button" id="dx">Cancelar</button></form>`}
 function bindDuelForm(u){if($("#dgo"))$("#dgo").onclick=()=>{S.dform={sec:S.lastSec||"cuerda",kind:"semana"};perfil()};
   if(!$("#dfm"))return;$("#dx").onclick=()=>{S.dform=null;perfil()};$("#dsec").onchange=e=>S.dform.sec=e.target.value;
-  document.querySelectorAll("[data-dk]").forEach(b=>b.onclick=()=>{S.dform.kind=b.dataset.dk;document.querySelectorAll("[data-dk]").forEach(x=>x.classList.toggle("on",x===b))});
+  document.querySelectorAll("[data-dk]").forEach(b=>b.onclick=()=>{S.dform.kind=b.dataset.dk;perfil()});
   $("#dfm").onsubmit=async e=>{e.preventDefault();if(S.busy)return;S.busy=true;const{data,error}=await sb.rpc("liga_duel_create",{p_rival:u.id,p_sec:S.dform.sec,p_kind:S.dform.kind});S.busy=false;
     if(error){$("#derr").textContent=error.message;$("#derr").hidden=false;return}applyRows(data);S.dform=null;toast(`Reto enviado a ${u.name}. Lo verá en su inicio.`);perfil()}}
 /* Quién abrió cada vía o bloque y quién la hizo primero a vista o al flash */
