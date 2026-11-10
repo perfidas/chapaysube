@@ -367,6 +367,11 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .shelf{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-radius:8px;background:#0c141b;box-shadow:inset 0 -6px 0 #22303c}
 .shelf .med{width:34px;height:34px;display:block}
 @media (prefers-reduced-motion:reduce){.go .med,.go .t1,.go .t2,.shine{animation:none}}
+/* Canción de la liga */
+.song{margin:14px 0 4px}
+.songlab{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
+#songbox{min-height:80px;border-radius:12px;overflow:hidden;background:var(--card)}
+#songbox iframe{display:block;border:0;border-radius:12px}
 </style>
 
 </head>
@@ -531,7 +536,7 @@ async function refresh(){
 /* Solicitudes de alta: solo el administrador las ve */
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
-let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
+let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
@@ -1049,6 +1054,15 @@ async function backup(){const b=$("#bkp");b.disabled=true;b.textContent="Prepara
     XLSX.writeFile(wb,`chapa-y-sube-copia-${isoDay(new Date())}.xlsx`);toast(`Copia descargada: ${vias.length} vías y bloques, ${enc.length} encadenes.`)}
   catch(e){toast("No se ha podido hacer la copia: "+(e.message||e))}
   b.disabled=false;b.textContent="Descargar copia de seguridad (Excel)"}
+/* La canción de la liga (Spotify) en el inicio. Con la API de Spotify se sabe si está sonando,
+   y mientras suene el inicio no se redibuja para no cortarla. */
+const SONG_ID="2MLVlV2FGhluLo5RNxWBmP";
+function songFrame(){return `<iframe src="https://open.spotify.com/embed/track/${SONG_ID}?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Santo de Magnesio · Perfidas"></iframe>`}
+function mountSong(){const box=$("#songbox");if(!box)return;S.songPlaying=false;
+  if(!window.SPAPI){box.innerHTML=songFrame();return}
+  box.innerHTML="<div></div>";window.SPAPI.createController(box.firstChild,{uri:"spotify:track:"+SONG_ID,width:"100%",height:80},c=>{S.songCtl=c;c.addListener("playback_update",e=>{S.songPlaying=!e.data.isPaused})})}
+window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songPlaying)mountSong()};
+(()=>{const sc=document.createElement("script");sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;document.head.appendChild(sc)})();
 function home(){
   const p=period("bim");
   $("#app").innerHTML=`<div class="top"><div><h1>Liga del Rocódromo</h1><div class="sub">Bimestre ${p.label} · termina en ${daysLeft()} días</div></div></div>
@@ -1058,9 +1072,10 @@ function home(){
     return `<button class="sec" data-s="${s.id}"><span><b>${s.name}</b>${nn?`<span class="tag nwtag">${nn} ${bl?(nn===1?"bloque nuevo":"bloques nuevos"):(nn===1?"vía nueva":"vías nuevas")}</span>`:""}</span>
     <span class="sub">${mine?`Vas ${i+1}.º de ${r.length} este bimestre`:r.length?(r.length===1?"1 escalador puntuando":`${r.length} escaladores puntuando`):"Aún nadie ha puntuado"}</span>
     <span class="pts">${mine?fmt(mine.p):"0"}<small>tus puntos</small></span></button>`}).join("")}</div>
+  <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>
   ${S.owner?`<button class="link" id="bkp">Descargar copia de seguridad (Excel)</button>`:""}`;
-  bindWho();$("#rls").onclick=openRules;if($("#bkp"))$("#bkp").onclick=backup;
+  bindWho();$("#rls").onclick=openRules;if($("#bkp"))$("#bkp").onclick=backup;mountSong();
   document.querySelectorAll(".sec").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.s;S.tab=(ZONES[S.sec]||S.sec==="boulder")?"mapa":"ranking";S.zone=null;S.open=null;S.scrollTop=true;render()});
 }
 
