@@ -373,8 +373,8 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 #songbox{min-height:80px;border-radius:12px;overflow:hidden;background:var(--card)}
 #songbox iframe{display:block;border:0;border-radius:12px}
 /* Selector de sección dentro de Mapa y Ranking */
-.secsw{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;margin:4px 0 12px}
-.secsw button{border:0;background:none;border-radius:7px;min-height:42px;padding:6px 4px;font:900 18px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
+.secsw{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;margin:4px 0 12px}
+.secsw button{border:0;background:none;border-radius:7px;min-height:42px;padding:6px 2px;font:900 17px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
 .secsw button.on{background:var(--acc);color:#fff}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 /* Animación al cambiar de sección deslizando */
@@ -398,7 +398,7 @@ p.rnb{margin:-6px 0 14px}
 .hdays{display:flex;gap:4px;align-items:flex-end}.hdays small{font-size:11px;color:var(--mut);margin-left:2px}
 .dg{width:32px;height:46px;border-radius:5px;background:linear-gradient(#1b2530 50%,#141d26 50%);border:1px solid #26333f;display:grid;place-items:center;font:900 36px/1 var(--disp);color:var(--gold);text-shadow:0 0 10px rgba(255,197,61,.45)}
 .hbar{height:6px;border-radius:99px;background:#22303c;overflow:hidden}.hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
 .bcell small{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
@@ -423,6 +423,37 @@ p.rnb{margin:-6px 0 14px}
 .hero .ctag{display:inline-block;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,197,61,.5);border-radius:99px;padding:2px 8px}
 .hello{font-size:30px}
 .acts button{width:100%;margin:0;align-self:stretch}.acts #bkp{color:var(--ink)}
+
+/* Kilter: tus bloques como tablillas blancas y la subida de la captura */
+.kst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}.kst div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 4px;text-align:center}
+.kst b{display:block;font:900 26px/1 var(--disp)}.kst small{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+.kup{border:2px dashed #3a4c59;border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:#131d26;cursor:pointer;width:100%;font:inherit;color:inherit}
+.kup svg{width:40px;height:40px;color:#2fe0e6}.kup b{font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.kup:focus-within{outline:3px solid var(--acc);outline-offset:2px}
+.kman{display:block;margin:6px auto 0}
+.kl{display:flex;flex-direction:column;gap:6px;margin:6px 0 4px}
+.kb{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;background:#f4f4f1;color:#1b2226;border:0;border-radius:8px;padding:8px 10px 8px 8px;text-align:left;width:100%;min-height:58px;flex-shrink:0}
+.kb .g{font:900 30px/1 var(--disp);text-align:center}.kb .g small{display:block;font:600 11px var(--body);color:#5d6a70}
+.kb b{display:block;font-weight:700;overflow-wrap:anywhere}.kb .s{font-size:12px;color:#5d6a70}
+.kb .p{text-align:right;font:900 22px/1 var(--disp);color:#177a47}.kb .p small{display:block;font:600 11px var(--body);color:#5d6a70}
+.kb.op{outline:3px solid var(--acc);outline-offset:2px}
+.kd{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.kwho{display:flex;flex-wrap:wrap;gap:6px}.kwho span{font-size:12px;background:#22303c;border-radius:99px;padding:3px 9px}
+.kst2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kst2 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.kshot{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000;max-height:260px}
+.kshot img{display:block;width:100%;height:auto}
+.kscan{position:absolute;left:0;right:0;height:3px;background:#2fe0e6;box-shadow:0 0 14px 4px rgba(47,224,230,.6);top:0;animation:kscan 1.4s ease-in-out infinite}
+@keyframes kscan{0%{top:2%}50%{top:95%}100%{top:2%}}
+.kstate{display:flex;gap:8px;align-items:center;font-size:13px}.kstate i{width:10px;height:10px;border-radius:50%;background:#2fe0e6;animation:kpulse 1s infinite}
+@keyframes kpulse{50%{opacity:.3}}
+.kf{display:flex;flex-direction:column;gap:8px}.kf .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kf label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}
+.kf input,.kf select{width:100%;font-size:16px}
+.kf .ok{border-color:#2fe0e6;box-shadow:0 0 0 1px #2fe0e6 inset}
+.kcalc{display:flex;justify-content:space-between;align-items:center;background:#131d26;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.kcalc b{font:900 26px/1 var(--disp);color:var(--gold)}
+.ksrch{width:100%;font-size:16px;margin:4px 0 6px}
+@media (prefers-reduced-motion:reduce){.kscan,.kstate i{animation:none}}
 </style>
 
 </head>
@@ -438,7 +469,7 @@ const GP={"4":30,"5a":45,"5b":60,"5c":80,"6a":100,"6a+":120,"6b":150,"6b+":180,"
 const STYLES=[["A vista",1.3],["Encadenada",1]]; /* En vías ya no hay flash; los flash antiguos se siguen mostrando y puntuando */
 const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
-const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"}];
+const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"},{id:"kilter",name:"Kilter"}];
 /* Boulder: el color es la dificultad, de más fácil a más difícil */
 const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Blanco y negro","#555555",450]};
 const BKEYS=Object.keys(BCOL);
@@ -446,6 +477,13 @@ const BKEYS=Object.keys(BCOL);
 const GOLD_BG="linear-gradient(135deg,#ffffff 0 50%,#111111 50% 100%)";
 const bbg=k=>k==="dorado"?GOLD_BG:BCOL[k]?.[1];
 const BSTYLES=[["Flash",1.2],["Encadenado",1]],BSM=Object.fromEntries(BSTYLES);
+/* Kilter: grados de bloque (Font), un extra por ángulo y el mismo flash que en boulder. Un bloque es nombre + ángulo */
+const KGRADES=["4","5","5+","6A","6A+","6B","6B+","6C","6C+","7A","7A+","7B","7B+","7C","7C+","8A","8A+"];
+const KGP={"4":40,"5":55,"5+":70,"6A":100,"6A+":120,"6B":150,"6B+":180,"6C":220,"6C+":260,"7A":320,"7A+":380,"7B":450,"7B+":520,"7C":600,"7C+":700,"8A":800,"8A+":920};
+const KANGS=[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70],KANG={};
+const angM=a=>a>=50?1.2:a>=40?1.1:1;
+const kpts=(g,an,st)=>Math.round((KGP[g]||0)*angM(an)*(BSM[st]||1));
+const isBl=sec=>sec==="boulder"||sec==="kilter";
 const BSECT=[
  {id:"b5a",name:"Sector 1.1",short:"1.1",d:"M254 528 L314 528",lab:[284,516,"middle"]},
  {id:"b5b",name:"Sector 1.2",short:"1.2",d:"M322 536 L322 652",lab:[306,600,"end"]},
@@ -558,8 +596,8 @@ async function loadAll(){
   if(S.me){const{data}=await sb.from("liga_projects").select("route_id");S.proj=new Set((data||[]).map(x=>x.route_id))}else S.proj=new Set();S.asc=a.map(mapA);
 }
 /* Carga por partes: después de la carga inicial, solo viajan las filas que cambian (tiempo real o la respuesta de lo que guardas) */
-const mapR=x=>({id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active});
-const okR=r=>r.sec==="boulder"?!!BCOL[r.grade]:GRADES.includes(r.grade);
+const mapR=x=>{if(x.sec==="kilter")KANG[x.id]=x.angle;return{id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active,name:x.name||"",angle:x.angle??null}};
+const okR=r=>r.sec==="boulder"?!!BCOL[r.grade]:r.sec==="kilter"?KGRADES.includes(r.grade):GRADES.includes(r.grade);
 const mapA=x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at});
 function setPeople(p){S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));S.users=S.people.filter(x=>x.ok)}
 async function loadPeople(){setPeople(await fetchAll(()=>sb.from("liga_people").select("*").order("user_id")))}
@@ -587,7 +625,7 @@ async function refresh(){
 /* Solicitudes de alta: solo el administrador las ve */
 async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pend=error?[]:data||[]}
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
-let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
+let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&S.kq)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
@@ -647,7 +685,7 @@ function showErr(e){S.view="error";S.err=e.message||String(e);render()}
 function period(mode,d=new Date()){const y=d.getFullYear();
   if(mode==="year")return{from:new Date(y,0,1),to:new Date(y+1,0,1),label:"Anual "+y};
   const b=Math.floor(d.getMonth()/2);return{from:new Date(y,b*2,1),to:new Date(y,b*2+2,1),label:BIM[b]+" "+y}}
-const pts=a=>a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
+const pts=a=>a.sec==="kilter"?kpts(a.grade,KANG[a.route]||0,a.style):a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
 function ranking(sec,mode){if(mode==="year")return annual(sec);const{from,to}=period("bim");return rankRange(sec,from,to)}
 /* Anual: en cada bimestre los 10 primeros reciben 10, 9, 8… 1 puntos de liga */
 const LEAGUE=[10,9,8,7,6,5,4,3,2,1];
@@ -678,6 +716,7 @@ function bindNews(view){document.querySelectorAll("[data-nr]").forEach(b=>b.oncl
 const daysLeft=()=>Math.ceil((period("bim").to-new Date())/864e5);
 const fmt=n=>n.toLocaleString("es-ES");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kgc=g=>gcol({"5":"5b","5+":"5c"}[g]||String(g).toLowerCase());
 const gcol=g=>{const i=GRADES.indexOf(g);return i<4?"var(--g1)":i<10?"var(--g2)":i<14?"var(--g3)":"var(--g4)"};
 const $=s=>document.querySelector(s);
 const me=()=>S.users.find(u=>u.id===S.me);
@@ -973,7 +1012,7 @@ function rules(){
   const av=SM["A vista"]||1,ex=Math.round(GP["6b"]*av),dec=n=>String(n).replace(".",",");
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   <article class="rl"><h2>Cómo se puntúa</h2>
-  <p>La liga tiene tres secciones: <b>Cuerda</b>, <b>Autoseguro</b> y <b>Boulder</b>. Cada una tiene su propio ranking y los puntos de una no cuentan en las otras.</p>
+  <p>La liga tiene cuatro secciones: <b>Cuerda</b>, <b>Autoseguro</b>, <b>Boulder</b> y <b>Kilter</b>. Cada una tiene su propio ranking y los puntos de una no cuentan en las otras.</p>
   <h3>Ranking bimestral</h3>
   <ul>
    <li>El año se divide en seis bimestres: ${BIM.join(", ")}. El día 1 de cada bimestre el ranking empieza de cero.</li>
@@ -989,6 +1028,9 @@ function rules(){
   <h3>Boulder: puntos por color</h3>
   <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
   <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
+  <h3>Kilter: puntos por grado y ángulo</h3>
+  <p>En Kilter subes la captura del bloque que has hecho en la app de Kilter y la liga lee el nombre, el grado y el ángulo. El mismo bloque a otro ángulo cuenta como otro bloque. Ángulo hasta 35° ×1, de 40° a 45° ×1,1 y de 50° en adelante ×1,2. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
+  <div class="gpt">${KGRADES.map(g=>`<div><b style="color:${kgc(g)}">${g}</b><span>${KGP[g]}</span></div>`).join("")}</div>
   <h3>Ranking anual</h3>
   <ul>
    <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
@@ -1004,12 +1046,14 @@ async function loadNameNext(){if(!S.me)return;const{data}=await sb.rpc("liga_nam
 function openProfile(id){S.pid=id;S.ren=false;if(id===S.me)loadNameNext().then(()=>{if(S.view==="perfil"&&S.pid===S.me&&!S.ren)perfil()}).catch(()=>{});if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
 const ord=n=>n?n+".º":"–";
 function bestOf(as,sec){if(!as.length)return"–";
+  if(sec==="kilter"){const g=as.map(a=>a.grade).sort((a,b)=>KGRADES.indexOf(b)-KGRADES.indexOf(a))[0];return `<span style="color:${kgc(g)}">${g}</span>`}
   if(sec==="boulder"){const k=as.map(a=>a.grade).sort((a,b)=>BKEYS.indexOf(b)-BKEYS.indexOf(a))[0];return BCOL[k]?`<i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}`:"–"}
   const g=as.map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];return `<span style="color:${gcol(g)}">${g}</span>`}
 function ascDesc(a){const r=S.routes.find(x=>x.id===a.route);
+  if(a.sec==="kilter")return r?`${esc(r.name)} · ${r.angle}° · ${a.grade}`:`Bloque de Kilter · ${a.grade}`;
   if(a.sec==="boulder")return `${r?BSECT.find(z=>z.id===r.zone)?.name||"Boulder":"Bloque desmontado"} · ${BCOL[a.grade]?.[0]||a.grade}`;
   return r?`Línea ${r.line} · ${HOLDS[r.hold]?.[0]||""} · ${a.grade}`:`Vía desmontada · ${a.grade}`}
-function projHtml(){const rs=S.routes.filter(r=>S.proj.has(r.id)&&r.active);
+function projHtml(){const rs=S.routes.filter(r=>S.proj.has(r.id)&&r.active&&r.sec!=="kilter");
   const gone=[...S.proj].filter(id=>!rs.some(r=>r.id===id)).length;
   const item=r=>{const bl=r.sec==="boulder",done=myAsc(r.id),where=bl?BSECT.find(z=>z.id===r.zone)?.name||"":`Línea ${r.line} · ${ZONES[r.sec]?.find(z=>z.id===zoneOf(r))?.name||""}`;
     return `<button class="nit" data-pr="${r.id}"><span class="${bl?"bsw":"sw"}" style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]}"></span><span><b>${bl?BCOL[r.color][0]:HOLDS[r.hold]?.[0]||""}</b> · ${SECTIONS.find(s=>s.id===r.sec).name}<br><span class="sub">${where}</span>${done?'<br><span class="done">Hecha este bimestre ✓</span>':""}</span>${bl?"":`<span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span>`}</button>`};
@@ -1019,7 +1063,7 @@ function projHtml(){const rs=S.routes.filter(r=>S.proj.has(r.id)&&r.active);
   ${gone?`<p class="sub" style="margin:4px 0 0">${gone===1?"1 proyecto se ha desmontado":gone+" proyectos se han desmontado"} y ya no sale.</p>`:""}`}
 /* Cabecera del perfil tipo cromo: nombre, grado máximo como tablilla, puesto y números */
 function cromo(u,y,cur){const yr=S.asc.filter(a=>a.u===u.id&&new Date(a.at).getFullYear()===y);
-  const vg=yr.filter(a=>a.sec!=="boulder").map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];
+  const vg=yr.filter(a=>!isBl(a.sec)).map(a=>a.grade).sort((a,b)=>GRADES.indexOf(b)-GRADES.indexOf(a))[0];
   const pos=SECTIONS.map(s=>{const r=rankRange(s.id,cur.from,cur.to),i=r.findIndex(x=>x.id===u.id);return{s,i,p:i>=0?r[i].p:0}});
   const best=pos.filter(x=>x.i>=0).sort((a,b)=>a.i-b.i)[0],lead=pos.filter(x=>x.i===0).map(x=>x.s.name.toLowerCase());
   const n=new Set(yr.map(a=>a.route)).size,tot=pos.reduce((t,x)=>t+x.p,0);
@@ -1038,7 +1082,7 @@ function perfil(){
     return `<div class="pfc"><h3>${s.name}</h3><div class="kv">
       <span>Este bimestre</span><b>${bi>=0?`${ord(bi+1)} · ${fmt(br[bi].p)} pts`:"–"}</b>
       <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
-      <span>${s.id==="boulder"?"Bloques":"Vías"} encadenad${s.id==="boulder"?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
+      <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
   const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${SECTIONS.map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
   const last=[...mine].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,25);
@@ -1048,18 +1092,18 @@ function perfil(){
   const dl=(a,b)=>{const d=a-b;if(!a&&!b)return"";return `<span class="dl ${d===0?"eq":d>0?"up":"dw"}">${d===0?"= igual":(d>0?"▲ +":"▼ ")+fmt(d)}</span>`};
   const cmp=SECTIONS.map(s=>{const a=stat(s.id,cur.from,cur.to),b=stat(s.id,pf,cur.from);
     return `<div class="cmp"><h3>${s.name}</h3><div><span class="big">${fmt(a.p)}</span> <span class="sub">pts</span> ${dl(a.p,b.p)}</div>
-     <div class="kv"><span>${s.id==="boulder"?"Bloques":"Vías"}</span><b>${a.n} ${dl(a.n,b.n)}</b>
+     <div class="kv"><span>${isBl(s.id)?"Bloques":"Vías"}</span><b>${a.n} ${dl(a.n,b.n)}</b>
      <span>Puesto</span><b>${ord(a.pos)} ${a.pos&&b.pos?(a.pos===b.pos?`<span class="dl eq">= igual</span>`:`<span class="dl ${a.pos<b.pos?"up":"dw"}">${a.pos<b.pos?"▲ sube "+(b.pos-a.pos):"▼ baja "+(a.pos-b.pos)}</span>`):""}</b>
      <span>${s.id==="boulder"?"Color máx.":"Grado máx."}</span><b>${bestOf(a.as,s.id)}</b>
-     </div><span class="sub">En ${pb}: ${b.n?`${fmt(b.p)} pts, ${b.n} ${s.id==="boulder"?(b.n===1?"bloque":"bloques"):(b.n===1?"vía":"vías")}, ${ord(b.pos)}`:"sin encadenes"}</span></div>`}).join("");
+     </div><span class="sub">En ${pb}: ${b.n?`${fmt(b.p)} pts, ${b.n} ${isBl(s.id)?(b.n===1?"bloque":"bloques"):(b.n===1?"vía":"vías")}, ${ord(b.pos)}`:"sin encadenes"}</span></div>`}).join("");
   /* Pirámide: vías o bloques distintos encadenados este año, por grado */
   const has=sec=>yr.some(a=>a.sec===sec);
   if(!S.psec||(!has(S.psec)&&SECTIONS.some(x=>has(x.id))))S.psec=(SECTIONS.find(x=>has(x.id))||SECTIONS[0]).id;
-  const ps=S.psec,isB=ps==="boulder",keys=isB?BKEYS:GRADES,cnt={};
+  const ps=S.psec,isB=ps==="boulder",isK=ps==="kilter",keys=isB?BKEYS:isK?KGRADES:GRADES,gc=isK?kgc:gcol,cnt={};
   const seen=new Set();yr.filter(a=>a.sec===ps).forEach(a=>{if(seen.has(a.route))return;seen.add(a.route);cnt[a.grade]=(cnt[a.grade]||0)+1});
   const idx=Object.keys(cnt).map(g=>keys.indexOf(g)).filter(i=>i>=0),mx=Math.max(1,...Object.values(cnt));
   const pyr=idx.length?keys.slice(Math.min(...idx),Math.max(...idx)+1).reverse().map(g=>{const n=cnt[g]||0;
-    return `<div class="pr ${n?"":"z"}"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gcol(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gcol(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
+    return `<div class="pr ${n?"":"z"}"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gc(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gc(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}
@@ -1073,7 +1117,7 @@ function perfil(){
   <h3 class="pfh">Pirámide de ${isB?"bloques":"grados"} ${y}</h3>
   <div class="ptabs" role="tablist">${SECTIONS.map(s=>`<button role="tab" data-ps="${s.id}" class="${s.id===ps?"on":""}" aria-selected="${s.id===ps}">${s.name}</button>`).join("")}</div>
   <div class="pyr">${pyr}</div>
-  <p class="sub" style="margin:6px 0 0">Cada ${isB?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
+  <p class="sub" style="margin:6px 0 0">Cada ${isB||isK?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
   <h3 class="pfh">Puestos por bimestre</h3>
   <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${SECTIONS.map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
   <h3 class="pfh">Últimos encadenes</h3>
@@ -1100,8 +1144,8 @@ function loadXLSX(){return window.XLSX?Promise.resolve():new Promise((ok,ko)=>{c
 async function backup(){const b=$("#bkp");b.disabled=true;b.textContent="Preparando la copia…";
   try{await loadXLSX();await loadAll();if(S.owner)await loadPending();
     const nm=Object.fromEntries(S.people.map(p=>[p.id,p.name])),rt=Object.fromEntries(S.routes.map(r=>[r.id,r])),sn=id=>SECTIONS.find(s=>s.id===id)?.name||id;
-    const where=r=>!r?"":r.sec==="boulder"?(BSECT.find(z=>z.id===r.zone)?.name||r.zone):"Línea "+r.line;
-    const vias=S.routes.map(r=>({"Sección":sn(r.sec),"Línea o sector":where(r),"Pared":r.sec==="boulder"?"":ZONES[r.sec]?.find(z=>z.id===zoneOf(r))?.name||"",
+    const where=r=>!r?"":r.sec==="kilter"?`${r.name} · ${r.angle}°`:r.sec==="boulder"?(BSECT.find(z=>z.id===r.zone)?.name||r.zone):"Línea "+r.line;
+    const vias=S.routes.map(r=>({"Sección":sn(r.sec),"Línea o sector":where(r),"Pared":isBl(r.sec)?"":ZONES[r.sec]?.find(z=>z.id===zoneOf(r))?.name||"",
       "Grado o dificultad":r.sec==="boulder"?BCOL[r.color]?.[0]||r.grade:r.grade,"Presas":HOLDS[r.hold]?.[0]||"","Montada el":r.created||"","Estado":r.active?"Montada":"Desmontada","Id":r.id}));
     const enc=[...S.asc].sort((a,b)=>a.at.localeCompare(b.at)).map(a=>{const r=rt[a.route],d=new Date(a.at);return{"Fecha":d.toLocaleString("es-ES"),"Escalador":nm[a.u]||a.u,"Sección":sn(a.sec),
       "Vía":where(r),"Grado":a.sec==="boulder"?BCOL[a.grade]?.[0]||a.grade:a.grade,"Estilo":a.style,"Puntos":pts(a),"Bimestre":BIM[Math.floor(d.getMonth()/2)]+" "+d.getFullYear()}});
@@ -1123,7 +1167,8 @@ window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songP
 /* ---------- Inicio: tu marcador arriba y lo que pasa en la liga debajo ---------- */
 function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),R=Object.fromEntries(S.routes.map(r=>[r.id,r])),ev=[];
   S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u])return;
-    if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
+    if(a.sec==="kilter")ev.push({t,dot:`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
+    else if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
     else ev.push({t,dot:`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
   try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
   SECTIONS.forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
@@ -1135,7 +1180,7 @@ function home(){
   const cells=SECTIONS.map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),m=moves(s.id),was=m&&i>=0?m[S.me]:null,d=was?was-(i+1):0;
     return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}</button>`}).join("");
   const myTot=SECTIONS.reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=SECTIONS.filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
-  const news=S.routes.filter(r=>r.active&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
+  const news=S.routes.filter(r=>r.active&&r.sec!=="kilter"&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
   const ev=feedEvents(),N=S.feedAll?20:4,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
   $("#app").innerHTML=`<section class="hero"><div class="hrow"><div class="hwho"><div class="k">${p.label}</div><h1 class="hello">${u?"Hola, "+esc(u.name):"Liga del rocódromo"}</h1></div>
      <div class="hdays" aria-label="Quedan ${dl} días">${String(dl).split("").map(c=>`<span class="dg">${c}</span>`).join("")}<small>${dl===1?"día":"días"}</small></div></div>
@@ -1173,16 +1218,129 @@ function section(){
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder"));
   if(!canEdit)S.edit=false;
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
-  <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.name}</button>`).join("")}</div>
+  <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
-  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">Mapa</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
+  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Mapa"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
   document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{if(b.dataset.sw===S.sec)return;S.sec=S.lastSec=b.dataset.sw;S.zone=null;S.open=null;S.edit=false;S.arm=null;section()});
   $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
-  S.tab==="mapa"?(S.sec==="boulder"?boulderView():mapView()):rankView();
+  S.tab==="mapa"?(S.sec==="boulder"?boulderView():S.sec==="kilter"?kilterView():mapView()):rankView();
 }
+
+/* ---------- Kilter: cada uno sube la captura del bloque que ha hecho en la Kilter Board ----------
+   La captura se lee en el propio móvil (Tesseract) y no se guarda: solo el nombre, el grado y el ángulo. */
+function loadTess(){return window.Tesseract?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=ok;s.onerror=()=>ko(new Error("No se ha podido cargar el lector de capturas"));document.head.appendChild(s)})}
+/* Grado en V (si la app de Kilter está en V) a su equivalente Font más bajo */
+const KV={0:"4",1:"5",2:"5+",3:"6A",4:"6B",5:"6C",6:"7A",7:"7A+",8:"7B",9:"7C",10:"7C+",11:"8A",12:"8A+"};
+function kGrade(t){t=t.replace(/[|]/g,"/").trim();let m=t.match(/^([4-8])([abcABC])?(\+)?(\/.*)?$/);
+  if(m){const d=+m[1],l=(m[2]||"").toUpperCase(),p=m[3]||"";
+    if(d===4)return"4";if(d===5)return l==="C"||(!l&&p)?"5+":"5";if(!l)return null;const g=d+l+p;return KGRADES.includes(g)?g:null}
+  m=t.match(/^V(\d{1,2})$/i);if(m&&KV[+m[1]])return KV[+m[1]];return null}
+/* De las palabras leídas (con su posición) saca ángulo, grado y nombre del bloque.
+   En la app de Kilter: el ángulo arriba a la derecha, el grado a la izquierda y el nombre a la derecha, a la altura del grado. */
+function kParse(ws,W,H){const o={},T=w=>w.t.trim(),cy=w=>(w.y0+w.y1)/2,hh=w=>w.y1-w.y0;
+  const an=ws.map(w=>{const m=T(w).match(/^(\d{1,2})\s*([°º*oO9])?$/);if(!m||w.x0<W*.3||w.y0<H*.2)return null;const v=+m[1];if(v>70||v%5||(v<20&&!m[2]))return null;return{w,v,deg:!!m[2]}}).filter(Boolean).sort((a,b)=>b.deg-a.deg||a.w.y0-b.w.y0)[0];
+  if(an)o.angle=an.v;
+  const gw=ws.filter(w=>w.x0<W*.35&&(!an||w.y0>an.w.y0)).map(w=>({w,g:kGrade(T(w))})).filter(x=>x.g).sort((a,b)=>a.w.y0-b.w.y0)[0];
+  if(gw)o.grade=gw.g;
+  const right=ws.filter(w=>w.x0>W*.42&&/[A-Za-zÀ-ÿ0-9]/.test(T(w))&&(!an||w!==an.w&&w.y0>an.w.y1-2));
+  let row=[];
+  if(gw)row=right.filter(w=>Math.abs(cy(w)-cy(gw.w))<Math.max(hh(gw.w),hh(w))*.6);
+  if(!row.length&&right.length){const f=right.slice().sort((a,b)=>a.y0-b.y0)[0];row=right.filter(w=>Math.abs(cy(w)-cy(f))<hh(f)*.6)}
+  const nm=row.sort((a,b)=>a.x0-b.x0).map(T).join(" ").replace(/^[^A-Za-zÀ-ÿ0-9]+|[^A-Za-zÀ-ÿ0-9!?)'.]+$/g,"").replace(/[<>]/g,"").trim();
+  if(nm.length>=2)o.name=nm.slice(0,60);
+  return o}
+function kImg(url){return new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ko(new Error("No se ha podido abrir la imagen"));i.src=url})}
+/* Solo se lee la franja de arriba, ampliada y en negro sobre blanco; si falta algo se prueba con otro contraste */
+async function kRead(file){const url=URL.createObjectURL(file);S.kq={st:"read",img:url,style:"Encadenado",name:"",grade:"",angle:"",found:{}};kilterView();
+  let got={};
+  try{const im=await kImg(url),W=1170,sc=W/im.naturalWidth,H=Math.max(1,Math.round(im.naturalHeight*.25*sc));
+    const mk=th=>{const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.drawImage(im,0,0,im.naturalWidth,im.naturalHeight*.25,0,0,W,H);
+      const d=x.getImageData(0,0,W,H),p=d.data;for(let i=0;i<p.length;i+=4){let v=255-(p[i]*.299+p[i+1]*.587+p[i+2]*.114);if(th)v=v<th?0:255;p[i]=p[i+1]=p[i+2]=v}x.putImageData(d,0,0);return c};
+    await loadTess();const wk=await Tesseract.createWorker("eng");
+    try{for(const[th,ps] of [[100,"11"],[0,"3"],[0,"11"],[170,"11"]]){await wk.setParameters({tessedit_pageseg_mode:ps});const{data}=await wk.recognize(mk(th));
+      const g=kParse((data.words||[]).map(w=>({t:w.text||"",x0:w.bbox.x0,y0:w.bbox.y0,x1:w.bbox.x1,y1:w.bbox.y1})),W,H);
+      for(const k in g)if(!got[k])got[k]=g[k];if(got.name&&got.grade&&got.angle!=null)break}}
+    finally{wk.terminate().catch(()=>{})}}
+  catch(e){got.err=1}
+  if(!S.kq||S.kq.img!==url)return;
+  Object.assign(S.kq,{st:"form",name:got.name||"",grade:got.grade||"",angle:got.angle??"",found:{name:!!got.name,grade:!!got.grade,angle:got.angle!=null},err:got.err});kilterView()}
+const kRoute=(n,an)=>S.routes.find(r=>r.sec==="kilter"&&r.angle===an&&r.name.toLowerCase()===n.trim().replace(/\s+/g," ").toLowerCase());
+const kWho=rid=>{const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),seen={};S.asc.filter(a=>a.route===rid&&nm[a.u]).sort((a,b)=>b.at.localeCompare(a.at)).forEach(a=>{if(!seen[a.u])seen[a.u]=a});return Object.values(seen).map(a=>({n:nm[a.u],fl:a.style==="Flash",me:a.u===S.me}))};
+function kRow(r,a){const p=a?pts(a):kpts(r.grade,r.angle,"Encadenado"),d=a?new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"}):"";
+  return `<button class="kb ${S.open===r.id?"op":""}" data-kr="${r.id}" aria-expanded="${S.open===r.id}"><span class="g">${esc(r.grade)}<small>${r.angle}°</small></span><span><b>${esc(r.name)}</b><span class="s">${a?`${esc(a.style)} · ${d}`:`${kWho(r.id).length} en la liga`}</span></span><span class="p">${a?"+":""}${fmt(p)}<small>pts</small></span></button>`}
+function kDetail(r){const who=kWho(r.id),mine=myAsc(r.id);
+  return `<div class="kd" id="kd"><div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
+   ${who.length?`<div class="kwho">${who.map(w=>`<span>${esc(w.n)}${w.fl?" · flash":""}</span>`).join("")}</div>`:""}
+   ${S.me?`<div class="sub">${mine?"Tu encadene de este bimestre:":"¿Lo has hecho tú también?"}</div>
+   <div class="kst2">${BSTYLES.map(([st])=>`<button data-kst="${st}" class="${mine?.style===st?"on":""}">${st} · ${fmt(kpts(r.grade,r.angle,st))}</button>`).join("")}</div>
+   ${mine?`<button class="${S.arm==="krm"?"dng":""}" id="krm">${S.arm==="krm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}`:""}</div>`}
+function kForm(){const q=S.kq,opt=(v,l,cur)=>`<option value="${v}" ${String(v)===String(cur)?"selected":""}>${l}</option>`;
+  if(q.st==="read")return `<div class="kd"><div class="kshot"><img src="${q.img}" alt="Tu captura de Kilter"><div class="kscan"></div></div><div class="kstate"><i></i>Leyendo la captura…</div><button id="kx">Cancelar</button></div>`;
+  const f=q.found||{},any=f.name||f.grade||f.angle;
+  return `<form class="kd kf" id="kfm" novalidate>${q.img?`<div class="kshot"><img src="${q.img}" alt="Tu captura de Kilter"></div>`:""}
+   <div class="kstate" style="color:${q.img?(any?"#2fe0e6":"var(--gold)"):"var(--mut)"}">${q.img?(any?"✓ Revisa los datos y guarda.":"No he podido leer la captura. Rellena los datos a mano."):"Apunta el bloque a mano."}</div>
+   <label>Nombre del bloque<input id="kn" class="${f.name?"ok":""}" maxlength="60" autocomplete="off" value="${esc(q.name)}"></label>
+   <div class="two"><label>Grado<select id="kg" class="${f.grade?"ok":""}">${opt("","Elige",q.grade)}${KGRADES.map(g=>opt(g,g,q.grade)).join("")}</select></label>
+    <label>Ángulo<select id="ka" class="${f.angle?"ok":""}">${opt("","Elige",q.angle)}${KANGS.map(a=>opt(a,a+"°",q.angle)).join("")}</select></label></div>
+   <div class="kst2" id="kss">${BSTYLES.map(([st])=>`<button type="button" data-ks="${st}" class="${q.style===st?"on":""}">${st}</button>`).join("")}</div>
+   <div class="sub" id="kex"></div>
+   <div class="kcalc"><span class="sub">Puntos para la liga</span><b id="kpt">–</b></div>
+   <span class="err" id="kerr" role="alert" hidden></span>
+   <button class="pri" type="submit" id="ksv">Guardar encadene</button><button type="button" id="kx">Cancelar</button></form>`}
+function kilterView(){
+  const cur=period("bim"),y=new Date().getFullYear(),R=Object.fromEntries(S.routes.filter(r=>r.sec==="kilter").map(r=>[r.id,r]));
+  const mine=S.asc.filter(a=>a.u===S.me&&a.sec==="kilter"&&R[a.route]).sort((a,b)=>b.at.localeCompare(a.at));
+  const nowB=mine.filter(a=>new Date(a.at)>=cur.from),seen=new Set(nowB.map(a=>a.route)),older=[];
+  mine.filter(a=>new Date(a.at)<cur.from).forEach(a=>{if(!seen.has(a.route)){seen.add(a.route);older.push(a)}});
+  const rk=rankRange("kilter",cur.from,cur.to),pos=rk.findIndex(x=>x.id===S.me);
+  const yb=mine.filter(a=>new Date(a.at).getFullYear()===y).map(a=>a.grade).sort((a,b)=>KGRADES.indexOf(b)-KGRADES.indexOf(a))[0];
+  const op=S.open&&R[S.open],inMine=op&&seen.has(op.id),q=S.kq;
+  const sq=(S.ksq||"").trim().toLowerCase(),all=Object.values(R).filter(r=>r.active&&(!sq||r.name.toLowerCase().includes(sq)));
+  const cnt={};S.asc.forEach(a=>{if(R[a.route])cnt[a.route]=(cnt[a.route]||0)+1});all.sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)||a.name.localeCompare(b.name));
+  const list=as=>as.map(a=>kRow(R[a.route],a)+(S.open===a.route?kDetail(R[a.route]):"")).join("");
+  $("#body").innerHTML=`${S.me?`<div class="kst"><div><b style="color:${pos===0?"var(--gold)":"inherit"}">${pos>=0?ord(pos+1):"–"}</b><small>Puesto</small></div><div><b>${nowB.length}</b><small>Bloques bim.</small></div><div><b style="color:${yb?kgc(yb):"inherit"}">${yb||"–"}</b><small>Máx. ${y}</small></div></div>`:""}
+   ${op&&!inMine?`<div class="k">Ficha del bloque</div><div class="kl">${kRow(op)}${kDetail(op)}</div>`:""}
+   ${!S.me?`<div class="empty">Entra en tu cuenta para subir tus bloques del Kilter.<br><br><button class="pri" id="klin">Entrar</button></div>`
+    :q?kForm()
+    :`<label class="kup" for="kfile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5"/></svg><b>Subir captura de Kilter</b><span class="sub">Abre el bloque en la app de Kilter, haz una captura y súbela aquí. La captura no se guarda.</span><input type="file" id="kfile" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label>
+     <button class="link kman" id="kman">O apúntalo a mano</button>`}
+   ${S.me?`<div class="k" style="margin-top:14px">Este bimestre</div>${nowB.length?`<div class="kl">${list(nowB)}</div>`:`<div class="hint">Aún no has subido ningún bloque este bimestre.</div>`}`:""}
+   ${older.length?`<div class="k" style="margin-top:10px">Antes</div><div class="kl">${list(older.slice(0,40))}</div>`:""}
+   <div class="k" style="margin-top:14px">Bloques de la liga</div>
+   <input class="ksrch" id="ksq" type="search" placeholder="Buscar por nombre" aria-label="Buscar un bloque del Kilter por nombre" value="${esc(S.ksq||"")}" data-noswipe>
+   <div class="kl" id="kall">${all.length?all.slice(0,S.kmore?200:12).map(r=>kRow(r)).join(""):`<div class="hint">${sq?"Ningún bloque con ese nombre.":"Todavía nadie ha subido un bloque."}</div>`}</div>
+   ${all.length>12&&!S.kmore?`<button class="link" id="kmore">Ver todos (${all.length})</button>`:""}`;
+  if($("#klin"))$("#klin").onclick=()=>{S.reg=false;needLogin()};
+  if($("#kfile"))$("#kfile").onchange=e=>{const f=e.target.files[0];if(f)kRead(f)};
+  if($("#kman"))$("#kman").onclick=()=>{S.kq={st:"form",img:null,style:"Encadenado",name:"",grade:"",angle:"",found:{}};kilterView();$("#kn")?.focus()};
+  if($("#kmore"))$("#kmore").onclick=()=>{S.kmore=true;kilterView()};
+  const sqi=$("#ksq");sqi.oninput=()=>{S.ksq=sqi.value;const p=sqi.selectionStart;kilterView();const n=$("#ksq");n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
+  document.querySelectorAll("[data-kr]").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.kr?null:b.dataset.kr;S.arm=null;kilterView()});
+  if(op){document.querySelectorAll("[data-kst]").forEach(b=>b.onclick=()=>markAscent(op,b.dataset.kst));
+    if($("#krm"))$("#krm").onclick=()=>{if(S.arm!=="krm"){S.arm="krm";return kilterView()}S.arm=null;unmark(op)}}
+  if($("#kx"))$("#kx").onclick=()=>{if(S.kq?.img)URL.revokeObjectURL(S.kq.img);S.kq=null;kilterView()};
+  const fm=$("#kfm");if(!fm)return;
+  const upd=()=>{const n=$("#kn").value,g=$("#kg").value,a=$("#ka").value,ex=a!==""&&n.trim()?kRoute(n,+a):null;Object.assign(S.kq,{name:n,grade:g,angle:a});
+    if(ex){$("#kg").value=ex.grade;S.kq.grade=ex.grade;$("#kg").disabled=true;const w=kWho(ex.id).length;$("#kex").textContent=`Este bloque ya está en la liga como ${ex.grade}${w?` y lo ${w===1?"ha":"han"} hecho ${w}`:""}.`}
+    else{$("#kg").disabled=false;$("#kex").textContent=""}
+    const gg=ex?ex.grade:$("#kg").value;$("#kpt").textContent=gg&&a!==""?"+"+fmt(kpts(gg,+a,S.kq.style)):"–"};
+  ["kn","kg","ka"].forEach(id=>{$("#"+id).oninput=upd;$("#"+id).onchange=upd});
+  document.querySelectorAll("[data-ks]").forEach(b=>b.onclick=()=>{S.kq.style=b.dataset.ks;document.querySelectorAll("[data-ks]").forEach(x=>x.classList.toggle("on",x===b));upd()});
+  upd();
+  fm.onsubmit=async e=>{e.preventDefault();const n=$("#kn").value.trim().replace(/\s+/g," "),a=$("#ka").value,ex=a!==""&&n?kRoute(n,+a):null,g=ex?ex.grade:$("#kg").value,er=t=>{$("#kerr").textContent=t;$("#kerr").hidden=false};
+    if(n.length<2)return er("Escribe el nombre del bloque tal como sale en Kilter.");if(/[<>]/.test(n))return er("El nombre no puede llevar los signos < ni >.");
+    if(!g)return er("Elige el grado.");if(a==="")return er("Elige el ángulo.");
+    if(!S.owner&&!S.users.some(u=>u.id===S.me))return er("Tu cuenta aún no está aprobada. Cuando el administrador la apruebe podrás subir bloques.");
+    if(ex&&myAsc(ex.id)?.style===S.kq.style)return er("Ya tienes este bloque marcado este bimestre.");
+    $("#ksv").disabled=true;$("#ksv").textContent="Guardando…";S.busy=true;
+    try{const{data,error}=await sb.rpc("liga_kilter_log",{p_name:n,p_grade:g,p_angle:+a,p_style:S.kq.style});if(error)throw error;
+      applyRows(data.route);applyRows(data.ascent);if(S.kq?.img)URL.revokeObjectURL(S.kq.img);S.kq=null;S.open=data.route.id;
+      toast(`Guardado: ${n} a ${a}°, +${fmt(pts(mapA(data.ascent)))} puntos`)}
+    catch(err){S.busy=false;$("#ksv").disabled=false;$("#ksv").textContent="Guardar encadene";return er("No se ha podido guardar: "+(err.message||err))}
+    S.busy=false;kilterView()}}
 
 /* ---------- Boulder: plano de la sala, sectores y bloques por color ---------- */
 function bSvg(){
@@ -1369,7 +1527,7 @@ function bindRoutes(){
     $("#edl").onclick=()=>{if(S.arm!=="del"){S.arm="del";return mapView()}S.arm=null;S.open=null;updRoute(r.id,{active:false})}}
 }
 
-const unit=(n,sec)=>`${n} ${sec==="boulder"?(n===1?"bloque":"bloques"):(n===1?"vía":"vías")}`;
+const unit=(n,sec)=>`${n} ${isBl(sec)?(n===1?"bloque":"bloques"):(n===1?"vía":"vías")}`;
 const CROWN=`<svg class="crown" viewBox="0 0 26 16" aria-hidden="true"><path fill="currentColor" d="M2 4l5 4 6-7 6 7 5-4-2 11H4z"/><circle cx="2" cy="3.5" r="1.8" fill="currentColor"/><circle cx="13" cy="1.6" r="1.8" fill="currentColor"/><circle cx="24" cy="3.5" r="1.8" fill="currentColor"/></svg>`;
 /* Puesto de cada uno hace 24 h, para marcar quién ha bajado o subido */
 function moves(sec){const{from,to}=period("bim"),ago=new Date(Date.now()-864e5);if(ago<=from)return null;const m={};rankRange(sec,from,ago).forEach((x,i)=>m[x.id]=i+1);return m}
@@ -1394,7 +1552,7 @@ function rankView(){
   if(S.rmode==="hist")html=histHtml();
   else{const p=period(S.rmode),r=ranking(S.sec,S.rmode);
     html=`<div class="sub" style="margin-bottom:10px">${p.label}${S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
-    ${r.length?rkList(r,S.rmode==="year",S.rmode==="bim"?moves(S.sec):null):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. Marca tus vías desde el mapa.</div>`}`}
+    ${r.length?rkList(r,S.rmode==="year",S.rmode==="bim"?moves(S.sec):null):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. ${S.sec==="kilter"?"Sube la captura de un bloque desde «Mis bloques».":"Marca tus vías desde el mapa."}</div>`}`}
   $("#body").innerHTML=`<div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;
   $("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
