@@ -496,6 +496,26 @@ p.rnb{margin:-6px 0 14px}
 .rsi{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 10px;text-align:left;width:100%}
 .btick{pointer-events:none}.btick path{fill:none;stroke-linecap:round;stroke-linejoin:round}.bt0{stroke:#0b1118;stroke-width:5.2}.bt1{stroke:#3fd28b;stroke-width:2.8}
 .bdot.dn{stroke:var(--ink);stroke-width:1.2}
+
+/* Competición: objetivo, avisos, duelos, quién la abrió */
+.goal{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:7px}
+.goal.spr{border-color:var(--acc);background:linear-gradient(135deg,rgba(255,61,127,.16),transparent 70%),var(--card)}
+.sprb{font:900 15px/1 var(--disp);text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--acc);border-radius:99px;padding:4px 10px}
+.gl{display:grid;grid-template-columns:78px 1fr;gap:8px;font-size:14px;align-items:baseline}.gl>b{font:800 15px/1.1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
+.ovt{background:#131d26;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:6px}
+.ovl{display:grid;grid-template-columns:18px 1fr;gap:6px;font-size:14px}.ovl.up i{color:var(--g1);font-style:normal}.ovl.dw i{color:var(--g3);font-style:normal}
+.ovt .link{align-self:flex-end}
+.duels{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.duel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.duel.inv{border-color:var(--gold)}.duel.won{border-color:var(--g1)}.duel.lost{opacity:.85}
+.dsec{font:800 13px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}.duel.won .dsec{color:var(--g1)}
+.dsc{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}.dsc span{display:flex;flex-direction:column}.dsc .dot{text-align:right;align-items:flex-end}
+.dsc small{color:var(--mut);font-size:12px;overflow-wrap:anywhere}.dsc b{font:900 30px/1 var(--disp)}.dvs{font:900 16px/1 var(--disp);color:var(--acc)}
+.dbar{height:6px;border-radius:99px;background:#33414d;overflow:hidden}.dbar i{display:block;height:100%;background:var(--acc)}
+.drow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dform{display:flex;flex-direction:column;gap:8px;margin:10px 0}.dform label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}.dform select{font-size:16px}
+.dbtn{border-color:var(--acc);color:var(--acc);background:transparent;font-weight:700}
+.king{display:flex;flex-wrap:wrap;gap:6px}.king span{font-size:12.5px;background:#2a2410;border:1px solid #5a4a14;color:#ffe6a3;border-radius:99px;padding:3px 10px}
 </style>
 
 </head>
@@ -626,7 +646,7 @@ const READY=!/PEGA_AQUI/.test(CFG.url+CFG.key)&&typeof supabase!=="undefined";
 const sb=READY?supabase.createClient(CFG.url,CFG.key):null;
 /* Si se abre desde el enlace del correo de «He olvidado mi contraseña», se pide la nueva */
 const REC=/type=recovery/.test(location.hash);
-const S={rec:REC,proj:new Set(),fol:new Set(),people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
+const S={rec:REC,proj:new Set(),fol:new Set(),duels:[],people:[],users:[],routes:[],asc:[],me:null,owner:false,view:"loading",sec:null,tab:"mapa",zone:null,open:null,edit:false,rmode:"bim",arm:null};
 async function fetchAll(build){let out=[];for(let from=0;;from+=1000){const{data,error}=await build().range(from,from+999);if(error)throw error;out=out.concat(data);if(data.length<1000)return out}}
 async function loadAll(){
   const q=t=>sb.from(t).select("*").then(x=>{if(x.error)throw x.error;return x.data});
@@ -635,6 +655,7 @@ async function loadAll(){
     fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
     fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
     q("liga_points"),q("liga_styles")]);
+  const dq=await sb.from("liga_duels").select("*").order("created_at",{ascending:false}).limit(500);S.duels=(dq.data||[]).map(mapD);
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
   STYLES.forEach(x=>{if(SM[x[0]])x[1]=SM[x[0]]});BSTYLES.forEach(x=>{if(BSM[x[0]])x[1]=BSM[x[0]]});
@@ -649,7 +670,7 @@ function setPeople(p){S.dv=(S.dv||0)+1;S.people=p.map(x=>({id:x.user_id,name:x.n
 async function loadPeople(){setPeople(await fetchAll(()=>sb.from("liga_people").select("*").order("user_id")))}
 function putIn(list,row){S.dv=(S.dv||0)+1;const i=list.findIndex(x=>x.id===row.id);if(i<0)list.push(row);else list[i]=row}
 function applyRows(data){if(!data)return;(Array.isArray(data)?data:[data]).forEach(x=>{if(!x||!x.id)return;
-  if("route_id" in x)putIn(S.asc,mapA(x));else if("sec" in x&&"active" in x){const r=mapR(x);if(okR(r))putIn(S.routes,r)}})}
+  if("challenger" in x)putIn(S.duels,mapD(x));else if("route_id" in x)putIn(S.asc,mapA(x));else if("sec" in x&&"active" in x){const r=mapR(x);if(okR(r))putIn(S.routes,r)}})}
 const dropAsc=id=>{S.dv=(S.dv||0)+1;S.asc=S.asc.filter(a=>a.id!==id)};
 let session=null;
 async function refresh(){
@@ -676,7 +697,7 @@ let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open
 let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
 function onRt(p){const t=p.table;
-  if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_ascents")dropAsc(id);else{S.dv=(S.dv||0)+1;S.routes=S.routes.filter(r=>r.id!==id)}}
+  if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_duels")S.duels=S.duels.filter(d=>d.id!==id);else if(t==="liga_ascents")dropAsc(id);else{S.dv=(S.dv||0)+1;S.routes=S.routes.filter(r=>r.id!==id)}}
   else applyRows(p.new);
   redraw()}
 function toast(t,undo){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}
@@ -720,6 +741,7 @@ async function start(){
     let wasOn=false,hidAt=0;
     sb.channel("liga").on("postgres_changes",{event:"*",schema:"public",table:"liga_ascents"},onRt)
       .on("postgres_changes",{event:"*",schema:"public",table:"liga_routes"},onRt)
+      .on("postgres_changes",{event:"*",schema:"public",table:"liga_duels"},onRt)
       .subscribe(st=>{if(st==="SUBSCRIBED"){if(wasOn)bump();wasOn=true}});
     document.addEventListener("visibilitychange",()=>{if(document.hidden)hidAt=Date.now();else if(hidAt&&Date.now()-hidAt>60000)bump()});
     await refresh();
@@ -732,7 +754,7 @@ function period(mode,d=new Date()){const y=d.getFullYear();
   if(mode==="year")return{from:new Date(y,0,1),to:new Date(y+1,0,1),label:"Anual "+y};
   const b=Math.floor(d.getMonth()/2);return{from:new Date(y,b*2,1),to:new Date(y,b*2+2,1),label:BIM[b]+" "+y}}
 const pts=a=>a.sec==="kilter"?kpts(a.grade,KANG[a.route]||0,a.style):a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
-function ranking(sec,mode){if(mode==="year")return annual(sec);const{from,to}=period("bim");return rankRange(sec,from,to)}
+function ranking(sec,mode){if(mode==="year")return annual(sec);if(mode==="week"){const w=weekOf();return rankRange(sec,w.from,w.to)}const{from,to}=period("bim");return rankRange(sec,from,to)}
 /* Anual: en cada bimestre los 10 primeros reciben 10, 9, 8… 1 puntos de liga */
 const LEAGUE=[10,9,8,7,6,5,4,3,2,1];
 function annual(sec,y=new Date().getFullYear()){const now=new Date(),cy=now.getFullYear(),cur=y<cy?5:Math.floor(now.getMonth()/2),by={};
@@ -792,6 +814,7 @@ const LPICT={
  first:lT("1.º",20)+'<path d="M-12-12l4 4M12-12l-4 4M0-15v5" stroke="#0f1720" stroke-width="2.4" stroke-linecap="round"/>',
  podium:'<path d="M-14 12V2h9v10M-5 12V-6h10v18M5 12V5h9v7" fill="#0f1720"/>',
  crown:'<path d="M-13-4l7 6 6-10 6 10 7-6-3 14h-20z" fill="#0f1720"/>',
+ swords:'<path d="M-12-12L10 10M12-12L-10 10" stroke="#0f1720" stroke-width="3.6" stroke-linecap="round"/><path d="M5 13l8-8M-5 13l-8-8" stroke="#0f1720" stroke-width="3" stroke-linecap="round"/>',
  crown2:'<path d="M-13-6l7 6 6-10 6 10 7-6-3 14h-20z" fill="#0f1720"/><path d="M-10 13h20" stroke="#0f1720" stroke-width="3"/>',
  hold:lBlob("#0f1720"),hblue:lBlob("#2a6fdb"),hred:lBlob("#d8322a"),hblack:lBlob("#1d1d1d"),
  bw:'<circle r="11" fill="#fff" stroke="#0f1720" stroke-width="2.4"/><path d="M-8-8a11 11 0 0 1 16 16z" fill="#111"/>',
@@ -821,7 +844,7 @@ const L_VIA=[["first","Bautismo de magnesio","Tu primera vía","rope","bronce"],
  ["walls","Trotamuros","Al menos una vía en cada pared","map","bronce"],["wall","Limpiaparedes","Todas las vías montadas de una pared","wall","oro"],["open","Abrelatas","Ser el primero en hacer una vía","first","plata"],["pod","Al cajón","Acabar en el podio de un bimestre","podium","plata"],["win","Rey del bimestre","Ganar un bimestre","crown","oro"],["year","El jefe final","Ganar el ranking anual","crown2","diamante"]];
 const L_BOU=[["first","Despegue","Tu primer bloque","hold","bronce"],["azul","Blues","Tu primer bloque azul","hblue","plata"],["rojo","Alerta roja","Tu primer bloque rojo","hred","oro"],["negro","El lado oscuro","Tu primer bloque negro","hblack","platino"],["dorado","Jaque mate","Un bloque blanco y negro","bw","diamante"],["all","Caja de ceras","Un bloque de cada color","rainbow","plata"],["w4","Pegado a la presa","Encadenar algo 4 semanas seguidas","fire","bronce"],
  ["b20","Bicho de bloque","20 bloques en un bimestre","cal","plata"],["n100","Picapiedra","100 bloques en la temporada","c100","oro"],["open","Primera huella","Ser el primero en hacer un bloque","first","plata"],["pod","Al cajón","Acabar en el podio de un bimestre","podium","plata"],["win","Rey de la colchoneta","Ganar un bimestre","crown","oro"],["year","Señor de los bloques","Ganar el ranking anual","crown2","diamante"]];
-const L_MIX=[["pair1","Dos por uno","La misma vía, primero en autoseguro y después en cuerda","ac","bronce"],["pair10","Ensayo general","10 vías hechas primero en autoseguro y después en cuerda","x10","plata"],["pair25","Sin red","25 vías hechas primero en autoseguro y después en cuerda","x25","oro"],["pair7a","Séptimo cielo al cuadrado","Un 7a, primero en autoseguro y después en cuerda","seven2","rubi"],
+const L_MIX=[["week","Rey de la semana","Ganar una semana en cualquier sección","cal","oro"],["duel1","Duelista","Ganar un duelo","swords","plata"],["duel5","Gladiador","Ganar 5 duelos","swords","rubi"],["pair1","Dos por uno","La misma vía, primero en autoseguro y después en cuerda","ac","bronce"],["pair10","Ensayo general","10 vías hechas primero en autoseguro y después en cuerda","x10","plata"],["pair25","Sin red","25 vías hechas primero en autoseguro y después en cuerda","x25","oro"],["pair7a","Séptimo cielo al cuadrado","Un 7a, primero en autoseguro y después en cuerda","seven2","rubi"],
  ["day3","Tres en raya","Encadenar en tres secciones distintas el mismo día","three","bronce"],["bim3","Todoterreno","Puntuar en cuerda, autoseguro y boulder el mismo bimestre","tri","plata"],["bim4","Cuatro de cuatro","Puntuar en las cuatro secciones, Kilter incluida, el mismo bimestre","four","oro"],["bal","Equilibrista","10 encadenes en cuerda, autoseguro y boulder el mismo bimestre","scale","oro"],["kb","Del muro al tablero","Un bloque negro en boulder y un 7A en la Kilter el mismo bimestre","bk","esmeralda"],["edge","Doble filo","Un 7a en cuerda y un bloque negro el mismo bimestre","blades","esmeralda"],
  ["pod3","Tres medallas","Podio en cuerda, autoseguro y boulder el mismo bimestre","podium","rubi"],["win3","Triple corona","Ganar el mismo bimestre en cuerda, autoseguro y boulder","crown","platino"],["win4","Póquer de coronas","Ganar el mismo bimestre en las cuatro secciones","crown2","diamante"],["jaque","Jaque a la octava","Un 8a en cuerda y un bloque blanco y negro","bw","diamante"],["king","Rey absoluto","Ganar el ranking anual en cuerda, autoseguro y boulder","crown2","diamante"]];
 const L_KIL=[["first","Enchufado","Tu primer bloque en la Kilter","board","bronce"],["6A","Luz verde","Tu primer 6A en la Kilter","k6a","bronce"],["6B","Modo fosforito","Tu primer 6B en la Kilter","k6b","plata"],["6C","Chispazo","Tu primer 6C en la Kilter","k6c","oro"],["7A","Alto voltaje","Tu primer 7A en la Kilter","k7a","esmeralda"],["7B","Fundido a negro","Tu primer 7B en la Kilter","k7b","rubi"],["7C","Apagón general","Tu primer 7C en la Kilter","k7c","platino"],["8A","Tablero en llamas","Tu primer 8A en la Kilter","k8a","diamante"],
@@ -842,7 +865,8 @@ function streak(list,need){/* semanas ISO seguidas con algún encadene; devuelve
 let LCACHE={k:"",v:null};
 /* Para todos los escaladores a la vez: {uid:{id:{ok,at,v,m}}} de la temporada y */
 function computeLogros(y){
-  const key=y+"|"+S.asc.length+"|"+(S.asc[S.asc.length-1]?.id||"")+"|"+S.routes.length+"|"+S.users.length+"|"+Math.floor(Date.now()/36e5);
+  const key=y+"|"+S.dv+"|"+S.duels.length+"|"+S.duels.filter(d=>d.st==="aceptado").length+"|"+S.users.length+"|"+Math.floor(Date.now()/36e5);
+  const WW=weeksWon(y);
   if(LCACHE.k===key)return LCACHE.v;
   const now=new Date(),from=new Date(y,0,1),to=new Date(y+1,0,1),users=S.users.map(u=>u.id),R=Object.fromEntries(S.routes.map(r=>[r.id,r]));
   const asc=S.asc.filter(a=>{const t=new Date(a.at);return t>=from&&t<to&&R[a.route]}).sort((a,b)=>a.at.localeCompare(b.at));
@@ -899,8 +923,14 @@ function computeLogros(y){
     set(u,"mix:pod3",p3,p3?.end,p3?1:0,1);set(u,"mix:win3",w3,w3?.end,Math.max(0,...bims.map(b=>["cuerda","autoseguro","boulder"].filter(s=>b.r[s][0]===u).length)),3);
     const w4=bims.find(b=>["cuerda","autoseguro","boulder","kilter"].every(s=>b.r[s][0]===u));set(u,"mix:win4",w4,w4?.end,Math.max(0,...bims.map(b=>["cuerda","autoseguro","boulder","kilter"].filter(s=>b.r[s][0]===u).length)),4);
     const c8=C.find(a=>GRADES.indexOf(a.grade)>=GRADES.indexOf("8a")),bd=B.find(a=>a.grade==="dorado");set(u,"mix:jaque",c8&&bd,c8&&bd?(c8.at>bd.at?c8.at:bd.at):null,(c8?1:0)+(bd?1:0),2);
-    const kn=closed?["cuerda","autoseguro","boulder"].filter(s=>yr[s]===u).length:0;set(u,"mix:king",kn===3,to.toISOString(),kn,3)});
+    const kn=closed?["cuerda","autoseguro","boulder"].filter(s=>yr[s]===u).length:0;set(u,"mix:king",kn===3,to.toISOString(),kn,3);
+    const ww=WW[u];set(u,"mix:week",!!ww,ww?.at,ww?1:0,1);
+    const dw=S.duels.filter(d=>duelOver(d)&&new Date(d.end).getFullYear()===y&&duelWinner(d)===u).sort((a,b)=>a.end.localeCompare(b.end));
+    set(u,"mix:duel1",dw.length>=1,dw[0]?.end,dw.length,1);set(u,"mix:duel5",dw.length>=5,dw[4]?.end,dw.length,5)});
   LCACHE={k:key,v:out};return out}
+/* Ganadores de cada semana ya terminada del año (la semana cuenta para el año en que acaba) */
+function weeksWon(y){const out={},now=new Date(),nx=w=>({from:w.to,to:new Date(w.to.getFullYear(),w.to.getMonth(),w.to.getDate()+7)});let w=weekOf(new Date(y,0,1));if(w.from.getFullYear()<y)w=nx(w);
+  while(w.from.getFullYear()===y&&w.to<=now){SECTIONS.forEach(s=>{const r=rankRange(s.id,w.from,w.to);if(r[0]&&r[0].p>0&&!out[r[0].id])out[r[0].id]={at:w.to.toISOString()}});w=nx(w)}return out}
 const seasonYears=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
 const rarity=(all,id)=>{const act=Object.values(all).filter(o=>Object.values(o).some(x=>x.ok));if(!act.length)return 0;return Math.round(100*act.filter(o=>o[id]?.ok).length/act.length)};
 
@@ -1099,6 +1129,8 @@ function rules(){
   <h3>Kilter: puntos por grado y ángulo</h3>
   <p>En Kilter subes la captura del bloque que has hecho en la app de Kilter y la liga lee el nombre, el grado y el ángulo. El mismo bloque a otro ángulo cuenta como otro bloque. Ángulo hasta 35° ×1, de 40° a 45° ×1,1 y de 50° en adelante ×1,2. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
   <div class="gpt">${KGRADES.map(g=>`<div><b style="color:${kgc(g)}">${g}</b><span>${KGP[g]}</span></div>`).join("")}</div>
+  <h3>Semana y duelos</h3>
+  <p>El ranking de la semana va de lunes a domingo y sirve para picarse aunque llegues tarde al bimestre; ganarlo da un logro. Desde el perfil de otro escalador puedes retarle a un duelo en una sección, durante una semana o lo que queda de bimestre: gana quien sume más puntos en ese tiempo. Los duelos no cambian el ranking, pero los ganados cuentan para los logros.</p>
   <h3>Ranking anual</h3>
   <ul>
    <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
@@ -1109,6 +1141,83 @@ function rules(){
   $("#bk").onclick=()=>{S.view=S.back||"home";S.scrollTop=true;render()};
 }
 
+
+
+/* ---------- Competición: objetivo, avisos de adelantamiento, duelos, quién abrió cada vía y ranking semanal ---------- */
+const secName=s=>SECTIONS.find(x=>x.id===s)?.name||s;
+const secLow=s=>secName(s).toLowerCase();
+/* Semana de lunes a lunes (hora local) */
+function weekOf(d=new Date()){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);const e=new Date(x);e.setDate(e.getDate()+7);return{from:x,to:e}}
+const wkLabel=w=>{const e=new Date(w.to-864e5),f=d=>d.toLocaleDateString("es-ES",{day:"numeric",month:"short"});return `Semana del ${f(w.from)} al ${f(e)}`};
+/* Qué te bastaría para ganar `need` puntos: la vía o bloque montado más fácil que lo cubre (encadenado) */
+function sugFor(sec,need){const c=[];S.routes.forEach(r=>{if(!r.active||r.sec!==sec||myAsc(r.id))return;
+    const p=pts({sec,grade:r.grade,route:r.id,style:isBl(sec)?"Encadenado":"Encadenada"});if(p>=need)c.push([p,r])});
+  if(!c.length)return"";c.sort((a,b)=>a[0]-b[0]);const r=c[0][1];
+  return sec==="boulder"?`un bloque ${BCOL[r.color][0].toLowerCase()}`:sec==="kilter"?`un ${r.grade} a ${r.angle}°`:`un ${r.grade} encadenado`}
+function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,rows=[];
+  SECTIONS.forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i<0)return;
+    if(i===0){const nx=r[1];rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>${nx?`Vas 1.º: le sacas <b>${fmt(r[0].p-nx.p)} pts</b> a ${esc(nx.name)}.`:"Vas 1.º y nadie más ha puntuado."}</span></div>`);return}
+    const a=r[i-1],need=a.p-r[i].p+1,sg=sugFor(s.id,need),bh=r[i+1];
+    rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>Te faltan <b>${fmt(need)} pts</b> para pasar a ${esc(a.name)} (${ord(i)})${sg?`: te bastaría ${sg}`:""}.${sprint&&bh?` <span class="sub">${esc(bh.name)} está a ${fmt(r[i].p-bh.p)} pts por detrás.</span>`:""}</span></div>`)});
+  if(!rows.length)return"";
+  return `<section class="goal ${sprint?"spr":""}"><div class="hrow"><span class="k">${sprint?"Sprint final":"Tu objetivo"}</span>${sprint?`<span class="sprb">${dl===1?"Último día":`Quedan ${dl} días`}</span>`:""}</div>${rows.join("")}</section>`}
+/* Avisos de adelantamiento: se comparan los puestos con los que viste la última vez en este móvil */
+const OVK=()=>"liga-pos:"+S.me+":"+bimKey(new Date());
+function posSnap(){const o={};SECTIONS.forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i>=0)o[s.id]={pos:i+1,above:r.slice(0,i).map(x=>x.id)}});return o}
+function overtakeMsgs(){if(!S.me||!me())return[];let prev=null;try{prev=JSON.parse(localStorage.getItem(OVK())||"null")}catch(e){}
+  const now=posSnap();if(!prev){try{localStorage.setItem(OVK(),JSON.stringify(now))}catch(e){}return[]}
+  const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),out=[];
+  SECTIONS.forEach(s=>{const p=prev[s.id],n=now[s.id];if(!n)return;
+    if(!p){out.push({up:1,t:`Ya estás en el ranking de ${secLow(s.id)}: vas ${ord(n.pos)}.`});return}
+    const passed=n.above.filter(id=>!p.above.includes(id)&&nm[id]);
+    passed.slice(0,2).forEach(id=>out.push({up:0,t:`${nm[id]} te ha pasado en ${secLow(s.id)}.`}));
+    if(n.pos<p.pos)out.push({up:1,t:`Has subido del ${ord(p.pos)} al ${ord(n.pos)} en ${secLow(s.id)}.`});
+    else if(n.pos>p.pos&&!passed.length)out.push({up:0,t:`Has bajado al ${ord(n.pos)} en ${secLow(s.id)}.`})});
+  return out.slice(0,4)}
+function ovHtml(){const m=overtakeMsgs();if(!m.length)return"";
+  return `<section class="ovt" role="status"><div class="k">Desde la última vez</div>${m.map(x=>`<div class="ovl ${x.up?"up":"dw"}"><i>${x.up?"▲":"▼"}</i><span>${esc(x.t)}</span></div>`).join("")}<button class="link" id="ovok">Vale</button></section>`}
+function bindOv(){if($("#ovok"))$("#ovok").onclick=()=>{try{localStorage.setItem(OVK(),JSON.stringify(posSnap()))}catch(e){}$(".ovt")?.remove()}}
+/* Duelos: dos escaladores, una sección, una semana o lo que queda de bimestre. Gana quien sume más puntos en ese tiempo */
+const mapD=x=>({id:x.id,ch:x.challenger,rv:x.rival,sec:x.sec,kind:x.kind,st:x.status,start:x.starts_at,end:x.ends_at,at:x.created_at});
+function duelScore(d){if(!d.start)return[0,0];const r=rankRange(d.sec,new Date(d.start),new Date(d.end)),g=id=>r.find(x=>x.id===id)?.p||0;return[g(d.ch),g(d.rv)]}
+const duelOver=d=>d.st==="aceptado"&&new Date(d.end)<=new Date();
+function duelWinner(d){if(!duelOver(d))return null;const[a,b]=duelScore(d);return a>b?d.ch:b>a?d.rv:"empate"}
+function duelStats(uid){let w=0,l=0,t=0;(S.duels||[]).forEach(d=>{if(!duelOver(d)||(d.ch!==uid&&d.rv!==uid))return;const x=duelWinner(d);if(x==="empate")t++;else if(x===uid)w++;else l++});return{w,l,t}}
+const left=d=>{const ms=new Date(d.end)-new Date(),dd=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24;return dd>0?`${dd} ${dd===1?"día":"días"}${h?` y ${h} h`:""}`:`${Math.max(1,Math.ceil(ms/36e5))} h`};
+function duelsHtml(){if(!S.me||!me())return"";const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),mine=(S.duels||[]).filter(d=>(d.ch===S.me||d.rv===S.me)&&nm[d.ch===S.me?d.rv:d.ch]);
+  const inv=mine.filter(d=>d.st==="pendiente"&&d.rv===S.me),out=mine.filter(d=>d.st==="pendiente"&&d.ch===S.me),
+    act=mine.filter(d=>d.st==="aceptado"&&!duelOver(d)),fin=mine.filter(d=>duelOver(d)&&new Date()-new Date(d.end)<7*864e5);
+  if(!inv.length&&!out.length&&!act.length&&!fin.length)return"";
+  const kd=d=>d.kind==="semana"?"una semana":"hasta fin de bimestre",ot=d=>d.ch===S.me?d.rv:d.ch;
+  const card=d=>{const[a,b]=duelScore(d),mineP=d.ch===S.me?a:b,theirs=d.ch===S.me?b:a,o=nm[ot(d)],w=duelWinner(d);
+    return `<div class="duel ${w?(w===S.me?"won":w==="empate"?"tie":"lost"):""}"><div class="dsec">${secName(d.sec)} · ${w?(w===S.me?"¡Has ganado!":w==="empate"?"Empate":"Has perdido"):`quedan ${left(d)}`}</div>
+      <div class="dsc"><span class="dme"><small>Tú</small><b>${fmt(mineP)}</b></span><span class="dvs">VS</span><span class="dot"><small>${esc(o)}</small><b>${fmt(theirs)}</b></span></div>
+      ${!w?`<div class="dbar"><i style="width:${mineP+theirs?Math.round(mineP/(mineP+theirs)*100):50}%"></i></div>`:""}</div>`};
+  return `<div class="hrow hk"><span class="k">Duelos</span></div><section class="duels">
+   ${inv.map(d=>`<div class="duel inv"><div><b>${esc(nm[d.ch])}</b> te reta en ${secLow(d.sec)}, ${kd(d)}.</div><div class="drow"><button class="pri" data-dok="${d.id}">Aceptar</button><button data-dno="${d.id}">Rechazar</button></div></div>`).join("")}
+   ${act.map(card).join("")}${fin.map(card).join("")}
+   ${out.map(d=>`<div class="duel out"><div>Has retado a <b>${esc(nm[d.rv])}</b> en ${secLow(d.sec)}, ${kd(d)}. Esperando respuesta.</div><button class="link" data-dno="${d.id}">Retirar el reto</button></div>`).join("")}</section>`}
+async function duelAnswer(id,ok){if(S.busy)return;S.busy=true;const{data,error}=await sb.rpc("liga_duel_answer",{p_id:id,p_ok:ok});S.busy=false;
+  if(error)return toast("No se ha podido: "+error.message);applyRows(data);toast(ok?"¡Duelo aceptado! Ya cuentan los puntos.":"Hecho.");render()}
+function bindDuels(){document.querySelectorAll("[data-dok]").forEach(b=>b.onclick=()=>duelAnswer(b.dataset.dok,true));document.querySelectorAll("[data-dno]").forEach(b=>b.onclick=()=>duelAnswer(b.dataset.dno,false))}
+function duelForm(u){const st=duelStats(u.id),f=S.dform;
+  const rec=st.w+st.l+st.t?`<span class="sub">Duelos de ${esc(u.name)}: ${st.w} ganados · ${st.l} perdidos${st.t?` · ${st.t} empatados`:""}</span>`:"";
+  if(!S.me||!me()||u.id===S.me)return rec?`<div class="dform">${rec}</div>`:"";
+  if(!f)return `<div class="dform"><button id="dgo" class="dbtn">⚔ Retar a un duelo</button>${rec}</div>`;
+  return `<form class="dform kd" id="dfm"><b>Retar a ${esc(u.name)}</b>
+   <label>Sección<select id="dsec">${SECTIONS.map(s=>`<option value="${s.id}" ${f.sec===s.id?"selected":""}>${s.name}</option>`).join("")}</select></label>
+   <div class="kst2"><button type="button" data-dk="semana" class="${f.kind==="semana"?"on":""}">Una semana</button><button type="button" data-dk="bimestre" class="${f.kind==="bimestre"?"on":""}">Hasta fin de bimestre</button></div>
+   <span class="sub">Empieza cuando acepte. Gana quien sume más puntos en esa sección durante el duelo.</span>
+   <span class="err" id="derr" hidden></span><button class="pri" type="submit">Enviar reto</button><button type="button" id="dx">Cancelar</button></form>`}
+function bindDuelForm(u){if($("#dgo"))$("#dgo").onclick=()=>{S.dform={sec:S.lastSec||"cuerda",kind:"semana"};perfil()};
+  if(!$("#dfm"))return;$("#dx").onclick=()=>{S.dform=null;perfil()};$("#dsec").onchange=e=>S.dform.sec=e.target.value;
+  document.querySelectorAll("[data-dk]").forEach(b=>b.onclick=()=>{S.dform.kind=b.dataset.dk;document.querySelectorAll("[data-dk]").forEach(x=>x.classList.toggle("on",x===b))});
+  $("#dfm").onsubmit=async e=>{e.preventDefault();if(S.busy)return;S.busy=true;const{data,error}=await sb.rpc("liga_duel_create",{p_rival:u.id,p_sec:S.dform.sec,p_kind:S.dform.kind});S.busy=false;
+    if(error){$("#derr").textContent=error.message;$("#derr").hidden=false;return}applyRows(data);S.dform=null;toast(`Reto enviado a ${u.name}. Lo verá en su inicio.`);perfil()}}
+/* Quién abrió cada vía o bloque y quién la hizo primero a vista o al flash */
+function kingHtml(r){const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),as=S.asc.filter(a=>a.route===r.id&&nm[a.u]).sort((a,b)=>a.at.localeCompare(b.at));if(!as.length)return"";
+  const f=as[0],st=isBl(r.sec)?"Flash":"A vista",fl=as.find(a=>a.style===st),d=t=>new Date(t).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+  return `<div class="king"><span>♛ ${isBl(r.sec)?"Abierto":"Abierta"} por <b>${esc(nm[f.u])}</b> · ${d(f.at)}</span>${fl&&fl!==f?`<span>⚡ ${isBl(r.sec)?"Primer flash":"Primera a vista"}: <b>${esc(nm[fl.u])}</b></span>`:fl?`<span>⚡ ${fl.style==="Flash"?"al flash":"a vista"}</span>`:""}</div>`}
 
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
@@ -1134,7 +1243,7 @@ function folListHtml(){const ls=S.users.filter(u=>S.fol.has(u.id)).sort((a,b)=>a
    :`<div class="empty">Todavía no sigues a nadie. Entra en el perfil de un escalador desde el ranking y pulsa «Seguir».</div>`}`}
 /* ---------- Perfil de un escalador ---------- */
 async function loadNameNext(){if(!S.me)return;const{data}=await sb.rpc("liga_name_next");S.nameNext=data||null}
-function openProfile(id){S.pid=id;S.ren=false;if(id===S.me)loadNameNext().then(()=>{if(S.view==="perfil"&&S.pid===S.me&&!S.ren)perfil()}).catch(()=>{});if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
+function openProfile(id){S.pid=id;S.ren=false;S.dform=null;if(id===S.me)loadNameNext().then(()=>{if(S.view==="perfil"&&S.pid===S.me&&!S.ren)perfil()}).catch(()=>{});if(S.view!=="perfil")S.pback=S.view;S.view="perfil";S.scrollTop=true;render()}
 const ord=n=>n?n+".º":"–";
 function bestOf(as,sec){if(!as.length)return"–";
   if(sec==="kilter"){const g=as.map(a=>a.grade).sort((a,b)=>KGRADES.indexOf(b)-KGRADES.indexOf(a))[0];return `<span style="color:${kgc(g)}">${g}</span>`}
@@ -1198,7 +1307,7 @@ function perfil(){
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}
-  ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}
+  ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${duelForm(u)}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml()+folListHtml():""}
@@ -1217,7 +1326,7 @@ function perfil(){
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
   ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
-  if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);
+  if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
   if($("#bkp"))$("#bkp").onclick=backup;if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
@@ -1283,7 +1392,9 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
+  ${ovHtml()}${goalHtml()}
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
+  ${duelsHtml()}
   <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
   <section class="feed2">${ev.length?ev.slice(0,N).map((e,k)=>`<button class="fi2" ${e.r?`data-fr="${e.r.id}"`:e.lg?'data-fl="1"':""}>${e.dot}<span>${e.h}</span><small>${ago(e.t)}</small></button>`).join(""):'<div class="empty">Esta semana todavía no ha pasado nada. ¡Estrena tú la liga!</div>'}
    ${ev.length>4?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
@@ -1291,7 +1402,7 @@ function home(){
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
-  $("#rls").onclick=openRules;mountSong();
+  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();
   if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
@@ -1367,7 +1478,7 @@ const kWho=rid=>{const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),seen
 function kRow(r,a){const p=a?pts(a):kpts(r.grade,r.angle,"Encadenado"),d=a?new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"}):"";
   return `<button class="kb ${S.open===r.id?"op":""}" data-kr="${r.id}" aria-expanded="${S.open===r.id}"><span class="g">${esc(r.grade)}<small>${r.angle}°</small></span><span><b>${esc(r.name)}</b><span class="s">${a?`${esc(a.style)} · ${d}`:`${kWho(r.id).length} en la liga`}</span></span><span class="p">${a?"+":""}${fmt(p)}<small>pts</small></span></button>`}
 function kDetail(r){const who=kWho(r.id),mine=myAsc(r.id);
-  return `<div class="kd" id="kd">${fwHtml(r)}<div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
+  return `<div class="kd" id="kd">${kingHtml(r)}${fwHtml(r)}<div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
    ${who.length?`<div class="kwho">${who.map(w=>`<span>${esc(w.n)}${w.fl?" · flash":""}</span>`).join("")}</div>`:""}
    ${S.me?`<div class="sub">${mine?"Tu encadene de este bimestre:":"¿Lo has hecho tú también?"}</div>
    <div class="kst2">${BSTYLES.map(([st])=>`<button data-kst="${st}" class="${mine?.style===st?"on":""}">${st} · ${fmt(kpts(r.grade,r.angle,st))}</button>`).join("")}</div>
@@ -1631,7 +1742,7 @@ function bRow(b){
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
   <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
-  ${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
+  ${kingHtml(b)}${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
   <label>Color de presas<select id="bh">${HOLDS[b.hold]?"":`<option value="" selected disabled>Elige el color</option>`}${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
   <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
@@ -1731,7 +1842,7 @@ function routeRow(r){
   <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
-  ${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${kingHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
   <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
@@ -1778,10 +1889,10 @@ function histHtml(){
 function rankView(){
   let html;
   if(S.rmode==="hist")html=histHtml();
-  else{const p=period(S.rmode),r=ranking(S.sec,S.rmode);
-    html=`<div class="sub" style="margin-bottom:10px">${p.label}${S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
+  else{const wk=S.rmode==="week",p=wk?{label:wkLabel(weekOf())}:period(S.rmode),r=ranking(S.sec,S.rmode);
+    html=`<div class="sub" style="margin-bottom:10px">${p.label}${wk?" · el ranking corto: se reinicia cada lunes":S.rmode==="bim"?` · se reinicia en ${daysLeft()} días`:" · suma de puntos de liga (10 al 1.º … 1 al 10.º de cada bimestre)"}</div>
     ${r.length?rkList(r,S.rmode==="year",S.rmode==="bim"?moves(S.sec):null):`<div class="empty">Nadie ha puntuado todavía en ${SECTIONS.find(s=>s.id===S.sec).name.toLowerCase()} en este periodo. ${S.sec==="kilter"?"Sube la captura de un bloque desde «Mis bloques».":"Marca tus vías desde el mapa."}</div>`}`}
-  $("#body").innerHTML=`<div class="rsrch"><input type="search" id="rsq" placeholder="Buscar escalador" aria-label="Buscar un escalador por nombre" autocomplete="off" value="${esc(S.rsq||"")}"><div id="rsr" class="rsr"></div></div><div class="tabs"><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
+  $("#body").innerHTML=`<div class="rsrch"><input type="search" id="rsq" placeholder="Buscar escalador" aria-label="Buscar un escalador por nombre" autocomplete="off" value="${esc(S.rsq||"")}"><div id="rsr" class="rsr"></div></div><div class="tabs"><button id="rw" class="${S.rmode==="week"?"on":""}">Semana</button><button id="rb" class="${S.rmode==="bim"?"on":""}">Bimestre</button><button id="ry" class="${S.rmode==="year"?"on":""}">Anual</button><button id="rh" class="${S.rmode==="hist"?"on":""}">Historial</button></div>${html}<button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;
   const sq=$("#rsq"),fill=()=>{const v=sq.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");S.rsq=sq.value;const box=$("#rsr");
     if(!v){box.innerHTML="";return}
@@ -1789,7 +1900,7 @@ function rankView(){
     box.innerHTML=hits.length?hits.map(u=>{const i=bim.findIndex(x=>x.id===u.id);return `<button class="rsi" data-u="${u.id}"><b>${esc(u.name)}</b>${S.fol.has(u.id)?' <span class="sub">· la sigues</span>':""}<span class="sub">${i>=0?`${i+1}.º en ${SECTIONS.find(x=>x.id===S.sec).name.toLowerCase()} · ${fmt(bim[i].p)} pts`:"Sin puntos este bimestre"}</span></button>`}).join(""):`<div class="sub" style="padding:6px 2px">Nadie se llama así en la liga.</div>`;
     box.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u))};
   sq.oninput=fill;fill();
-  $("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
+  $("#rw").onclick=()=>{S.rmode="week";rankView()};$("#rb").onclick=()=>{S.rmode="bim";rankView()};$("#ry").onclick=()=>{S.rmode="year";rankView()};$("#rh").onclick=()=>{S.rmode="hist";rankView()};
   document.querySelectorAll("#body [data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u));
   document.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>{S.hopen=S.hopen===b.dataset.hk?null:b.dataset.hk;rankView()});
   document.querySelectorAll("[data-hy]").forEach(b=>b.onclick=()=>{S.hy=+b.dataset.hy;S.hopen=null;rankView()});
