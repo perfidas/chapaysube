@@ -1374,13 +1374,20 @@ window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songP
 (()=>{const sc=document.createElement("script");sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;document.head.appendChild(sc)})();
 /* ---------- Inicio: tu marcador arriba y lo que pasa en la liga debajo ---------- */
 function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),R=Object.fromEntries(S.routes.map(r=>[r.id,r])),ev=[];
-  S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u])return;
+  /* solo encadenes destacados: vías de 7a para arriba (7A en Kilter) y bloques de morado para arriba */
+  const big=a=>a.sec==="boulder"?BKEYS.indexOf(a.grade)>=BKEYS.indexOf("morado"):a.sec==="kilter"?KGRADES.indexOf(a.grade)>=KGRADES.indexOf("7A"):GRADES.indexOf(a.grade)>=GRADES.indexOf("7a");
+  S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a))return;
     if(a.sec==="kilter")ev.push({t,dot:`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
     else if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
     else ev.push({t,dot:`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
   try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
   SECTIONS.forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
     if(last)ev.push({t:new Date(last.at).getTime()+2,dot:`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`,h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
+  /* duelos: cuando empiezan y cuando se deciden */
+  (S.duels||[]).forEach(d=>{if(d.st!=="aceptado"||!nm[d.ch]||!nm[d.rv])return;const k=d.kind==="dia"?"hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre",sw='<span class="fdot" style="background:var(--acc);color:#fff"><b>⚔</b></span>';
+    const ts=new Date(d.start).getTime();if(now-ts<wk&&!duelOver(d))ev.push({t:ts,dot:sw,h:`<b>${esc(nm[d.ch])}</b> y <b>${esc(nm[d.rv])}</b> se baten en duelo <span class="sub">· ${secLow(d.sec)}, ${k}</span>`});
+    if(duelOver(d)){const te=new Date(d.end).getTime();if(now-te>wk)return;const[a,b]=duelScore(d),w=duelWinner(d);
+      ev.push({t:te,dot:sw,h:w==="empate"?`<b>${esc(nm[d.ch])}</b> y <b>${esc(nm[d.rv])}</b> empatan su duelo <span class="sub">· ${secLow(d.sec)} (${fmt(a)}–${fmt(b)})</span>`:`<b>${esc(nm[w])}</b> gana el duelo a <b>${esc(nm[w===d.ch?d.rv:d.ch])}</b> <span class="sub">· ${secLow(d.sec)} (${fmt(Math.max(a,b))}–${fmt(Math.min(a,b))})</span>`})}});
   return ev.sort((a,b)=>b.t-a.t)}
 const ago=t=>{const m=(Date.now()-t)/6e4;return m<1?"ahora":m<60?`${Math.round(m)} min`:m<1440?`${Math.round(m/60)} h`:m<2880?"ayer":`${Math.round(m/1440)} días`};
 function home(){
