@@ -517,6 +517,7 @@ p.rnb{margin:-6px 0 14px}
 .dbtn{border-color:var(--acc);color:var(--acc);background:transparent;font-weight:700}
 .king{display:flex;flex-wrap:wrap;gap:6px}.king span{font-size:12.5px;background:#2a2410;border:1px solid #5a4a14;color:#ffe6a3;border-radius:99px;padding:3px 10px}
 .kst3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.kst3 button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.15;padding:6px 4px}.kst3 button small{font-size:11px;opacity:.8}.kst3 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.beta{display:flex;flex-direction:column;gap:3px;margin:10px 0;padding:10px 12px;border-radius:10px;border:1px dashed var(--gold);background:rgba(255,197,61,.08);font-size:13.5px}.beta b{font:900 16px/1 var(--disp);text-transform:uppercase;letter-spacing:.05em;color:var(--gold)}
 </style>
 
 </head>
@@ -1395,6 +1396,7 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
+  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><b>Liga en pruebas</b><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
   ${duelsHtml()}
