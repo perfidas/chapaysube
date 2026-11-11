@@ -561,7 +561,7 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
   const isl=n=>({E:"Isla este",S:"Isla sur",O:"Isla oeste"})[n[0]]+" "+n.slice(1);
   /* [puntos del tramo, lado del rótulo (+1 hacia dentro de la sala, -1 hacia fuera de la isla), subsecciones en orden: [id, nombre corto]] */
   const runs=[
-    [[[125,958],[125,22],[413,22]],1,[["b5e","1.6"],["b5i","1.7"],["b5f","1.8"],["b6-1","2.1"],["b6-2","2.2"],["b7-1","3.1"],["b7-2","3.2"],["b7-3","3.3"],["b1-1","4.1",1.25],["b1-2","4.2"],["b1-3","4.3"]]],
+    [[[125,950],[125,22],[413,22]],1,[["b5e","1.6",.94],["b5i","1.7"],["b5f","1.8"],["b6-1","2.1"],["b6-2","2.2"],["b7-1","3.1"],["b7-2","3.2"],["b7-3","3.3"],["b1-1","4.1",1.25],["b1-2","4.2"],["b1-3","4.3"]]],
     /* sector 5: cuatro partes cortadas en la esquina (dos arriba y dos en la pared derecha); de la 5.3 a la 7.2, todas del mismo largo */
     [[[482,22],[612,22]],1,[["b2-1","5.1"],["b2-2","5.2"]]],
     [[[620,30],[620,658]],1,[["b2-3","5.3"],["b2-4","5.4"],["b3-1","6.1"],["b3-2","6.2"],["b3-3","6.3"],["b4-1","7.1"],["b4-2","7.2"]]],
