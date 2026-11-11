@@ -518,6 +518,24 @@ p.rnb{margin:-6px 0 14px}
 .king{display:flex;flex-wrap:wrap;gap:6px}.king span{font-size:12.5px;background:#2a2410;border:1px solid #5a4a14;color:#ffe6a3;border-radius:99px;padding:3px 10px}
 .kst3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.kst3 button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.15;padding:6px 4px}.kst3 button small{font-size:11px;opacity:.8}.kst3 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .beta{display:flex;flex-direction:column;gap:3px;margin:10px 0;padding:10px 12px;border-radius:10px;border:1px dashed var(--gold);background:rgba(255,197,61,.08);font-size:13.5px}.beta b{font:900 16px/1 var(--disp);text-transform:uppercase;letter-spacing:.05em;color:var(--gold)}
+
+/* Verificar encadenes */
+.whol{display:flex;flex-direction:column;gap:6px}.whol>.link{align-self:flex-start}
+.whos{display:flex;flex-direction:column;gap:5px}
+.whr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13.5px;background:#131d26;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.whr small{display:block;color:var(--mut);font-size:12px}
+.vbtn{min-height:34px;padding:3px 9px;font-size:12px;color:var(--mut);background:transparent}
+.vok{color:var(--g1);font-size:12px;font-weight:600;margin-left:4px}.vrev{font-size:11px;border:1px solid var(--line);border-radius:99px;padding:1px 7px;color:var(--mut);margin-left:4px}
+.vlist{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:9px;font-size:14px}
+.vcard h4{margin:0;font:800 17px/1.1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.vcard.warn{border-color:var(--gold)}.vcard.warn h4{color:var(--gold)}.vcard.wit{border-color:#2fe0e6}.vcard.wit h4{color:#2fe0e6}.vcard.adm{border-color:var(--acc)}.vcard.adm h4{color:var(--acc)}
+.vch{display:flex;flex-direction:column;gap:6px}
+.vchb{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;text-align:left;padding:9px 10px}.vchb.on{border-color:var(--gold);background:rgba(255,197,61,.08)}
+.vchb i{width:18px;height:18px;border-radius:50%;border:2px solid var(--mut);margin-top:2px}.vchb.on i{border:6px solid var(--gold)}.vchb small{display:block;color:var(--mut);font-size:12px}
+.vcard label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--mut)}.vcard select{font-size:16px}
+.vok2{background:var(--g1);border-color:var(--g1);color:#0b1118;font-weight:700}.vno{border-color:var(--g3);color:var(--g3);background:transparent}
+.vfacts{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13px}.vfacts span{color:var(--mut)}
 </style>
 
 </head>
@@ -680,7 +698,7 @@ async function refresh(){
   S.me=session?.user?.id||null;S.owner=false;S.bed=false;S.ved=false;
   if(S.me){const{data}=await sb.rpc("liga_is_owner");S.owner=!!data;
     if(!S.owner){const[r,v]=await Promise.all([sb.rpc("liga_is_boulder_editor"),sb.rpc("liga_is_route_editor")]);S.bed=!r.error&&!!r.data;S.ved=!v.error&&!!v.data}}
-  await loadAll();
+  await loadAll();await loadVerifs().catch(()=>{});
   const md=session?.user?.user_metadata||{};
   if(S.me&&!S.people.some(u=>u.id===S.me)&&(md.name||"").trim().length>=2){
     const{error}=await sb.rpc("liga_join",{p_name:md.name.trim(),p_invited:(md.invited_by||"").trim()});if(!error)await loadAll()}
@@ -697,7 +715,7 @@ async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pe
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
 let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&(S.kq||S.tq))&&!["rsq","ksq"].includes(document.activeElement?.id)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
-let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
+let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();await loadVerifs().catch(()=>{});if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
 function onRt(p){const t=p.table;
   if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_duels")S.duels=S.duels.filter(d=>d.id!==id);else if(t==="liga_ascents")dropAsc(id);else{S.dv=(S.dv||0)+1;S.routes=S.routes.filter(r=>r.id!==id)}}
@@ -1134,6 +1152,8 @@ function rules(){
   <div class="gpt">${KGRADES.map(g=>`<div><b style="color:${kgc(g)}">${g}</b><span>${KGP[g]}</span></div>`).join("")}</div>
   <h3>Semana y duelos</h3>
   <p>El ranking de la semana va de lunes a domingo y sirve para picarse aunque llegues tarde al bimestre; ganarlo da un logro. Desde el perfil de otro escalador puedes retarle a un duelo en una sección: solo hoy (para cuando vais juntos a escalar), una semana o lo que queda de bimestre: gana quien sume más puntos en ese tiempo. Los duelos no cambian el ranking, pero los ganados cuentan para los logros.</p>
+  <h3>Verificar encadenes</h3>
+  <p>Si dudas de que alguien haya hecho una vía, ábrela, pulsa «Ver quién la ha hecho» y «Pedir verificación». Es anónimo y puedes pedir 2 por semana. Quien la marcó la demuestra nombrando a un testigo que le vio o repitiéndola delante de alguien; si el testigo lo confirma, queda verificada ✓. Si no, decide el administrador. Mientras está en revisión, sigue contando.</p>
   <h3>Ranking anual</h3>
   <ul>
    <li>Al acabar cada bimestre, los diez primeros reciben puntos de liga: el 1.º gana 10, el 2.º 9, y así hasta el 10.º, que gana 1.</li>
@@ -1222,6 +1242,51 @@ function bindDuelForm(u){if($("#dgo"))$("#dgo").onclick=()=>{S.dform={sec:S.last
 function kingHtml(r){const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),as=S.asc.filter(a=>a.route===r.id&&nm[a.u]).sort((a,b)=>a.at.localeCompare(b.at));if(!as.length)return"";
   const f=as[0],st=isBl(r.sec)?"Flash":"A vista",fl=as.find(a=>a.style===st),d=t=>new Date(t).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
   return `<div class="king"><span>♛ ${isBl(r.sec)?"Abierto":"Abierta"} por <b>${esc(nm[f.u])}</b> · ${d(f.at)}</span>${fl&&fl!==f?`<span>⚡ ${isBl(r.sec)?"Primer flash":"Primera a vista"}: <b>${esc(nm[fl.u])}</b></span>`:fl?`<span>⚡ ${fl.style==="Flash"?"al flash":"a vista"}</span>`:""}</div>`}
+
+
+/* ---------- Verificar encadenes: cualquiera puede pedirlo (anónimo); se demuestra con testigo o repitiéndola; si no, decide el administrador ---------- */
+async function loadVerifs(){S.vst={};S.vmine=[];S.vadm=[];if(!S.me)return;
+  const[a,b,c]=await Promise.all([sb.rpc("liga_verif_states"),sb.rpc("liga_verif_mine"),S.owner?sb.rpc("liga_verif_admin"):Promise.resolve({data:[]})]);
+  (a.data||[]).forEach(x=>S.vst[x.ascent_id]=x.status);S.vmine=b.data||[];S.vadm=c.data||[]}
+const VOK=st=>st==="verificada"||st==="valida";
+const vBadge=a=>{const st=S.vst?.[a.id];return !st?"":VOK(st)?' <span class="vok" title="Verificada">✓ verificada</span>':' <span class="vrev">en revisión</span>'};
+const ascRoute=id=>{const a=S.asc.find(x=>x.id===id);return{a,r:a&&S.routes.find(r=>r.id===a.route)}};
+const vWhat=r=>!r?"esa vía":r.sec==="boulder"?`el bloque ${BCOL[r.color]?.[0].toLowerCase()||""} de ${BSECT.find(z=>z.id===r.zone)?.name||""}`:r.sec==="kilter"?`${esc(r.name)} a ${r.angle}°`:`la ${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()} (${r.grade})`;
+/* Lista de quién ha hecho una vía o bloque, con su estado y el botón para pedir verificación */
+function whoHtml(r){const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),as=S.asc.filter(a=>a.route===r.id&&nm[a.u]).sort((a,b)=>b.at.localeCompare(a.at));if(!as.length)return"";
+  const open=S.whoOpen===r.id,d=t=>new Date(t).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+  return `<div class="whol"><button class="link" id="whot">${open?"Ocultar":"Ver"} quién ${isBl(r.sec)?"lo":"la"} ha hecho (${as.length})</button>
+   ${open?`<div class="whos">${as.map(a=>`<div class="whr"><span><b>${esc(nm[a.u])}</b>${vBadge(a)}<small>${esc(a.style)} · ${d(a.at)}</small></span>${S.me&&me()&&a.u!==S.me&&!S.vst?.[a.id]?`<button class="vbtn" data-vq="${a.id}">Pedir verificación</button>`:""}</div>`).join("")}
+    <div class="sub">Pedir verificación es anónimo: quien la marcó no sabrá que has sido tú. Puedes pedir 2 por semana.</div></div>`:""}</div>`}
+function bindWho(r,view){if($("#whot"))$("#whot").onclick=()=>{S.whoOpen=S.whoOpen===r.id?null:r.id;view()};
+  document.querySelectorAll("[data-vq]").forEach(b=>b.onclick=async()=>{if(S.busy)return;if(S.arm!=="vq"+b.dataset.vq){S.arm="vq"+b.dataset.vq;b.textContent="Pulsa otra vez para pedirla";b.classList.add("dng");return}
+    S.arm=null;S.busy=true;const{error}=await sb.rpc("liga_verif_request",{p_ascent:b.dataset.vq});S.busy=false;
+    if(error)return toast(error.message);S.vst[b.dataset.vq]="pendiente";toast("Verificación pedida. Le llegará el aviso sin saber que has sido tú.");view()})}
+/* Avisos en el inicio: me piden verificar, me piden de testigo, o (administrador) hay que decidir */
+function verifHtml(){if(!S.me)return"";const nm=Object.fromEntries(S.people.map(u=>[u.id,u.name])),out=[],F=S.vform||(S.vform={});
+  (S.vmine||[]).forEach(v=>{const{a,r}=ascRoute(v.ascent_id);if(!a)return;const what=vWhat(r),when=new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+    if(v.role==="climber"&&v.status==="pendiente"){const f=F[v.id]||(F[v.id]={mode:"testigo",w:""});
+      out.push(`<div class="vcard warn" data-vid="${v.id}"><h4>Te piden verificar una vía</h4><div>Alguien de la liga pide que verifiques ${what}, que marcaste ${a.style.toLowerCase()} el ${when}.</div>
+       <div class="vch"><button class="vchb ${f.mode==="testigo"?"on":""}" data-vm="testigo"><i></i><span><b>Alguien me vio hacerla</b><small>Nombra al testigo y él lo confirma.</small></span></button>
+        <button class="vchb ${f.mode==="repeticion"?"on":""}" data-vm="repeticion"><i></i><span><b>La repito delante de alguien</b><small>Eliges quién te verá; cuando la hagas, lo confirma.</small></span></button></div>
+       <label>${f.mode==="testigo"?"¿Quién te vio?":"¿Delante de quién la vas a repetir?"}<select data-vw>${`<option value="">Elige</option>`+S.users.filter(u=>u.id!==S.me).sort((x,y)=>x.name.localeCompare(y.name)).map(u=>`<option value="${u.id}" ${f.w===u.id?"selected":""}>${esc(u.name)}</option>`).join("")}</select></label>
+       <button class="pri" data-vgo>Pedir confirmación</button><span class="sub">Tienes 7 días. Si no, lo decide el administrador.</span></div>`)}
+    else if(v.role==="climber")out.push(`<div class="vcard"><div>Verificación de ${what}: ${v.status==="admin"?"la está revisando el administrador.":`esperando a que ${esc(nm[v.witness]||"tu testigo")} lo confirme.`}</div></div>`);
+    else if(v.role==="witness"&&(v.status==="testigo"||v.status==="repeticion"))out.push(`<div class="vcard wit" data-vid="${v.id}"><h4>${v.status==="testigo"?"¿Lo viste?":"Repetición pendiente"}</h4>
+      <div>${v.status==="testigo"?`<b>${esc(nm[v.climber]||"")}</b> dice que le viste hacer ${what} (${a.style.toLowerCase()}, ${when}).`:`<b>${esc(nm[v.climber]||"")}</b> va a repetir ${what} delante de ti. Cuando la haga, confírmalo aquí.`}</div>
+      <div class="drow"><button class="vok2" data-vw-ok="1">${v.status==="testigo"?"Sí, lo vi":"La ha hecho"}</button><button class="vno" data-vw-ok="0">${v.status==="testigo"?"No lo vi":"No la ha hecho"}</button></div></div>`)});
+  (S.vadm||[]).forEach(v=>{const{a,r}=ascRoute(v.ascent_id);if(!a)return;
+    const why=v.status==="admin"?`${esc(nm[v.witness]||"El testigo")}: ${v.witness_ok===false?"no lo confirma":"sin respuesta"}`:v.status==="pendiente"?"No ha respondido en 7 días":`${esc(nm[v.witness]||"El testigo")} no ha respondido en 7 días`;
+    out.push(`<div class="vcard adm" data-vid="${v.id}"><h4>Verificación por decidir</h4><div class="vfacts"><span>Vía</span><b>${vWhat(r)} · ${secLow(a.sec)}</b><span>Marcada</span><b>${esc(nm[v.climber]||"")} · ${esc(a.style.toLowerCase())} · ${new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</b><span>Pedida por</span><b>${esc(nm[v.asker]||"")}</b><span>Estado</span><b>${why}</b></div>
+      <div class="drow"><button class="vok2" data-vd="1">Vale, cuenta</button><button class="vno" data-vd="0">${S.arm==="vd"+v.id?"Pulsa otra vez":"No cuenta"}</button></div><span class="sub">«No cuenta» borra ese encadene y sus puntos. Solo tú ves quién lo pidió.</span></div>`)});
+  return out.length?`<div class="hrow hk"><span class="k">Verificaciones</span></div><section class="vlist">${out.join("")}</section>`:""}
+async function vCall(fn,args,msg,after){if(S.busy)return;S.busy=true;const{error}=await sb.rpc(fn,args);S.busy=false;if(error)return toast(error.message);if(after)after();if(msg)toast(msg);await loadVerifs();render()}
+function bindVerif(){document.querySelectorAll(".vcard[data-vid]").forEach(c=>{const id=c.dataset.vid,F=S.vform[id];
+  c.querySelectorAll("[data-vm]").forEach(b=>b.onclick=()=>{F.mode=b.dataset.vm;home()});
+  const sel=c.querySelector("[data-vw]");if(sel)sel.onchange=()=>F.w=sel.value;
+  const go=c.querySelector("[data-vgo]");if(go)go.onclick=()=>{if(!F.w)return toast("Elige a una persona de la liga.");vCall("liga_verif_choose",{p_id:id,p_mode:F.mode,p_witness:F.w},"Hecho: le llegará el aviso para que lo confirme.")};
+  c.querySelectorAll("[data-vw-ok]").forEach(b=>b.onclick=()=>vCall("liga_verif_witness",{p_id:id,p_ok:b.dataset.vwOk==="1"},b.dataset.vwOk==="1"?"Confirmado. Gracias.":"Anotado. Lo revisará el administrador."));
+  c.querySelectorAll("[data-vd]").forEach(b=>b.onclick=()=>{const ok=b.dataset.vd==="1";if(!ok&&S.arm!=="vd"+id){S.arm="vd"+id;return home()}S.arm=null;const asc=(S.vadm||[]).find(v=>v.id===id)?.ascent_id;vCall("liga_verif_decide",{p_id:id,p_ok:ok},ok?"Cuenta: queda como válida.":"Encadene borrado.",()=>{if(!ok&&asc)dropAsc(asc)})})})}
 
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
@@ -1406,7 +1471,7 @@ function home(){
   ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><b>Liga en pruebas</b><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
-  ${duelsHtml()}
+  ${verifHtml()}${duelsHtml()}
   <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
   <section class="feed2">${ev.length?ev.slice(0,N).map((e,k)=>`<button class="fi2" ${e.r?`data-fr="${e.r.id}"`:e.lg?'data-fl="1"':""}>${e.dot}<span>${e.h}</span><small>${ago(e.t)}</small></button>`).join(""):'<div class="empty">Esta semana todavía no ha pasado nada. ¡Estrena tú la liga!</div>'}
    ${ev.length>4?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
@@ -1414,7 +1479,7 @@ function home(){
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
-  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();
+  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();
   if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
@@ -1490,7 +1555,7 @@ const kWho=rid=>{const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),seen
 function kRow(r,a){const p=a?pts(a):kpts(r.grade,r.angle,"Encadenado"),d=a?new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"}):"";
   return `<button class="kb ${S.open===r.id?"op":""}" data-kr="${r.id}" aria-expanded="${S.open===r.id}"><span class="g">${esc(r.grade)}<small>${r.angle}°</small></span><span><b>${esc(r.name)}</b><span class="s">${a?`${esc(a.style)} · ${d}`:`${kWho(r.id).length} en la liga`}</span></span><span class="p">${a?"+":""}${fmt(p)}<small>pts</small></span></button>`}
 function kDetail(r){const who=kWho(r.id),mine=myAsc(r.id);
-  return `<div class="kd" id="kd">${kingHtml(r)}${fwHtml(r)}<div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
+  return `<div class="kd" id="kd">${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}<div class="sub">${who.length?`Lo ${who.length===1?"ha":"han"} hecho en la liga (${who.length}):`:"Nadie de la liga lo ha marcado todavía."}</div>
    ${who.length?`<div class="kwho">${who.map(w=>`<span>${esc(w.n)}${w.fl?" · flash":""}</span>`).join("")}</div>`:""}
    ${S.me?`<div class="sub">${mine?"Tu encadene de este bimestre:":"¿Lo has hecho tú también?"}</div>
    <div class="kst2">${BSTYLES.map(([st])=>`<button data-kst="${st}" class="${mine?.style===st?"on":""}">${st} · ${fmt(kpts(r.grade,r.angle,st))}</button>`).join("")}</div>
@@ -1537,6 +1602,7 @@ function kilterView(){
   if($("#kmore"))$("#kmore").onclick=()=>{S.kmore=true;kilterView()};
   const sqi=$("#ksq");sqi.oninput=()=>{S.ksq=sqi.value;const p=sqi.selectionStart;kilterView();const n=$("#ksq");n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
   document.querySelectorAll("[data-kr]").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.kr?null:b.dataset.kr;S.arm=null;kilterView()});
+  if(op)bindWho(op,kilterView);
   if(op){document.querySelectorAll("[data-kst]").forEach(b=>b.onclick=()=>markAscent(op,b.dataset.kst));
     if($("#krm"))$("#krm").onclick=()=>{if(S.arm!=="krm"){S.arm="krm";return kilterView()}S.arm=null;unmark(op)}}
   if($("#kx"))$("#kx").onclick=()=>{if(S.kq?.img)URL.revokeObjectURL(S.kq.img);S.kq=null;kilterView()};
@@ -1754,7 +1820,7 @@ function bRow(b){
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
   <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
-  ${kingHtml(b)}${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
+  ${kingHtml(b)}${whoHtml(b)}${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
   <label>Color de presas<select id="bh">${HOLDS[b.hold]?"":`<option value="" selected disabled>Elige el color</option>`}${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
   <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
@@ -1766,7 +1832,7 @@ function bindB(z){
   document.querySelectorAll(".hd").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.r?null:b.dataset.r;S.arm=null;boulderView()});
   const b=S.routes.find(x=>x.id===S.open);if(!b)return;
   document.querySelectorAll("[data-st]").forEach(x=>x.onclick=()=>markAscent(b,x.dataset.st));
-  if($("#pj"))$("#pj").onclick=()=>toggleProj(b);
+  if($("#pj"))$("#pj").onclick=()=>toggleProj(b);bindWho(b,boulderView);
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return boulderView()}S.arm=null;unmark(b)};
   if(S.edit){
     $("#esv").onclick=()=>{const color=$("#bc").value,created=$("#ec").value;
@@ -1854,7 +1920,7 @@ function routeRow(r){
   <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
-  ${kingHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
   <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
@@ -1868,7 +1934,7 @@ function bindRoutes(){
     S.arm=null;addRoute({sec:S.sec,line:num,grade:"6a",hold,created:isoDay(new Date())})});
   const r=S.routes.find(x=>x.id===S.open);if(!r)return;
   document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>markAscent(r,b.dataset.st));
-  if($("#pj"))$("#pj").onclick=()=>toggleProj(r);
+  if($("#pj"))$("#pj").onclick=()=>toggleProj(r);bindWho(r,mapView);
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return mapView()}S.arm=null;unmark(r)};
   if(S.edit){
     $("#esv").onclick=()=>{const hold=$("#eh").value,created=$("#ec").value;
