@@ -1374,8 +1374,8 @@ window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songP
 (()=>{const sc=document.createElement("script");sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;document.head.appendChild(sc)})();
 /* ---------- Inicio: tu marcador arriba y lo que pasa en la liga debajo ---------- */
 function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),R=Object.fromEntries(S.routes.map(r=>[r.id,r])),ev=[];
-  /* solo encadenes destacados: vías de 7a para arriba (7A en Kilter) y bloques de morado para arriba */
-  const big=a=>a.sec==="boulder"?BKEYS.indexOf(a.grade)>=BKEYS.indexOf("morado"):a.sec==="kilter"?KGRADES.indexOf(a.grade)>=KGRADES.indexOf("7A"):GRADES.indexOf(a.grade)>=GRADES.indexOf("7a");
+  /* solo encadenes destacados: vías de 6c+ para arriba (6C+ en Kilter) y bloques de morado para arriba */
+  const big=a=>a.sec==="boulder"?BKEYS.indexOf(a.grade)>=BKEYS.indexOf("morado"):a.sec==="kilter"?KGRADES.indexOf(a.grade)>=KGRADES.indexOf("6C+"):GRADES.indexOf(a.grade)>=GRADES.indexOf("6c+");
   S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a))return;
     if(a.sec==="kilter")ev.push({t,dot:`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
     else if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
