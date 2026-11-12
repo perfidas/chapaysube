@@ -565,6 +565,16 @@ p.rnb{margin:-6px 0 14px}
 .ai.bi{grid-template-columns:1fr auto}
 .dmore{display:block;width:100%;text-align:center;padding:8px 12px;font-size:13px;border-top:1px solid var(--line);border-radius:0;min-height:0}
 .lnum.dn{fill:var(--g1)}.zone.sel .lnum.dn{fill:#fff}
+
+/* Nota de las vías */
+.tb-rt{color:#a06f00;font-weight:700;font-size:12px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.rtg{font-style:normal;font-size:10px;font-weight:700;border-radius:99px;padding:0 6px;text-transform:uppercase;letter-spacing:.04em}.rtg.regalada{background:#d7f5e6;color:#137a48}.rtg.dura{background:#ffe0dc;color:#b3271d}
+.rtl{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card2,#131d26);border:1px solid var(--line);border-radius:10px;padding:6px 10px}.rtl .link{padding:4px 0}.rst{color:var(--gold)}
+.rtm{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}.rtm .link{margin-left:4px}
+.rtp h2{text-align:center}.rstars{display:flex;justify-content:center;gap:6px}
+.rstars button{background:none;border:0;min-height:44px;min-width:44px;padding:0;font-size:36px;line-height:1;color:#3a4856}.rstars button.on{color:var(--gold)}
+.rfeel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.rfeel button{min-height:40px;font-size:13.5px;padding:6px}.rfeel button.on{border-color:var(--cyan,#2fe0e6);color:var(--cyan,#2fe0e6);background:rgba(47,224,230,.1);font-weight:600}
+.rtp .c{text-align:center}
 </style>
 
 </head>
@@ -717,6 +727,7 @@ async function loadAll(){
     fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
     fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
     q("liga_points"),q("liga_styles")]);
+  S.rates=await fetchAll(()=>sb.from("liga_ratings").select("route_id,user_id,stars,feel").order("route_id").order("user_id")).catch(()=>S.rates||[]);S._rm=null;
   const dq=await sb.from("liga_duels").select("*").order("created_at",{ascending:false}).limit(500);S.duels=(dq.data||[]).map(mapD);
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
@@ -1378,6 +1389,42 @@ function lastByDay(last,mine){const td=isoDay(new Date()),y=new Date();y.setDate
      g.as.slice(0,S.dayOpen?.has(g.d)?g.as.length:4).map(a=>`<div class="ai bi"><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")+
      (g.as.length>4?`<button class="link dmore" data-dmore="${g.d}">${S.dayOpen?.has(g.d)?"Ver menos":`Ver más (${g.as.length-4})`}</button>`:"")}).join("")}</div>`}
 
+/* ---------- Nota de las vías (cuerda y autoseguro): 1–5 estrellas y, si quieres, regalada / en su grado / dura ---------- */
+const FEEL={regalada:"Regalada",grado:"En su grado",dura:"Dura"},RSEC=r=>r.sec==="cuerda"||r.sec==="autoseguro";
+function rIdx(){if(!S._rm){S._rm=new Map();(S.rates||[]).forEach(x=>{let l=S._rm.get(x.route_id);if(!l)S._rm.set(x.route_id,l=[]);l.push(x)})}return S._rm}
+function rateOf(id){const L=rIdx().get(id);if(!L||!L.length)return null;const c={regalada:0,grado:0,dura:0};L.forEach(x=>{if(x.feel)c[x.feel]++});
+  const top=c.regalada>c.dura&&c.regalada>c.grado?"regalada":c.dura>c.regalada&&c.dura>c.grado?"dura":null;
+  return{avg:L.reduce((t,x)=>t+x.stars,0)/L.length,n:L.length,c,top}}
+const myRate=id=>S.me?(rIdx().get(id)||[]).find(x=>x.user_id===S.me):null;
+const f1=v=>v.toFixed(1).replace(".",",");
+/* En la tablilla: la media de estrellas y, si la mayoría coincide, la etiqueta */
+const rateTag=r=>{if(!RSEC(r))return"";const q=rateOf(r.id);return q?`<span class="tb-rt" title="${q.n} ${q.n===1?"nota":"notas"}">★ ${f1(q.avg)}${q.top?` <i class="rtg ${q.top}">${FEEL[q.top]}</i>`:""}</span>`:""};
+const starTxt=n=>"★".repeat(n)+"☆".repeat(5-n);
+function rateLine(r){if(!RSEC(r))return"";const q=rateOf(r.id),m=myRate(r.id),done=!!myAsc(r.id);
+  const fs=q?Object.keys(FEEL).filter(k=>q.c[k]).map(k=>`${FEEL[k].toLowerCase()} ${q.c[k]}`).join(" · "):"";
+  const sum=q?`<span><b class="rst">★ ${f1(q.avg)}</b> <span class="sub">${q.n} ${q.n===1?"nota":"notas"}${fs?" · "+fs:""}</span></span>`:`<span class="sub">Aún nadie la ha puntuado.</span>`;
+  const mine=done?(m?`<span class="rtm"><span class="sub">Tu nota</span> <span class="rst" aria-label="${m.stars} estrellas">${starTxt(m.stars)}</span>${m.feel?` <span class="sub">· ${FEEL[m.feel]}</span>`:""}<button class="link" id="rtb">Cambiar</button></span>`:`<button class="link" id="rtb">Puntuar esta vía</button>`):"";
+  return `<div class="rtl">${sum}${mine}</div>`}
+function rateOpen(r){if(!S.me||$("#rts"))return;const m=myRate(r.id),st={n:m?.stars||0,f:m?.feel||null};
+  const d=document.createElement("div");d.id="rts";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","rtt");
+  const draw=()=>{d.innerHTML=`<div class="fbp rtp"><h2 id="rtt">¿Qué tal la ${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}?</h2>
+    <div class="rstars" role="radiogroup" aria-label="Estrellas">${[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${st.n===i}" aria-label="${i} ${i===1?"estrella":"estrellas"}" data-sn="${i}" class="${i<=st.n?"on":""}">★</button>`).join("")}</div>
+    <div class="sub c">El grado (opcional)</div>
+    <div class="rfeel">${Object.entries(FEEL).map(([k,v])=>`<button type="button" data-fl="${k}" aria-pressed="${st.f===k}" class="${st.f===k?"on":""}">${v}</button>`).join("")}</div>
+    <div class="drow"><button type="button" id="rtc">Ahora no</button><button class="pri" type="button" id="rto" ${st.n?"":"disabled"}>Guardar</button></div></div>`;
+    d.querySelectorAll("[data-sn]").forEach(b=>b.onclick=()=>{st.n=+b.dataset.sn;draw();d.querySelector(`[data-sn="${st.n}"]`)?.focus()});
+    d.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{st.f=st.f===b.dataset.fl?null:b.dataset.fl;draw()});
+    d.querySelector("#rtc").onclick=close;d.querySelector("#rto").onclick=save};
+  const close=()=>d.remove();
+  const save=async()=>{if(!st.n||S.busy)return;S.busy=true;d.querySelector("#rto").disabled=true;
+    const q=m?await sb.from("liga_ratings").update({stars:st.n,feel:st.f,updated_at:new Date().toISOString()}).eq("route_id",r.id).eq("user_id",S.me)
+             :await sb.from("liga_ratings").insert({route_id:r.id,stars:st.n,feel:st.f});
+    S.busy=false;if(q.error){d.querySelector("#rto").disabled=false;return toast("No se ha podido guardar la nota: "+q.error.message)}
+    S.rates=(S.rates||[]).filter(x=>!(x.route_id===r.id&&x.user_id===S.me)).concat({route_id:r.id,user_id:S.me,stars:st.n,feel:st.f});S._rm=null;
+    close();toast("Nota guardada.");redraw()};
+  d.onclick=e=>{if(e.target===d)close()};d.onkeydown=e=>{if(e.key==="Escape")close()};
+  draw();document.body.appendChild(d);d.querySelector("[data-sn]")?.focus()}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -2011,10 +2058,10 @@ function routeRow(r){
   const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?r.created.split("-").reverse().join("."):"";
   return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
   <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}${S.proj.has(r.id)?PJS:""}</span><span class="tb-gr">${r.grade}</span></span>
-  <span class="tb-side"><span class="tb-date">${dd}</span>${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
+  <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
-  ${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${rateLine(r)}${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
   <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
@@ -2027,7 +2074,8 @@ function bindRoutes(){
   document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const num=+b.dataset.add;const used=new Set(routesOf(num).map(r=>r.hold));const hold=Object.keys(HOLDS).find(k=>!used.has(k))||"amarilla";
     S.arm=null;addRoute({sec:S.sec,line:num,grade:"6a",hold,created:isoDay(new Date())})});
   const r=S.routes.find(x=>x.id===S.open);if(!r)return;
-  document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>markAscent(r,b.dataset.st));
+  document.querySelectorAll("[data-st]").forEach(b=>b.onclick=async()=>{const was=!!myAsc(r.id);await markAscent(r,b.dataset.st);if(!was&&myAsc(r.id)&&RSEC(r)&&!myRate(r.id))rateOpen(r)});
+  if($("#rtb"))$("#rtb").onclick=()=>rateOpen(r);
   if($("#pj"))$("#pj").onclick=()=>toggleProj(r);bindWho(r,mapView);
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return mapView()}S.arm=null;unmark(r)};
   if(S.edit){
