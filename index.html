@@ -615,9 +615,9 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
     /* Desde la esquina: 1.4 es el muro corto que baja un poco, 1.5 sube hacia la izquierda y 1.6 es recta hasta la pared oeste */
     [[[419.4,960.1],[354,984],[271,962],[156,962]],1,[["b5c","1.4",69.6],["b5d","1.5",85.9],["b5j","1.6",115.0]]],
     /* 1.7 no forma ángulo recto con la 1.6: sube abriéndose hacia la pared oeste */
-    [[[148.6,956.2],[125,858]],1,[["b5e","1.7"]]],
+    [[[148.6,956.2],[126.4,863.8]],1,[["b5e","1.7"]]],
     /* 1.8 sube inclinada hacia dentro y acaba un poco antes que la 1.1; la 1.9 hace esquina con ella y vuelve a la pared oeste */
-    [[[125,846],[141,762],[125,655]],1,[["b5i","1.8",85.5],["b5f","1.9",108.2]]],
+    [[[126.1,852.1],[145.0,752.9],[125,655]],1,[["b5i","1.8",101.0],["b5f","1.9",99.9]]],
     [[[447,146],[447,554],...curve.slice(1,-1),[303,554],[303,146]],-1,[["i2-1","E1"],["i2-2","E2"],["i2-3","E3"],["i3-1","S1"],["i3-3","S2",2/3],["i3-2","S3",2/3],["i3-5","S4",2/3],["i3-4","S5"],["i4-1","O1"],["i4-2","O2"],["i4-3","O3"]]]];
   const subs=[],lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
   runs.forEach(([pts,side,segs])=>{
@@ -635,7 +635,7 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
       subs.push({id,name:/^[ESO]/.test(sh)?isl(sh):"Sector "+sh,short:sh,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[+lx.toFixed(1),+ly.toFixed(1),anc]})})});
   BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
 })();
-const BFLOOR="M125 22 L620 22 L620 668 L425 742 L425 958 L354 984 L271 962 L150 962 L125 858 L141 762 L125 655 Z";
+const BFLOOR="M125 22 L620 22 L620 668 L425 742 L425 958 L354 984 L271 962 L150 962 L125 858 L145 753 L125 655 Z";
 const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Dic"];
 
 /* ---------- Mapa cenital de Cuerda: W con los fondos rectos + L exterior ---------- */
