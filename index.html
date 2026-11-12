@@ -596,13 +596,13 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
   const isl=n=>({E:"Isla este",S:"Isla sur",O:"Isla oeste"})[n[0]]+" "+n.slice(1);
   /* [puntos del tramo, lado del rótulo (+1 hacia dentro de la sala, -1 hacia fuera de la isla), subsecciones en orden: [id, nombre corto]] */
   const runs=[
-    [[[125,950],[125,22],[413,22]],1,[["b5e","1.7",.94],["b5i","1.8"],["b5f","1.9"],["b6-1","2.1"],["b6-2","2.2"],["b7-1","3.1"],["b7-2","3.2"],["b7-3","3.3"],["b1-1","4.1",1.25],["b1-2","4.2"],["b1-3","4.3"]]],
+    [[[125,954],[125,22],[413,22]],1,[["b5e","1.7",.94],["b5i","1.8"],["b5f","1.9"],["b6-1","2.1"],["b6-2","2.2"],["b7-1","3.1"],["b7-2","3.2"],["b7-3","3.3"],["b1-1","4.1",1.25],["b1-2","4.2"],["b1-3","4.3"]]],
     /* sector 5: cuatro partes cortadas en la esquina (dos arriba y dos en la pared derecha); de la 5.3 a la 7.2, todas del mismo largo */
     [[[482,22],[612,22]],1,[["b2-1","5.1"],["b2-2","5.2"]]],
     [[[620,30],[620,658]],1,[["b2-3","5.3"],["b2-4","5.4"],["b3-1","6.1"],["b3-2","6.2"],["b3-3","6.3"],["b4-1","7.1"],["b4-2","7.2"]]],
     [[[425,752],[425,952]],1,[["b5b","1.2"],["b5g","1.3"]]],
     /* Desde la esquina: 1.4 es el muro corto que baja un poco, 1.5 sube hacia la izquierda y 1.6 es recta hasta la pared oeste */
-    [[[419.2,959.4],[354,975],[243.5,958],[133,958]],1,[["b5c","1.4",67.0],["b5d","1.5",111.8],["b5j","1.6",110.5]]],
+    [[[419.2,959.4],[354,975],[271,962],[133,962]],1,[["b5c","1.4",67.0],["b5d","1.5",84.0],["b5j","1.6",138.0]]],
     [[[447,146],[447,554],...curve.slice(1,-1),[303,554],[303,146]],-1,[["i2-1","E1"],["i2-2","E2"],["i2-3","E3"],["i3-1","S1"],["i3-3","S2",2/3],["i3-2","S3",2/3],["i3-5","S4",2/3],["i3-4","S5"],["i4-1","O1"],["i4-2","O2"],["i4-3","O3"]]]];
   const subs=[],lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
   runs.forEach(([pts,side,segs])=>{
@@ -620,7 +620,7 @@ const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i
       subs.push({id,name:/^[ESO]/.test(sh)?isl(sh):"Sector "+sh,short:sh,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[+lx.toFixed(1),+ly.toFixed(1),anc]})})});
   BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
 })();
-const BFLOOR="M125 22 L620 22 L620 668 L425 742 L425 958 L354 975 L243.5 958 L125 958 Z";
+const BFLOOR="M125 22 L620 22 L620 668 L425 742 L425 958 L354 975 L271 962 L125 962 Z";
 const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Dic"];
 
 /* ---------- Mapa cenital de Cuerda: W con los fondos rectos + L exterior ---------- */
