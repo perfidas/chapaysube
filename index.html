@@ -575,6 +575,25 @@ p.rnb{margin:-6px 0 14px}
 .rstars button{background:none;border:0;min-height:44px;min-width:44px;padding:0;font-size:36px;line-height:1;color:#3a4856}.rstars button.on{color:var(--gold)}
 .rfeel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.rfeel button{min-height:40px;font-size:13.5px;padding:6px}.rfeel button.on{border-color:var(--cyan,#2fe0e6);color:var(--cyan,#2fe0e6);background:rgba(47,224,230,.1);font-weight:600}
 .rtp .c{text-align:center}
+
+/* Animación del ranking */
+.rk>li{position:relative}
+.rk>li.rk-mov{transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.rk>li.rk-up .rkb{animation:rkup 1.8s ease}
+@keyframes rkup{0%{box-shadow:0 0 0 0 rgba(63,210,139,0)}30%{box-shadow:0 0 0 3px rgba(63,210,139,.7),0 0 22px rgba(63,210,139,.45);background:#173328}100%{box-shadow:0 0 0 0 rgba(63,210,139,0)}}
+.rk>li.rk-dw .rkb{animation:rkdw 1.6s ease}
+@keyframes rkdw{35%{background:#2a1c20;box-shadow:0 0 0 2px rgba(255,90,79,.5)}}
+.rk>li.rk-in{animation:rkin .7s ease both .4s}@keyframes rkin{from{opacity:0;transform:translateY(10px)}}
+.rkpop{animation:rkpop .5s cubic-bezier(.3,1.8,.5,1) both .7s}@keyframes rkpop{from{transform:scale(0)}}
+.rk>li.rk-lead .rkb{animation:rklead 2.6s ease;position:relative;overflow:visible}
+@keyframes rklead{0%{box-shadow:0 0 0 0 rgba(255,197,61,0)}20%{box-shadow:0 0 0 3px var(--gold),0 0 34px rgba(255,197,61,.7);background:#33290f}60%{box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(255,197,61,.4)}100%{box-shadow:none}}
+.rk>li.rk-lead .crown{animation:rkcrown .8s cubic-bezier(.3,1.6,.5,1) both .8s}
+@keyframes rkcrown{from{transform:translateY(-30px) rotate(-30deg);opacity:0}}
+.rk-cf{position:absolute;top:45%;width:7px;height:11px;border-radius:2px;pointer-events:none;animation:rkcf 1.5s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes rkcf{from{transform:none;opacity:1}to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+.rk-ban{position:fixed;left:16px;right:16px;top:calc(14px + env(safe-area-inset-top,0px));z-index:70;max-width:480px;margin:0 auto;text-align:center;background:linear-gradient(90deg,#3a2c06,#ffc53d,#3a2c06);background-size:200% 100%;color:#1b1405;font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;padding:11px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);animation:rkban 3.2s ease forwards;pointer-events:none}
+@keyframes rkban{0%{transform:translateY(-20px) scale(.8);opacity:0}12%{transform:none;opacity:1;background-position:100% 0}75%{opacity:1;background-position:0 0}100%{opacity:0;transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){.rk-ban{animation:none;opacity:1}}
 </style>
 
 </head>
@@ -2124,7 +2143,27 @@ function rankView(){
   document.querySelectorAll("#body [data-u]").forEach(b=>b.onclick=()=>openProfile(b.dataset.u));
   document.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>{S.hopen=S.hopen===b.dataset.hk?null:b.dataset.hk;rankView()});
   document.querySelectorAll("[data-hy]").forEach(b=>b.onclick=()=>{S.hy=+b.dataset.hy;S.hopen=null;rankView()});
+  if(S.rmode!=="hist"){const r=ranking(S.sec,S.rmode);if(r.length)rkAnim(r,`${S.sec}:${S.rmode}:${S.rmode==="week"?weekOf():period(S.rmode).label}`)}
 }
+/* Animación del ranking: compara con cómo estaba la última vez que lo miraste en este móvil.
+   Solo se anima si ha cambiado algo; quien sube brilla en verde, quien baja en rojo, y el nuevo líder se lleva corona y confeti */
+function rkAnim(r,key){const ids=r.map(x=>x.id),K="liga-rk:"+(S.me||"-")+":"+key;let old=null;
+  try{old=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
+  try{localStorage.setItem(K,JSON.stringify(ids))}catch(e){}
+  if(!Array.isArray(old)||old.join()===ids.join())return;
+  const lis=[...document.querySelectorAll("#body ol.rk>li")];if(!lis.length)return;
+  const calm=matchMedia("(prefers-reduced-motion: reduce)").matches,tops=lis.map(l=>l.offsetTop),step=lis.length>1?tops[1]-tops[0]:62,moved=[];
+  lis.forEach((li,i)=>{const o=old.indexOf(ids[i]),d=o<0?0:o-i,pos=li.querySelector(".pos");
+    if(d&&pos){pos.querySelector(".mv")?.remove();pos.insertAdjacentHTML("beforeend",`<span class="mv ${d>0?"up":"dw"} rkpop" title="Desde la última vez que miraste">${d>0?"▲ "+d:"▼ "+(-d)}</span>`)}
+    if(calm)return;
+    if(o<0){li.classList.add("rk-in");return}
+    if(d){const dy=(o<tops.length?tops[o]:tops[tops.length-1]+(o-tops.length+1)*step)-tops[i];li.style.transform=`translateY(${dy}px)`;li.style.zIndex=d>0?3:1;li.classList.add(d>0?"rk-up":"rk-dw");moved.push(li)}});
+  if(moved.length){lis[0].offsetHeight;requestAnimationFrame(()=>moved.forEach(li=>{li.classList.add("rk-mov");li.style.transform=""}))}
+  if(old[0]!==ids[0]){const li=lis[0];li.classList.add("rk-lead");li.style.zIndex=4;
+    if(!calm)setTimeout(()=>{const b=li.querySelector(".rkb");if(!b)return;for(let c=0;c<26;c++){const e=document.createElement("i");e.className="rk-cf";const a=Math.random()*Math.PI*2,d=60+Math.random()*120;
+      e.style.cssText=`--x:${(Math.cos(a)*d).toFixed(0)}px;--y:${(Math.sin(a)*d-40).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg;left:${(8+Math.random()*84).toFixed(0)}%;background:${["#ffc53d","#ff3d7f","#3fd28b","#2fe0e6","#fff"][c%5]}`;b.appendChild(e);setTimeout(()=>e.remove(),1700)}},850);
+    if(ids[0]===S.me){const nm=S.sec==="autoseguro"?"Auto":SECTIONS.find(x=>x.id===S.sec)?.name||"",bn=document.createElement("div");bn.className="rk-ban";bn.setAttribute("role","status");
+      bn.textContent=`¡Eres el líder de ${nm}${S.rmode==="week"?" esta semana":S.rmode==="year"?" este año":""}!`;document.body.appendChild(bn);setTimeout(()=>bn.remove(),3200)}}}
 start();
 
 /* Al redibujar una pantalla (marcar, montar, cambiar de muro…) se mantiene donde estabas:
