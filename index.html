@@ -552,6 +552,17 @@ p.rnb{margin:-6px 0 14px}
 .fbm{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}.fbm.fbdone{border-left-color:var(--line);opacity:.75}
 .fbm p{margin:0;overflow-wrap:anywhere}.fbh{display:flex;justify-content:space-between;gap:8px}.fbh small{color:var(--mut);font-size:12px}
 .fba{display:flex;gap:10px;align-items:center}.fba button{min-height:34px;padding:4px 12px;font-size:13px}
+
+/* Perfil: hoy por sección y encadenes por día */
+.tdy{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.tdy>div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.tdy .sic{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tdy b{font:900 30px/1 var(--disp);font-variant-numeric:tabular-nums}.tdy small{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.tdy .z{opacity:.45}.tdy .on{border-color:rgba(63,210,139,.5)}.tdy .on .sic{color:var(--g1)}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 12px 6px;background:#131d26;border-top:1px solid var(--line)}.lc>.dh:first-child{border-top:0}
+.dh b{font:900 16px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}.dh span{font-size:13px;color:var(--mut)}
+.dh.hoy{background:rgba(63,210,139,.12)}.dh.hoy b{color:var(--g1);font-size:18px}.dh.hoy span{color:var(--g1);font-weight:600}
+.ai.bi{grid-template-columns:1fr auto}
 </style>
 
 </head>
@@ -1340,6 +1351,23 @@ function buzon(){const nm=Object.fromEntries(S.people.map(u=>[u.id,u.name])),L=S
   document.querySelectorAll("[data-fbu]").forEach(b=>b.onclick=()=>upd(b.dataset.fbu,{done:false}));
   document.querySelectorAll("[data-fbx]").forEach(b=>b.onclick=async()=>{const k="fbx"+b.dataset.fbx;if(S.arm!==k){S.arm=k;return buzon()}S.arm=null;const{error}=await sb.from("liga_feedback").delete().eq("id",b.dataset.fbx);if(error)return toast(error.message);await loadFeedback();buzon()})}
 
+/* Perfil: lo de hoy por sección (casillas con icono) y los últimos encadenes agrupados por día */
+const SICON={
+ autoseguro:'<svg class="sic" viewBox="0 0 32 32" aria-hidden="true"><rect x="8" y="3" width="16" height="11" rx="4"/><circle cx="16" cy="8.5" r="2"/><path d="M16 14v8"/><path d="M13 22h6l-1 3a3 3 0 0 1-4 0z"/><path d="M14 27.5h4"/></svg>',
+ cuerda:'<svg class="sic" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="12" rx="10" ry="7"/><ellipse cx="16" cy="12" rx="6" ry="3.8"/><path d="M24 17c1 3 1 6-1 8.5"/><path d="M21.5 24.5l2.5 2 1.5-3"/></svg>',
+ boulder:'<svg class="sic" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26l3-10 6-7 7 1 5 5 3 11z"/><circle cx="12" cy="17" r="1.6" fill="currentColor"/><circle cx="18" cy="14" r="1.6" fill="currentColor"/><circle cx="20" cy="20" r="1.6" fill="currentColor"/><path d="M2 26h28"/></svg>',
+ kilter:'<svg class="sic" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 4h18l3 22H4z"/>'+[[11,9],[16,9],[21,9],[10.3,15],[16,15],[21.7,15],[9.6,21],[16,21],[22.4,21]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3" fill="currentColor"/>`).join("")+'<path d="M2 30l5-4M30 30l-5-4"/></svg>'};
+const dayOf=t=>isoDay(new Date(t));
+function todayHtml(mine){const td=isoDay(new Date()),hoy=mine.filter(a=>dayOf(a.at)===td);
+  return `<h3 class="pfh">Hoy</h3><div class="tdy">${SECTIONS.map(s=>{const n=hoy.filter(a=>a.sec===s.id).length,nm=s.id==="autoseguro"?"Auto":s.name;
+    return `<div class="${n?"on":"z"}" aria-label="${nm}: ${n} hoy">${SICON[s.id]||""}<b>${n}</b><small>${nm}</small></div>`}).join("")}</div>`}
+function lastByDay(last,mine){const td=isoDay(new Date()),y=new Date();y.setDate(y.getDate()-1);const ay=isoDay(y),days=[];
+  last.forEach(a=>{const d=dayOf(a.at);let g=days[days.length-1];if(!g||g.d!==d)days.push(g={d,as:[]});g.as.push(a)});
+  return `<div class="lc">${days.map(g=>{const all=mine.filter(a=>dayOf(a.at)===g.d),p=all.reduce((t,a)=>t+pts(a),0),n=all.length;
+    const lab=g.d===td?"Hoy":g.d===ay?"Ayer":fdate(g.d).replace(/ de \d{4}$| \d{4}$/,"");
+    return `<div class="dh ${g.d===td?"hoy":""}"><b>${lab}</b><span>${n} ${n===1?"encadene":"encadenes"} · +${fmt(p)}</span></div>`+
+     g.as.map(a=>`<div class="ai bi"><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}).join("")}</div>`}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1442,8 +1470,9 @@ function perfil(){
   <p class="sub" style="margin:6px 0 0">Cada ${isB||isK?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
   <h3 class="pfh">Puestos por bimestre</h3>
   <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${SECTIONS.map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+  ${todayHtml(mine)}
   <h3 class="pfh">Últimos encadenes</h3>
-  ${last.length?`<div class="lc">${last.map(a=>`<div class="ai"><span class="ad">${new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</span><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}</div>`
+  ${last.length?lastByDay(last,mine)
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
   ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
