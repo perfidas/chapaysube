@@ -563,6 +563,7 @@ p.rnb{margin:-6px 0 14px}
 .dh b{font:900 16px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}.dh span{font-size:13px;color:var(--mut)}
 .dh.hoy{background:rgba(63,210,139,.12)}.dh.hoy b{color:var(--g1);font-size:18px}.dh.hoy span{color:var(--g1);font-weight:600}
 .ai.bi{grid-template-columns:1fr auto}
+.dmore{display:block;width:100%;text-align:center;padding:8px 12px;font-size:13px;border-top:1px solid var(--line);border-radius:0;min-height:0}
 </style>
 
 </head>
@@ -1373,7 +1374,8 @@ function lastByDay(last,mine){const td=isoDay(new Date()),y=new Date();y.setDate
   return `<div class="lc">${days.map(g=>{const all=mine.filter(a=>dayOf(a.at)===g.d),p=all.reduce((t,a)=>t+pts(a),0),n=all.length;
     const lab=g.d===td?"Hoy":g.d===ay?"Ayer":fdate(g.d).replace(/ de \d{4}$| \d{4}$/,"");
     return `<div class="dh ${g.d===td?"hoy":""}"><b>${lab}</b><span>${n} ${n===1?"encadene":"encadenes"} · +${fmt(p)}</span></div>`+
-     g.as.map(a=>`<div class="ai bi"><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}).join("")}</div>`}
+     g.as.slice(0,S.dayOpen?.has(g.d)?g.as.length:4).map(a=>`<div class="ai bi"><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")+
+     (g.as.length>4?`<button class="link dmore" data-dmore="${g.d}">${S.dayOpen?.has(g.d)?"Ver menos":`Ver más (${g.as.length-4})`}</button>`:"")}).join("")}</div>`}
 
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
@@ -1441,7 +1443,8 @@ function perfil(){
       <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
   const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${SECTIONS.map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
-  const last=[...mine].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,25);
+  /* los últimos 10 días con encadenes (enteros: cada día muestra 4 y «Ver más» despliega el resto) */
+  const last=(()=>{const so=[...mine].sort((a,b)=>b.at.localeCompare(a.at)),ds=[...new Set(so.map(a=>dayOf(a.at)))].slice(0,10);return so.filter(a=>ds.includes(dayOf(a.at)))})();
   /* Este bimestre frente al anterior (el actual va hasta hoy) */
   const pf=new Date(cur.from.getFullYear(),cur.from.getMonth()-2,1),pb=BIM[Math.floor(pf.getMonth()/2)];
   const stat=(sec,f,t)=>{const r=rankRange(sec,f,t),i=r.findIndex(x=>x.id===u.id),as=mine.filter(a=>a.sec===sec&&new Date(a.at)>=f&&new Date(a.at)<t);return{p:i>=0?r[i].p:0,n:i>=0?r[i].n:0,pos:i>=0?i+1:0,as}};
@@ -1485,6 +1488,7 @@ function perfil(){
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
+  document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
   if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
