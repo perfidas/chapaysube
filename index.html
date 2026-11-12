@@ -567,7 +567,7 @@ const GP={"4":30,"5a":45,"5b":60,"5c":80,"6a":100,"6a+":120,"6b":150,"6b+":180,"
 const STYLES=[["A vista",1.3],["Encadenada",1]]; /* En vías ya no hay flash; los flash antiguos se siguen mostrando y puntuando */
 const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
-const SECTIONS=[{id:"cuerda",name:"Cuerda"},{id:"autoseguro",name:"Autoseguro"},{id:"boulder",name:"Boulder"},{id:"kilter",name:"Kilter"}];
+const SECTIONS=[{id:"autoseguro",name:"Autoseguro"},{id:"cuerda",name:"Cuerda"},{id:"boulder",name:"Boulder"},{id:"kilter",name:"Kilter"}];
 /* Boulder: el color es la dificultad, de más fácil a más difícil */
 const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Blanco y negro","#555555",450]};
 const BKEYS=Object.keys(BCOL);
@@ -893,7 +893,7 @@ const L_KIL=[["first","Enchufado","Tu primer bloque en la Kilter","board","bronc
  ["a50","Cuesta arriba","Un bloque a 50° o más","a50","plata"],["a60","Mirando al techo","Un bloque a 60° o más","a60","oro"],["a70","Desplome total","Un bloque a 70°","a70","esmeralda"],["fl7a","Rayo","Un 7A al flash en la Kilter","bolt","rubi"],["ang3","Tres en uno","El mismo bloque a tres ángulos distintos","prot","oro"],
  ["w4","Pegado al tablero","Encadenar algo en la Kilter 4 semanas seguidas","fire","bronce"],["b20","Ratón de tablero","20 bloques de Kilter en un bimestre","cal","plata"],["n100","Cien bombillas","100 bloques de Kilter en la temporada","c100","oro"],["open","Pionero","Ser el primero de la liga en subir un bloque","first","plata"],
  ["pod","Al cajón","Acabar en el podio de un bimestre de Kilter","podium","plata"],["win","Rey del tablero","Ganar un bimestre de Kilter","crown","oro"],["year","Señor de los LED","Ganar el ranking anual de Kilter","crown2","diamante"]];
-const LSECS=[["cuerda","Cuerda",L_VIA,"C"],["autoseguro","Autoseguro",L_VIA,"A"],["boulder","Boulder",L_BOU,"B"],["kilter","Kilter",L_KIL,"K"],["mix","Combinados",L_MIX,"X"]];
+const LSECS=[["autoseguro","Autoseguro",L_VIA,"A"],["cuerda","Cuerda",L_VIA,"C"],["boulder","Boulder",L_BOU,"B"],["kilter","Kilter",L_KIL,"K"],["mix","Combinados",L_MIX,"X"]];
 const LCAT=LSECS.flatMap(([sec,name,arr,k])=>arr.map((x,i)=>({id:sec+":"+x[0],key:x[0],sec,secName:name,num:k+(i+1),n:x[1],d:x[2],p:x[3],t:x[4]})));
 
 /* ---- Cálculo ---- */
@@ -1000,7 +1000,7 @@ function logrosView(){
   if(!S.me||!me()){$("#app").innerHTML=`<h2>Logros</h2><div class="empty">${S.me?"Tus logros aparecerán cuando el administrador apruebe tu cuenta.":"Entra con tu cuenta para ver tus logros."}</div>${S.me?"":'<button class="pri" id="lg">Entrar</button>'}`;if($("#lg"))$("#lg").onclick=needLogin;return}
   const y=new Date().getFullYear(),all=computeLogros(y),mine=all[S.me]||{},got=LCAT.filter(c=>mine[c.id]?.ok),R=2*Math.PI*33;
   const near=LCAT.filter(c=>!mine[c.id]?.ok&&mine[c.id]?.v>0).sort((a,b)=>mine[b.id].v/mine[b.id].m-mine[a.id].v/mine[a.id].m)[0];
-  const f=S.lsec||"cuerda",recent=id=>mine[id]?.ok&&(Date.now()-new Date(mine[id].at))<7*864e5;
+  const f=S.lsec||"autoseguro",recent=id=>mine[id]?.ok&&(Date.now()-new Date(mine[id].at))<7*864e5;
   /* lo último de la liga */
   const feed=[];for(const uid in all)for(const c of LCAT){const x=all[uid][c.id];if(x?.ok&&x.at)feed.push({uid,c,at:x.at})}
   feed.sort((a,b)=>b.at.localeCompare(a.at));const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name]));
@@ -1041,7 +1041,7 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
     if(k==="Logros"){S.view="logros";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
-    if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
+    if(!sec){S.sec=S.lastSec||"autoseguro";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
   if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
@@ -1254,7 +1254,7 @@ function duelForm(u){const st=duelStats(u.id),f=S.dform;
    <div class="kst3"><button type="button" data-dk="dia" class="${f.kind==="dia"?"on":""}">Hoy<small>sesión</small></button><button type="button" data-dk="semana" class="${f.kind==="semana"?"on":""}">Una semana</button><button type="button" data-dk="bimestre" class="${f.kind==="bimestre"?"on":""}">Hasta fin de bimestre</button></div>
    <span class="sub">${f.kind==="dia"?"Para cuando vais juntos: empieza cuando acepte y acaba a las 12 de la noche. Si no lo acepta hoy, caduca.":"Empieza cuando acepte."} Gana quien sume más puntos en esa sección durante el duelo.</span>
    <span class="err" id="derr" hidden></span><button class="pri" type="submit">Enviar reto</button><button type="button" id="dx">Cancelar</button></form>`}
-function bindDuelForm(u){if($("#dgo"))$("#dgo").onclick=()=>{S.dform={sec:S.lastSec||"cuerda",kind:"semana"};perfil()};
+function bindDuelForm(u){if($("#dgo"))$("#dgo").onclick=()=>{S.dform={sec:S.lastSec||"autoseguro",kind:"semana"};perfil()};
   if(!$("#dfm"))return;$("#dx").onclick=()=>{S.dform=null;perfil()};$("#dsec").onchange=e=>S.dform.sec=e.target.value;
   document.querySelectorAll("[data-dk]").forEach(b=>b.onclick=()=>{S.dform.kind=b.dataset.dk;perfil()});
   $("#dfm").onsubmit=async e=>{e.preventDefault();if(S.busy)return;S.busy=true;const{data,error}=await sb.rpc("liga_duel_create",{p_rival:u.id,p_sec:S.dform.sec,p_kind:S.dform.kind});S.busy=false;
