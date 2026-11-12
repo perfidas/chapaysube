@@ -194,6 +194,8 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .mult div,.gpt div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:flex;flex-direction:column}
 .mult b,.gpt b{font:700 22px/1.1 var(--disp);font-variant-numeric:tabular-nums}
 .mult span,.gpt span{font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+.gpt b .pip{display:block;margin:0 0 4px}
+.gpt.bc{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}.gpt.bc b{font-size:19px}.gpt.bc span{white-space:nowrap}
 /* Carga rápida de boulder (modo editor) */
 .has .bz:not(.sel) .bwall,.has .bz:not(.sel) .bdots{opacity:.35}.has .bz:not(.sel) .zlab{opacity:.4}
 .has .bz.sel .bwall{stroke-width:18}.has .bz.sel .zlab{font-weight:700;font-size:19px}
@@ -1146,7 +1148,7 @@ function rules(){
   <div class="gpt">${GRADES.map(g=>`<div><b style="color:${gcol(g)}">${g}</b><span>${GP[g]}</span></div>`).join("")}</div>
   <h3>Boulder: puntos por color</h3>
   <p>En boulder la dificultad la marca el color, de más fácil a más difícil. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
-  <div class="gpt">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
+  <div class="gpt bc">${BKEYS.map(k=>`<div><b><i class="pip" style="background:${bbg(k)}"></i>${BCOL[k][0]}</b><span>${BCOL[k][2]} pts</span></div>`).join("")}</div>
   <h3>Kilter: puntos por grado y ángulo</h3>
   <p>En Kilter subes la captura del bloque que has hecho en la app de Kilter y la liga lee el nombre, el grado y el ángulo. El mismo bloque a otro ángulo cuenta como otro bloque. Ángulo hasta 35° ×1, de 40° a 45° ×1,1 y de 50° en adelante ×1,2. Un flash multiplica ×${dec(BSM.Flash||1)}.</p>
   <div class="gpt">${KGRADES.map(g=>`<div><b style="color:${kgc(g)}">${g}</b><span>${KGP[g]}</span></div>`).join("")}</div>
