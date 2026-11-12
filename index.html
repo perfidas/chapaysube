@@ -594,6 +594,18 @@ p.rnb{margin:-6px 0 14px}
 .rk-ban{position:fixed;left:16px;right:16px;top:calc(14px + env(safe-area-inset-top,0px));z-index:70;max-width:480px;margin:0 auto;text-align:center;background:linear-gradient(90deg,#3a2c06,#ffc53d,#3a2c06);background-size:200% 100%;color:#1b1405;font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;padding:11px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);animation:rkban 3.2s ease forwards;pointer-events:none}
 @keyframes rkban{0%{transform:translateY(-20px) scale(.8);opacity:0}12%{transform:none;opacity:1;background-position:100% 0}75%{opacity:1;background-position:0 0}100%{opacity:0;transform:translateY(-8px)}}
 @media (prefers-reduced-motion:reduce){.rk-ban{animation:none;opacity:1}}
+
+/* Las vías según la gente */
+.fl2{grid-column:1/-1}.frow:has(.fl2){grid-template-columns:1fr 1fr}
+.rmini{display:block;font:600 11px var(--body);color:var(--gold);text-align:right;white-space:nowrap}
+.crowd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.cgt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.cgt button{min-height:34px;padding:4px;font-size:13px;border-radius:99px;background:transparent}
+.cgt button.on{border-color:var(--gold);color:var(--gold);background:rgba(255,197,61,.1);font-weight:600}
+.cgr,.ntr{display:grid;grid-template-columns:18px 8px 1fr auto;gap:8px;align-items:center;text-align:left;background:#131d26;border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:0;width:100%}
+.ntr{grid-template-columns:8px 1fr}.cgr i{font:900 18px/1 var(--disp);font-style:normal;color:var(--gold)}
+.cgr .sw,.ntr .sw{width:8px;height:28px;border-radius:3px;display:block}
+.cgv{font:700 15px/1.1 var(--disp);color:var(--gold);text-align:right;white-space:nowrap}.cgv small{display:block;font:500 11px var(--body);color:var(--mut)}
+.ntl{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 </style>
 
 </head>
@@ -1085,7 +1097,7 @@ const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1
 function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
   let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
   if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
-  const sec=!["home","rules","perfil","approvals","logros","buzon"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
+  const sec=!["home","rules","perfil","approvals","logros","buzon","notas"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
   n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
   n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
@@ -1093,7 +1105,7 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec||"autoseguro";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
-  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","notas","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,notas:notasView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
 const _render=render;render=function(){_render();if(!["loading","error","setup","login","name","forgot","newpw"].includes(S.view))setTimeout(checkUnlocks,350)};
 function loadingView(){if(!S.splash){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`;return}if($("#app .boot"))return;$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
@@ -1380,7 +1392,7 @@ const fbNew=()=>(S.fb||[]).filter(m=>!m.done).length;
 function buzon(){const nm=Object.fromEntries(S.people.map(u=>[u.id,u.name])),L=S.fb||[],nw=L.filter(m=>!m.done),old=L.filter(m=>m.done);
   const row=m=>`<div class="fbm ${m.done?"fbdone":""}"><div class="fbh"><b>${esc(nm[m.user_id]||"Alguien")}</b><small>${new Date(m.created_at).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small></div>
     <p>${esc(m.body)}</p><div class="fba">${m.done?`<button class="link" data-fbu="${m.id}">Marcar como nuevo</button>`:`<button data-fbd="${m.id}">Hecho</button>`}<button class="link dng" data-fbx="${m.id}">${S.arm==="fbx"+m.id?"Pulsa otra vez":"Borrar"}</button></div></div>`;
-  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2 class="vh">Buzón</h2>
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Buzón</h2>
    <p class="sub">Fallos y sugerencias que manda la gente desde el inicio. Solo los ves tú.</p>
    ${nw.length?`<div class="k" style="margin-top:12px">Nuevos · ${nw.length}</div><div class="fbl">${nw.map(row).join("")}</div>`:`<div class="empty">No hay mensajes nuevos.</div>`}
    ${old.length?`<div class="k" style="margin-top:14px">Hechos</div><div class="fbl">${old.map(row).join("")}</div>`:""}`;
@@ -1443,6 +1455,38 @@ function rateOpen(r){if(!S.me||$("#rts"))return;const m=myRate(r.id),st={n:m?.st
     close();toast("Nota guardada.");redraw()};
   d.onclick=e=>{if(e.target===d)close()};d.onkeydown=e=>{if(e.key==="Escape")close()};
   draw();document.body.appendChild(d);d.querySelector("[data-sn]")?.focus()}
+
+/* Las vías según la gente: mejores, regaladas y duras (solo vías montadas de cuerda y autoseguro) */
+const rateMini=r=>{const q=rateOf(r.id);return q?`<small class="rmini">★ ${f1(q.avg)}${q.top?" · "+FEEL[q.top].toLowerCase():""}</small>`:""};
+function crowdList(k){const L=S.routes.filter(r=>r.active&&RSEC(r)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q);
+  if(k==="top")return L.sort((a,b)=>b.q.avg-a.q.avg||b.q.n-a.q.n);
+  return L.filter(x=>x.q.top===k).sort((a,b)=>b.q.c[k]-a.q.c[k]||b.q.n-a.q.n)}
+function crowdHtml(){const k=S.cg||"top",L=crowdList(k).slice(0,5);if(!crowdList("top").length)return"";
+  const T={top:"Mejores",regalada:"Regaladas",dura:"Duras"};
+  return `<div class="hrow hk"><span class="k">Las vías según la gente</span></div><section class="crowd">
+   <div class="cgt" role="tablist">${Object.entries(T).map(([v,l])=>`<button role="tab" aria-selected="${k===v}" class="${k===v?"on":""}" data-cg="${v}">${l}</button>`).join("")}</div>
+   ${L.length?L.map(({r,q},i)=>`<button class="cgr" data-fr="${r.id}"><i>${i+1}</i><span class="sw" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"></span><span><b>Línea ${r.line} · ${r.grade}</b> <span class="sub">${r.sec==="autoseguro"?"auto":"cuerda"} · ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</span></span>
+     <span class="cgv">${k==="top"?`★ ${f1(q.avg)}`:`${q.c[k]} de ${q.n}`}<small>${k==="top"?`${q.n} ${q.n===1?"nota":"notas"}`:"la ven "+T[k].toLowerCase().replace(/s$/,"")}</small></span></button>`).join("")
+     :`<div class="sub" style="padding:8px 2px">Ninguna vía montada tiene mayoría de «${T[k].toLowerCase().replace(/s$/,"")}» todavía.</div>`}</section>`}
+/* Solo el administrador: las vías que la gente ve regaladas o duras, para pasárselo a quien monta */
+function notasView(){if(!S.owner){S.view="home";return render()}
+  const sec=r=>r.sec==="autoseguro"?"Auto":"Cuerda",col=r=>(HOLDS[r.hold]?.[0]||"").toLowerCase();
+  const L=S.routes.filter(r=>r.active&&RSEC(r)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q&&(x.q.c.regalada||x.q.c.dura));
+  const grp=k=>L.filter(x=>x.q.top===k).sort((a,b)=>b.q.c[k]-a.q.c[k]||a.r.line-b.r.line),mix=L.filter(x=>!x.q.top).sort((a,b)=>a.r.line-b.r.line);
+  const row=({r,q})=>`<button class="ntr" data-fr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"></span><span><b>${sec(r)} · línea ${r.line} · ${col(r)} · ${r.grade}</b><br>
+    <span class="sub">★ ${f1(q.avg)} · ${q.n} ${q.n===1?"nota":"notas"} — regalada ${q.c.regalada} · en su grado ${q.c.grado} · dura ${q.c.dura}</span></span></button>`;
+  const txt=k=>grp(k).map(({r,q})=>`- ${sec(r)}, línea ${r.line} ${col(r)} (${r.grade}): ${q.c[k]} de ${q.n} la ven ${k}`).join("\n");
+  const R=grp("regalada"),D=grp("dura");
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Notas de las vías</h2>
+   <p class="sub">Lo que opina la gente del grado de las vías montadas de cuerda y auto. Solo lo ves tú. Toca una para ir a ella.</p>
+   ${L.length?`<button id="ntc">Copiar la lista para quien monta</button>`:""}
+   <div class="k" style="margin-top:14px">La ven regaladas · ${R.length}</div><div class="ntl">${R.map(row).join("")||'<div class="sub">Ninguna.</div>'}</div>
+   <div class="k" style="margin-top:14px">La ven duras · ${D.length}</div><div class="ntl">${D.map(row).join("")||'<div class="sub">Ninguna.</div>'}</div>
+   ${mix.length?`<div class="k" style="margin-top:14px">Opiniones divididas · ${mix.length}</div><div class="ntl">${mix.map(row).join("")}</div>`:""}`;
+  $("#bk").onclick=()=>{S.view="perfil";S.pid=S.me;S.scrollTop=true;render()};
+  document.querySelectorAll("[data-fr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.fr);if(r)goRoute(r)});
+  if($("#ntc"))$("#ntc").onclick=async()=>{const t=`Vías que la gente ve regaladas:\n${txt("regalada")||"- ninguna"}\n\nVías que la gente ve duras:\n${txt("dura")||"- ninguna"}`;
+    try{await navigator.clipboard.writeText(t);toast("Lista copiada. Pégala en WhatsApp o donde quieras.")}catch(e){toast("No se ha podido copiar en este móvil.")}}}
 
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
@@ -1551,13 +1595,13 @@ function perfil(){
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?lastByDay(last,mine)
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
-  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
-  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
@@ -1637,6 +1681,7 @@ function home(){
    ${ev.length>4?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
   ${news.length?`<div class="hrow hk"><span class="k">Recién montadas</span><span class="sub">${news.length}</span></div>
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
+  ${crowdHtml()}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
@@ -1646,6 +1691,7 @@ function home(){
   document.querySelectorAll("[data-gr]").forEach(b=>b.onclick=()=>{S.view="sec";S.sec=b.dataset.gr;S.tab="ranking";S.rmode="bim";S.zone=null;S.open=null;S.scrollTop=true;render()});
   document.querySelectorAll("[data-fr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.fr);if(r)goRoute(r)});
   document.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{S.view="logros";S.scrollTop=true;render()});
+  document.querySelectorAll("[data-cg]").forEach(b=>b.onclick=()=>{S.cg=b.dataset.cg;const y0=scrollY;home();scrollTo(0,y0)});
 }
 
 /* Deslizar el dedo a izquierda o derecha en Mapa o Ranking cambia de sección */
@@ -2003,11 +2049,12 @@ function bindB(z){
 }
 
 /* ---------- Buscador: filtra por grado, color y lo que no has hecho, y señala dónde está ---------- */
-const FQ=()=>S.fq?.[S.sec]||((S.fq=S.fq||{})[S.sec]={min:"",max:"",hold:"",col:"",todo:false});
-const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.todo);
+const FQ=()=>S.fq?.[S.sec]||((S.fq=S.fq||{})[S.sec]={min:"",max:"",hold:"",col:"",todo:false,rt:""});
+const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.todo||f.rt);
 function fMatch(r,f){
   if(f.hold&&r.hold!==f.hold)return false;
   if(f.todo&&myAsc(r.id))return false;
+  if(f.rt){const q=rateOf(r.id);if(!q)return false;if(f.rt==="top"?q.avg<4:q.top!==f.rt)return false}
   if(r.sec==="boulder")return !f.col||r.color===f.col;
   const i=GRADES.indexOf(r.grade);
   if(f.min&&i<GRADES.indexOf(f.min))return false;
@@ -2018,22 +2065,23 @@ function finderHtml(){const f=FQ(),bl=S.sec==="boulder",opt=(v,l,cur)=>`<option 
   return `<section class="finder" aria-label="Buscar ${bl?"bloques":"vías"}"><div class="frow">
   ${bl?`<label class="fl" for="fcol">Dificultad<select id="fcol">${opt("","Todas",f.col)}${BKEYS.map(k=>opt(k,BCOL[k][0],f.col)).join("")}</select></label>`
     :`<label class="fl" for="fmin">Grado desde<select id="fmin">${opt("","Cualquiera",f.min)}${GRADES.map(g=>opt(g,g,f.min)).join("")}</select></label>
-  <label class="fl" for="fmax">hasta<select id="fmax">${opt("","Cualquiera",f.max)}${GRADES.map(g=>opt(g,g,f.max)).join("")}</select></label>`}
+  <label class="fl" for="fmax">hasta<select id="fmax">${opt("","Cualquiera",f.max)}${GRADES.map(g=>opt(g,g,f.max)).join("")}</select></label>
+  <label class="fl fl2" for="frt">Según la gente<select id="frt">${opt("","Todas",f.rt)}${opt("top","★ 4 o más",f.rt)}${opt("regalada","Regaladas",f.rt)}${opt("dura","Duras",f.rt)}</select></label>`}
 </div>
   <div class="frow2">${S.me?`<label class="chk" for="ftd"><input type="checkbox" id="ftd" ${f.todo?"checked":""}> Solo ${bl?"los":"las"} que no he hecho este bimestre</label>`:"<span></span>"}
   ${fOn(f)?`<button class="link" id="fclr">Quitar filtros</button>`:""}</div></section>`}
 function bindFinder(view){const f=FQ(),set=(k,v)=>{f[k]=v;S.zone=null;S.open=null;view()};
-  [["fmin","min"],["fmax","max"],["fh","hold"],["fcol","col"]].forEach(([id,k])=>{const e=$("#"+id);if(e)e.onchange=()=>{const v=e.value;
+  [["fmin","min"],["fmax","max"],["fh","hold"],["fcol","col"],["frt","rt"]].forEach(([id,k])=>{const e=$("#"+id);if(e)e.onchange=()=>{const v=e.value;
     if(k==="min"&&v&&f.max&&GRADES.indexOf(f.max)<GRADES.indexOf(v))f.max="";if(k==="max"&&v&&f.min&&GRADES.indexOf(f.min)>GRADES.indexOf(v))f.min="";set(k,v)}});
   if($("#ftd"))$("#ftd").onchange=e=>set("todo",e.target.checked);
-  if($("#fclr"))$("#fclr").onclick=()=>{Object.assign(f,{min:"",max:"",hold:"",col:"",todo:false});S.zone=null;S.open=null;view()}}
+  if($("#fclr"))$("#fclr").onclick=()=>{Object.assign(f,{min:"",max:"",hold:"",col:"",todo:false,rt:""});S.zone=null;S.open=null;view()}}
 function resultsHtml(){const hs=fHits();if(!hs)return null;const bl=S.sec==="boulder";
   if(!hs.length)return `<div class="empty">No hay ${bl?"bloques":"vías"} que cumplan el filtro. Prueba a ampliar el grado o quitar algún filtro.</div>`;
   const groups=bl?BSECT.map(z=>({name:z.name,rs:hs.filter(r=>r.zone===z.id)})):ZONES[S.sec].slice().sort((a,b)=>a.lo-b.lo).map(z=>({name:z.name,rs:hs.filter(r=>LINES[r.line]?.zone===z.id).sort((a,b)=>a.line-b.line||GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade))}));
   return `<section class="news res" aria-label="Resultados"><header><h3>${hs.length} ${bl?(hs.length===1?"bloque encontrado":"bloques encontrados"):(hs.length===1?"vía encontrada":"vías encontradas")}</h3><span class="sub">Toca una para ir a ella. En el mapa están resaltadas.</span></header>
   ${groups.filter(g=>g.rs.length).map(g=>`<div class="rgh">${g.name.replace("Exterior · ","Exterior, ")}</div>${g.rs.map(r=>bl
     ?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b>${isNew(r)?NEWBM:""}<br><span class="sub">${HOLDS[r.hold]?"Presas "+HOLDS[r.hold][0].toLowerCase():"Presas sin indicar"}${myAsc(r.id)?" · hecho":""}</span></span></button>`
-    :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}`).join("")}</section>`}
+    :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}${rateMini(r)}</span></button>`).join("")}`).join("")}</section>`}
 
 function mapSvg(){
   let g="";
