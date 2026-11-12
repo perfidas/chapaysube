@@ -470,8 +470,9 @@ p.rnb{margin:-6px 0 14px}
 .tpi{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;background:#131d26;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
 .tpi.tp-add{border-left-color:var(--g1)}.tpi.tp-upd{border-left-color:var(--gold)}.tpi.tp-del{border-left-color:var(--g3)}.tpi.tp-same{opacity:.7}
 .tpi input{width:20px;height:20px}.tck{text-align:center;color:var(--g1)}
-.tcb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;border-radius:10px;border:1px solid var(--line)}
-.tcb img{display:block;width:100%;height:auto;pointer-events:none}
+.tcb{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;border-radius:10px;border:1px solid var(--line);width:fit-content;max-width:100%;margin:0 auto;line-height:0}
+.tcb img{display:block;max-width:100%;max-height:min(52vh,52dvh);width:auto;height:auto;pointer-events:none}
+#tx{scroll-margin-bottom:96px}
 .tfr{position:absolute;border:2px solid #2fe0e6;box-shadow:0 0 0 9999px rgba(0,0,0,.5);cursor:move}
 .th{position:absolute;width:30px;height:30px;border-radius:50%;background:#2fe0e6;border:3px solid #0b1118}
 .th.tl{left:-15px;top:-15px}.th.tr{right:-15px;top:-15px}.th.bl{left:-15px;bottom:-15px}.th.br{right:-15px;bottom:-15px}
@@ -1784,7 +1785,7 @@ function tBox(){const q=S.tq;
 function bindTBox(){const q=S.tq;
   if($("#tfile"))$("#tfile").onchange=e=>{const f=e.target.files[0];if(f)tRead(f)};
   if($("#tx"))$("#tx").onclick=()=>{if(S.tq?.img)URL.revokeObjectURL(S.tq.img);S.tq=null;mapView()};
-  if(q?.st==="crop"){bindCrop();$("#tgo").onclick=tOcr}
+  if(q?.st==="crop"){bindCrop();$("#tgo").onclick=tOcr;const im=$("#tcb img"),go=()=>$("#tx")?.scrollIntoView({block:"end",behavior:"smooth"});im.complete?requestAnimationFrame(go):im.addEventListener("load",go,{once:true})}
   if(!q||q.st!=="rows")return;
   const plan=()=>{$("#tplan").innerHTML=tPlanHtml();bindPlan()};
   document.querySelectorAll("[data-tf]").forEach(el=>{const i=+el.closest("[data-ti]").dataset.ti,f=el.dataset.tf;el.oninput=el.onchange=()=>{q.rows[i][f]=f==="line"?el.value.replace(/\D/g,""):el.value;
