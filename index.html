@@ -538,6 +538,19 @@ p.rnb{margin:-6px 0 14px}
 .vcard label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--mut)}.vcard select{font-size:16px}
 .vok2{background:var(--g1);border-color:var(--g1);color:#0b1118;font-weight:700}.vno{border-color:var(--g3);color:var(--g3);background:transparent}
 .vfacts{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13px}.vfacts span{color:var(--mut)}
+
+/* Buzón de fallos y sugerencias */
+.betah{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}.betah>b{white-space:nowrap;flex-shrink:0}
+.betab{min-height:0;padding:1px 8px;font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600;line-height:1.3;white-space:nowrap;flex-shrink:0;margin:-3px 0;border-radius:99px;border-color:var(--gold);color:var(--gold);background:transparent}
+.fbs{position:fixed;inset:0;z-index:60;background:rgba(5,9,13,.72);display:flex;align-items:flex-end;justify-content:center;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.fbp{width:100%;max-width:480px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.fbp h2{margin:0;font:900 24px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.fbk{position:relative;display:block}.fbk textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#131d26;border:1px solid var(--line);border-radius:10px;padding:10px 10px 24px;resize:none}
+.fbn{position:absolute;right:10px;bottom:8px;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}.fbn.lim{color:var(--gold)}
+.fbl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.fbm{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}.fbm.fbdone{border-left-color:var(--line);opacity:.75}
+.fbm p{margin:0;overflow-wrap:anywhere}.fbh{display:flex;justify-content:space-between;gap:8px}.fbh small{color:var(--mut);font-size:12px}
+.fba{display:flex;gap:10px;align-items:center}.fba button{min-height:34px;padding:4px 12px;font-size:13px}
 </style>
 
 </head>
@@ -708,7 +721,7 @@ async function refresh(){
   if(S.me&&!mine)S.view="name";
   else if(S.me&&!mine.ok&&!S.owner)S.view="pending";
   else if(["loading","login","name","pending"].includes(S.view))S.view=S.back&&!["login","pending","name"].includes(S.back)?S.back:"home";
-  if(S.owner)await loadPending();
+  if(S.owner){await loadPending();await loadFeedback().catch(()=>{})}
   if(S.rec&&S.me)S.view="newpw";
   render();
 }
@@ -717,7 +730,7 @@ async function loadPending(){const{data,error}=await sb.rpc("liga_pending");S.pe
 const pendCount=()=>(S.pend||[]).filter(p=>!p.approved).length;
 let bt;function redraw(){clearTimeout(bt);bt=setTimeout(()=>{if(!(S.edit&&S.open)&&!(S.view==="sec"&&(S.kq||S.tq))&&!["rsq","ksq"].includes(document.activeElement?.id)&&!(S.view==="home"&&S.songPlaying)&&!S.busy&&!["login","name","forgot","newpw"].includes(S.view))render()},250)}
 /* Recarga completa: solo al abrir, al volver tras un rato fuera o si se cortó el tiempo real */
-let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();await loadVerifs().catch(()=>{});if(S.owner)await loadPending()}catch(e){return}redraw()},350)}
+let ft;function bump(){clearTimeout(ft);ft=setTimeout(async()=>{try{await loadAll();await loadVerifs().catch(()=>{});if(S.owner){await loadPending();await loadFeedback().catch(()=>{})}}catch(e){return}redraw()},350)}
 /* Cambios que llegan en tiempo real: se aplica solo la fila cambiada */
 function onRt(p){const t=p.table;
   if(p.eventType==="DELETE"){const id=p.old?.id;if(t==="liga_duels")S.duels=S.duels.filter(d=>d.id!==id);else if(t==="liga_ascents")dropAsc(id);else{S.dv=(S.dv||0)+1;S.routes=S.routes.filter(r=>r.id!==id)}}
@@ -1016,7 +1029,7 @@ const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1
 function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
   let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
   if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
-  const sec=!["home","rules","perfil","approvals","logros"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
+  const sec=!["home","rules","perfil","approvals","logros","buzon"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
   n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
   n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
@@ -1024,7 +1037,7 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec||"cuerda";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
-  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
 const _render=render;render=function(){_render();if(!["loading","error","setup","login","name","forgot","newpw"].includes(S.view))setTimeout(checkUnlocks,350)};
 function loadingView(){if(!S.splash){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`;return}if($("#app .boot"))return;$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
@@ -1290,6 +1303,37 @@ function bindVerif(){document.querySelectorAll(".vcard[data-vid]").forEach(c=>{c
   c.querySelectorAll("[data-vw-ok]").forEach(b=>b.onclick=()=>vCall("liga_verif_witness",{p_id:id,p_ok:b.dataset.vwOk==="1"},b.dataset.vwOk==="1"?"Confirmado. Gracias.":"Anotado. Lo revisará el administrador."));
   c.querySelectorAll("[data-vd]").forEach(b=>b.onclick=()=>{const ok=b.dataset.vd==="1";if(!ok&&S.arm!=="vd"+id){S.arm="vd"+id;return home()}S.arm=null;const asc=(S.vadm||[]).find(v=>v.id===id)?.ascent_id;vCall("liga_verif_decide",{p_id:id,p_ok:ok},ok?"Cuenta: queda como válida.":"Encadene borrado.",()=>{if(!ok&&asc)dropAsc(asc)})})})}
 
+
+/* ---------- Buzón de fallos y sugerencias (mientras la liga está en pruebas) ---------- */
+function fbOpen(){if(!S.me)return needLogin();if($("#fbs"))return;
+  const d=document.createElement("div");d.id="fbs";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","fbt");
+  d.innerHTML=`<form class="fbp" id="fbf"><h2 id="fbt">Reporta fallos y sugerencias</h2>
+    <p class="sub">Cuéntanos qué falla o qué mejorarías. Lo lee el administrador.</p>
+    <label class="fbk"><span class="fbn" id="fbn">0/200</span><textarea id="fbx" maxlength="200" rows="4" placeholder="Por ejemplo: al marcar un bloque en la 3.2 se me cierra el plano"></textarea></label>
+    <span class="err" id="fbe" hidden></span>
+    <div class="drow"><button type="button" id="fbc">Cancelar</button><button class="pri" type="submit" id="fbo">Enviar</button></div></form>`;
+  document.body.appendChild(d);const x=$("#fbx"),close=()=>d.remove();x.focus();
+  x.oninput=()=>{$("#fbn").textContent=x.value.length+"/200";$("#fbn").classList.toggle("lim",x.value.length>=190)};
+  $("#fbc").onclick=close;d.onclick=e=>{if(e.target===d)close()};d.onkeydown=e=>{if(e.key==="Escape")close()};
+  $("#fbf").onsubmit=async e=>{e.preventDefault();const t=x.value.trim();if(t.length<3){$("#fbe").textContent="Escribe algo un poco más largo.";$("#fbe").hidden=false;return}
+    $("#fbo").disabled=true;$("#fbo").textContent="Enviando…";const{error}=await sb.from("liga_feedback").insert({body:t});
+    if(error){$("#fbo").disabled=false;$("#fbo").textContent="Enviar";$("#fbe").textContent=/row-level|policy/i.test(error.message)?"Solo pueden enviar mensajes los escaladores aprobados.":"No se ha podido enviar: "+error.message;$("#fbe").hidden=false;return}
+    close();toast("¡Gracias! Mensaje enviado.")}}
+async function loadFeedback(){if(!S.owner){S.fb=[];return}const{data}=await sb.from("liga_feedback").select("*").order("created_at",{ascending:false}).limit(200);S.fb=data||[]}
+const fbNew=()=>(S.fb||[]).filter(m=>!m.done).length;
+function buzon(){const nm=Object.fromEntries(S.people.map(u=>[u.id,u.name])),L=S.fb||[],nw=L.filter(m=>!m.done),old=L.filter(m=>m.done);
+  const row=m=>`<div class="fbm ${m.done?"fbdone":""}"><div class="fbh"><b>${esc(nm[m.user_id]||"Alguien")}</b><small>${new Date(m.created_at).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small></div>
+    <p>${esc(m.body)}</p><div class="fba">${m.done?`<button class="link" data-fbu="${m.id}">Marcar como nuevo</button>`:`<button data-fbd="${m.id}">Hecho</button>`}<button class="link dng" data-fbx="${m.id}">${S.arm==="fbx"+m.id?"Pulsa otra vez":"Borrar"}</button></div></div>`;
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2 class="vh">Buzón</h2>
+   <p class="sub">Fallos y sugerencias que manda la gente desde el inicio. Solo los ves tú.</p>
+   ${nw.length?`<div class="k" style="margin-top:12px">Nuevos · ${nw.length}</div><div class="fbl">${nw.map(row).join("")}</div>`:`<div class="empty">No hay mensajes nuevos.</div>`}
+   ${old.length?`<div class="k" style="margin-top:14px">Hechos</div><div class="fbl">${old.map(row).join("")}</div>`:""}`;
+  $("#bk").onclick=()=>{S.view="home";S.scrollTop=true;render()};
+  const upd=async(id,ch)=>{const{error}=await sb.from("liga_feedback").update(ch).eq("id",id);if(error)return toast(error.message);await loadFeedback();buzon()};
+  document.querySelectorAll("[data-fbd]").forEach(b=>b.onclick=()=>upd(b.dataset.fbd,{done:true}));
+  document.querySelectorAll("[data-fbu]").forEach(b=>b.onclick=()=>upd(b.dataset.fbu,{done:false}));
+  document.querySelectorAll("[data-fbx]").forEach(b=>b.onclick=async()=>{const k="fbx"+b.dataset.fbx;if(S.arm!==k){S.arm=k;return buzon()}S.arm=null;const{error}=await sb.from("liga_feedback").delete().eq("id",b.dataset.fbx);if(error)return toast(error.message);await loadFeedback();buzon()})}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1395,12 +1439,12 @@ function perfil(){
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?`<div class="lc">${last.map(a=>`<div class="ai"><span class="ad">${new Date(a.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</span><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")}</div>`
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
-  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
-  if($("#bkp"))$("#bkp").onclick=backup;if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
@@ -1470,8 +1514,9 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
-  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><b>Liga en pruebas</b><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
+  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb">Reporta fallos y sugerencias</button></div><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
+  ${S.owner&&fbNew()?`<button class="pendb" id="fbv">${fbNew()} ${fbNew()===1?"mensaje nuevo":"mensajes nuevos"} en el buzón ›</button>`:""}
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
   ${verifHtml()}${duelsHtml()}
   <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
@@ -1481,7 +1526,7 @@ function home(){
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
-  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();
+  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
   if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
