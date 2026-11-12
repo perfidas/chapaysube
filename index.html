@@ -541,7 +541,7 @@ p.rnb{margin:-6px 0 14px}
 
 /* Buzón de fallos y sugerencias */
 .betah{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}.betah>b{white-space:nowrap;flex-shrink:0}
-.betab{min-height:0;padding:1px 8px;font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600;line-height:1.3;white-space:nowrap;flex-shrink:0;margin:-3px 0;border-radius:99px;border-color:var(--gold);color:var(--gold);background:transparent}
+.betab{min-height:0;display:inline-flex;align-items:center;gap:4px;padding:3px 7px;font-size:10.5px;font-weight:700;letter-spacing:-.01em;line-height:1.3;white-space:nowrap;flex-shrink:0;min-width:0;margin:-5px 0;border:0;border-radius:99px;background:var(--acc);color:#fff;box-shadow:0 2px 0 #a31f4e}.betab svg{width:11px;height:11px;flex-shrink:0}.betab:active{transform:translateY(2px);box-shadow:none}.betab span{overflow:hidden;text-overflow:ellipsis}@media (max-width:385px){.betah>b{font-size:14px;letter-spacing:.03em}.betab{font-size:10px;padding:3px 7px;flex-shrink:1}.betab svg{display:none}}@media (max-width:340px){.betah>b{font-size:13px;letter-spacing:.01em}.betab{font-size:9.5px;padding:3px 5px;letter-spacing:-.02em}}
 .fbs{position:fixed;inset:0;z-index:60;background:rgba(5,9,13,.72);display:flex;align-items:flex-end;justify-content:center;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .fbp{width:100%;max-width:480px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .fbp h2{margin:0;font:900 24px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
@@ -1307,7 +1307,7 @@ function bindVerif(){document.querySelectorAll(".vcard[data-vid]").forEach(c=>{c
 /* ---------- Buzón de fallos y sugerencias (mientras la liga está en pruebas) ---------- */
 function fbOpen(){if(!S.me)return needLogin();if($("#fbs"))return;
   const d=document.createElement("div");d.id="fbs";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","fbt");
-  d.innerHTML=`<form class="fbp" id="fbf"><h2 id="fbt">Reporta fallos y sugerencias</h2>
+  d.innerHTML=`<form class="fbp" id="fbf"><h2 id="fbt">Reportar fallos y sugerencias</h2>
     <p class="sub">Cuéntanos qué falla o qué mejorarías. Lo lee el administrador.</p>
     <label class="fbk"><span class="fbn" id="fbn">0/200</span><textarea id="fbx" maxlength="200" rows="4" placeholder="Por ejemplo: al marcar un bloque en la 3.2 se me cierra el plano"></textarea></label>
     <span class="err" id="fbe" hidden></span>
@@ -1514,7 +1514,7 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
-  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb">Reporta fallos y sugerencias</button></div><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
+  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Reportar fallos y sugerencias</span></button></div><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
   ${S.owner&&fbNew()?`<button class="pendb" id="fbv">${fbNew()} ${fbNew()===1?"mensaje nuevo":"mensajes nuevos"} en el buzón ›</button>`:""}
   ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
