@@ -2135,13 +2135,16 @@ function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&
   for(const sec of secs)for(const ln of lines){if(UNUSED[sec]?.has(ln)){if(sec===S.sec)notes.push(`La línea ${ln} está tachada en ${sec}: no se toca.`);continue}
     const cur=S.routes.filter(r=>r.active&&r.sec===sec&&r.line===ln),used=new Set();
     ok.filter(r=>+r.line===ln).forEach(t=>{const m=cur.find(c=>!used.has(c.id)&&c.hold===t.hold);
-      if(m){used.add(m.id);const ch={};if(m.grade!==t.grade)ch.grade=t.grade;if(t.created&&m.created!==t.created)ch.created=t.created;
+      /* Mismo color pero otra fecha de montaje: es otra vía (se desmonta la antigua y se añade la nueva). Salvo las cargadas a mano al principio con la fecha 09.10.2026, que solo se corrigen */
+      if(m&&t.created&&m.created!==t.created&&m.created!==HAND_DAY){used.add(m.id);items.push({k:sec+m.id+"r",op:"rep",sec,ln,id:m.id,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created},txt:`${HOLDS[t.hold][0]} ${t.grade} · ${fdate(t.created)} (sustituye a la ${m.grade} del ${fdate(m.created)})`})}
+      else if(m){used.add(m.id);const ch={};if(m.grade!==t.grade)ch.grade=t.grade;if(t.created&&m.created!==t.created)ch.created=t.created;
         if(Object.keys(ch).length)items.push({k:sec+m.id,op:"upd",sec,ln,id:m.id,ch,txt:`${HOLDS[t.hold][0]}: ${ch.grade?`${m.grade} → ${t.grade}`:t.grade}${ch.created?` · fecha ${fdate(t.created)}`:""}`});
         else items.push({k:sec+m.id,op:"same",sec,ln,txt:`${HOLDS[t.hold][0]} ${t.grade}: ya está igual`})}
       else items.push({k:sec+ln+t.hold+t.grade+(t.n||""),op:"add",sec,ln,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created||isoDay(new Date())},txt:`${HOLDS[t.hold][0]} ${t.grade}${t.created?" · "+fdate(t.created):""}`})});
     cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",sec,ln,id:c.id,txt:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: no la he leído en la foto. Márcala solo si ya no está en la tablilla`}))}
   return{items,notes,bad:q.rows.length-ok.length}}
-const TOP={add:["Añadir","up"],upd:["Corregir","eq"],del:["¿Desmontar?","dw"],same:["Igual",""]};
+const HAND_DAY="2026-10-09";
+const TOP={rep:["Vía nueva","up"],add:["Añadir","up"],upd:["Corregir","eq"],del:["¿Desmontar?","dw"],same:["Igual",""]};
 /* Desmontar nunca va marcado de serie: si la foto se lee mal, no se quita ninguna vía que siga en la tablilla */
 const tOn=(q,i)=>i.op==="del"?q.on.has(i.k):!q.off.has(i.k);
 function tPlanHtml(){const{items,notes,bad}=tPlan(),q=S.tq,secs=[...new Set(items.map(i=>i.sec))];
@@ -2184,9 +2187,10 @@ function bindTBox(){const q=S.tq;
   bindPlan()}
 async function tApply(){if(S.busy)return;const{items}=tPlan(),q=S.tq,todo=items.filter(i=>i.op!=="same"&&tOn(q,i));if(!todo.length)return;
   S.busy=true;$("#tap").disabled=true;$("#tap").textContent="Guardando…";const n={add:0,upd:0,del:0};let err=null;
-  try{const adds=todo.filter(i=>i.op==="add").map(i=>i.row);
+  try{for(const i of todo.filter(i=>i.op==="rep")){const r=await sb.from("liga_routes").update({active:false}).eq("id",i.id).select();if(r.error)throw r.error;applyRows(r.data);n.del++}
+    const adds=todo.filter(i=>i.op==="add"||i.op==="rep").map(i=>i.row);
     if(adds.length){const r=await sb.from("liga_routes").insert(adds).select();if(r.error)throw r.error;applyRows(r.data);n.add=r.data.length}
-    for(const i of todo.filter(i=>i.op!=="add")){const r=await sb.from("liga_routes").update(i.op==="del"?{active:false}:i.ch).eq("id",i.id).select();if(r.error)throw r.error;applyRows(r.data);n[i.op]++}}
+    for(const i of todo.filter(i=>i.op==="upd"||i.op==="del")){const r=await sb.from("liga_routes").update(i.op==="del"?{active:false}:i.ch).eq("id",i.id).select();if(r.error)throw r.error;applyRows(r.data);n[i.op]++}}
   catch(e){err=e}
   S.busy=false;const sum=[n.add&&`${n.add} ${n.add===1?"añadida":"añadidas"}`,n.upd&&`${n.upd} ${n.upd===1?"corregida":"corregidas"}`,n.del&&`${n.del} ${n.del===1?"desmontada":"desmontadas"}`].filter(Boolean).join(", ");
   if(err){toast(`No se ha podido guardar todo: ${err.message||err}${sum?". Hecho: "+sum:""}`);$("#tap").disabled=false;$("#tap").textContent="Reintentar";return}
