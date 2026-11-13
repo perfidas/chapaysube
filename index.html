@@ -72,7 +72,6 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .lnum{font:700 13px var(--body);fill:var(--ink)}
 .zlab{font:600 15px var(--body);fill:var(--mut)}
 .zlab.sel{fill:var(--acc)}
-.zmain{font:700 15px var(--body);fill:var(--ink);opacity:.8}
 .area{font:700 13px var(--body);letter-spacing:.14em;fill:var(--mut);opacity:.75}
 .inset{fill:var(--bg);stroke:var(--mut);stroke-width:1.5}
 .hint{text-align:center;color:var(--mut);padding:18px 8px}
@@ -93,7 +92,6 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .ed .full{grid-column:1/-1}
 .floor{fill:var(--floor)}
 .island{fill:var(--block)}
-.door{fill:none;stroke:var(--mut);stroke-width:2;stroke-dasharray:6 6}
 .bwall{fill:none;stroke:var(--wall2);stroke-width:12;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
 .bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
 .bz.sel .bwall{stroke:var(--wallsel);stroke-opacity:1}
@@ -612,7 +610,7 @@ p.rnb{margin:-6px 0 14px}
 <body>
 <main id="app"></main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.109.0"></script>
 <script>
 /* ===== Configuración de Supabase: pega aquí los datos de tu proyecto (Project Settings > API) ===== */
 const CFG={url:"https://ctziadohyvkyikcjbepz.supabase.co",key:"sb_publishable_QMkPAjb5L-ZKNXPxX1mDjw_djy4fNKT"};
@@ -636,13 +634,10 @@ const KANGS=[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70],KANG={};
 const angM=a=>a>=50?1.2:a>=40?1.1:1;
 const kpts=(g,an,st)=>Math.round((KGP[g]||0)*angM(an)*(BSM[st]||1));
 const isBl=sec=>sec==="boulder"||sec==="kilter";
-const BSECT=[
-];
-/* Las paredes se recorren en tramos continuos y cada tramo se reparte en subsecciones de largo parecido (salvo 1.1 y 4.4, que son muros sueltos) */
-const BMAIN=[];
-/* Isla central: lados rectos y fondo redondeado */
+/* Plano de boulder calcado del dibujo de la sala (girado un cuarto de vuelta): las secciones se generan abajo a partir de los tramos de pared */
+const BSECT=[];
+/* Isla central en dos lóbulos */
 const ISLAND="M384.4 240 L363.6 328 L352.4 356 L330 392 L328.4 436 L366 464 L379.6 506.4 L382 596 L310 632 L270 612 L259.6 552 L299.6 476 L278 404 L290 356 L286 296 L330 217.6 Z";
-const qpts=(a,c,b,t0,t1,n)=>Array.from({length:n+1},(_,i)=>{const t=t0+(t1-t0)*i/n,u=1-t;return[u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]]});
 (()=>{
   const isl=n=>({E:"Isla este",S:"Isla sur",O:"Isla oeste"})[n[0]]+" "+n.slice(1);
   /* [puntos del tramo, lado del rótulo (+1 hacia dentro de la sala, -1 hacia fuera de la isla), subsecciones en orden: [id, nombre corto]] */
@@ -1955,7 +1950,6 @@ function bSvg(){
   return `<svg viewBox="0 10 580 1000" role="img" aria-label="Plano de la sala de boulder" class="${S.edit&&S.zone?"has":""}"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
-   ${BMAIN.map(m=>`<text class="zmain" x="${m.x}" y="${m.y}" text-anchor="${m.a}">${m.t}</text>`).join("")}
    
    ${zs}</svg>`}
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
@@ -2181,7 +2175,8 @@ function rankView(){
    Solo se anima si ha cambiado algo; quien sube brilla en verde, quien baja en rojo, y el nuevo líder se lleva corona y confeti */
 function rkAnim(r,key){const ids=r.map(x=>x.id),K="liga-rk:"+(S.me||"-")+":"+key;let old=null;
   try{old=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
-  try{localStorage.setItem(K,JSON.stringify(ids))}catch(e){}
+  try{localStorage.setItem(K,JSON.stringify(ids));const pre=K.slice(0,K.lastIndexOf(":")+1);
+    for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k!==K&&k.startsWith(pre))localStorage.removeItem(k)}}catch(e){}
   if(!Array.isArray(old)||old.join()===ids.join())return;
   const lis=[...document.querySelectorAll("#body ol.rk>li")];if(!lis.length)return;
   const calm=matchMedia("(prefers-reduced-motion: reduce)").matches,tops=lis.map(l=>l.offsetTop),step=lis.length>1?tops[1]-tops[0]:62,moved=[];
