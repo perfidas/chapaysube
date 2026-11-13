@@ -102,6 +102,7 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .bsw{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--mut)}
 .bleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:13px;color:var(--mut)}
 .bleg span{display:flex;align-items:center;gap:5px}
+.bsel{gap:6px}.bsel button{display:flex;align-items:center;gap:5px;min-height:0;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);font-size:13px}.bsel button.on{border-color:var(--acc);background:#2a1622;color:var(--ink);font-weight:700}.bsel .bclr{border:0;padding:5px 4px;color:var(--acc);text-decoration:underline}
 .bleg i,.pip{width:12px;height:12px;border-radius:50%;border:1px solid var(--mut);display:inline-block}
 .pip{margin-right:5px;vertical-align:middle}
 .err{color:var(--g3);font-size:14px;font-weight:600}
@@ -2249,10 +2250,14 @@ function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
-  $("#body").innerHTML=`${finderHtml()}<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
-  placeBDots();bindFinder(boulderView);
+  /* La leyenda filtra: toca uno o varios colores para ver solo esos bloques */
+  const fc=FQ().cols||[];
+  $("#body").innerHTML=`<div class="map">${bSvg()}</div><div class="bleg bsel" role="group" aria-label="Filtrar por color">${BKEYS.map(k=>`<button type="button" class="${fc.includes(k)?"on":""}" aria-pressed="${fc.includes(k)}" data-bc="${k}"><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</button>`).join("")}${fc.length?`<button type="button" class="link bclr" id="bclr">Quitar</button>`:""}</div><div id="zp" style="margin-top:12px"></div>`;
+  placeBDots();
+  document.querySelectorAll("[data-bc]").forEach(b=>b.onclick=()=>{const f=FQ(),L=f.cols=f.cols||[],k=b.dataset.bc,i=L.indexOf(k);i>=0?L.splice(i,1):L.push(k);S.zone=null;S.open=null;boulderView()});
+  if($("#bclr"))$("#bclr").onclick=()=>{FQ().cols=[];S.zone=null;S.open=null;boulderView()};
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
-  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro o un color para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
   $("#zp").innerHTML=`${S.edit?quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
@@ -2315,12 +2320,12 @@ function bindB(z){
 
 /* ---------- Buscador: filtra por grado, color y lo que no has hecho, y señala dónde está ---------- */
 const FQ=()=>S.fq?.[S.sec]||((S.fq=S.fq||{})[S.sec]={min:"",max:"",hold:"",col:"",todo:false,rt:""});
-const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.todo||f.rt);
+const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.cols?.length||f.todo||f.rt);
 function fMatch(r,f){
   if(f.hold&&r.hold!==f.hold)return false;
   if(f.todo&&myAsc(r.id))return false;
   if(f.rt){const q=rateOf(r.id);if(!q)return false;if(f.rt==="top"?!(q.avg>=4):q.top!==f.rt)return false}
-  if(r.sec==="boulder")return !f.col||r.color===f.col;
+  if(r.sec==="boulder")return !f.cols?.length||f.cols.includes(r.color);
   const i=GRADES.indexOf(r.grade);
   if(f.min&&i<GRADES.indexOf(f.min))return false;
   if(f.max&&i>GRADES.indexOf(f.max))return false;
@@ -2343,7 +2348,7 @@ function bindFinder(view){const f=FQ(),set=(k,v)=>{f[k]=v;S.zone=null;S.open=nul
 function resultsHtml(){const hs=fHits();if(!hs)return null;const bl=S.sec==="boulder";
   if(!hs.length)return `<div class="empty">No hay ${bl?"bloques":"vías"} que cumplan el filtro. Prueba a ampliar el grado o quitar algún filtro.</div>`;
   const groups=bl?BSECT.map(z=>({name:z.name,rs:hs.filter(r=>r.zone===z.id)})):ZONES[S.sec].slice().sort((a,b)=>a.lo-b.lo).map(z=>({name:z.name,rs:hs.filter(r=>LINES[r.line]?.zone===z.id).sort((a,b)=>a.line-b.line||GRADES.indexOf(a.grade)-GRADES.indexOf(b.grade))}));
-  return `<section class="news res" aria-label="Resultados"><header><h3>${hs.length} ${bl?(hs.length===1?"bloque encontrado":"bloques encontrados"):(hs.length===1?"vía encontrada":"vías encontradas")}</h3><span class="sub">Toca una para ir a ella. En el mapa están resaltadas.</span></header>
+  return `<section class="news res" aria-label="Resultados"><header><h3>${hs.length} ${bl?(hs.length===1?"bloque encontrado":"bloques encontrados"):(hs.length===1?"vía encontrada":"vías encontradas")}</h3><span class="sub">${bl?"Toca uno para ir a él. En el plano están resaltados.":"Toca una para ir a ella. En el mapa están resaltadas."}</span></header>
   ${groups.filter(g=>g.rs.length).map(g=>`<div class="rgh">${g.name.replace("Exterior · ","Exterior, ")}</div>${g.rs.map(r=>bl
     ?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b>${isNew(r)?NEWBM:""}<br><span class="sub">${HOLDS[r.hold]?"Presas "+HOLDS[r.hold][0].toLowerCase():"Presas sin indicar"}${myAsc(r.id)?" · hecho":""}</span></span></button>`
     :`<button class="nit" data-nr="${r.id}"><span class="lnb">${r.line}</span><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}${isNew(r)?NEWB:""}${myAsc(r.id)?'<br><span class="done">Hecha este bimestre</span>':""}</span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}${rateMini(r)}</span></button>`).join("")}`).join("")}</section>`}
