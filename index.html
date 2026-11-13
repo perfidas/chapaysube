@@ -402,6 +402,7 @@ p.rnb{margin:-6px 0 14px}
 .hsec{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:6px}
 .rkh{display:flex;justify-content:flex-end;margin:4px 0 -4px}.fdet summary{cursor:pointer;font-weight:700;padding:4px 0;list-style:none}.fdet[open] summary{margin-bottom:8px}.pfset{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:10px 14px}.pfset summary{cursor:pointer;font-weight:700}.pst td,.pst th{text-align:center}.pst td b{font-size:1rem}
 .lempty{display:flex;flex-direction:column;gap:4px;margin:8px 2px 0;font-size:.85rem;color:var(--mut)}.lempty b{color:var(--ink);font-weight:600}
+button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text-align:left;cursor:pointer}.dch{font-style:normal;display:inline-block;width:1em;opacity:.7}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -1492,9 +1493,12 @@ function todayHtml(mine){const td=isoDay(new Date()),hoy=mine.filter(a=>dayOf(a.
     return `<div class="${n?"on":"z"}" aria-label="${nm}: ${n} hoy">${SICON[s.id]||""}<b>${n}</b><small>${nm}</small></div>`}).join("")}</div>`}
 function lastByDay(last,mine){const td=isoDay(new Date()),y=new Date();y.setDate(y.getDate()-1);const ay=isoDay(y),days=[];
   last.forEach(a=>{const d=dayOf(a.at);let g=days[days.length-1];if(!g||g.d!==d)days.push(g={d,as:[]});g.as.push(a)});
-  return `<div class="lc">${days.map(g=>{const all=mine.filter(a=>dayOf(a.at)===g.d),p=all.reduce((t,a)=>t+pts(a),0),n=all.length;
+  /* Solo el último día va abierto; los demás se quedan en su cabecera y se abren al tocarla */
+  return `<div class="lc">${days.map((g,gi)=>{const op=(gi===0)!==!!S.dayTg?.has(g.d),all=mine.filter(a=>dayOf(a.at)===g.d),p=all.reduce((t,a)=>t+pts(a),0),n=all.length;
     const lab=g.d===td?"Hoy":g.d===ay?"Ayer":fdate(g.d).replace(/ de \d{4}$| \d{4}$/,"");
-    return `<div class="dh ${g.d===td?"hoy":""}"><b>${lab}</b><span>${n} ${n===1?"encadene":"encadenes"} · +${fmt(p)}</span></div>`+
+    const head=`<button class="dh dtg ${g.d===td?"hoy":""}" data-dtg="${g.d}" aria-expanded="${op}"><b><i class="dch" aria-hidden="true">${op?"▾":"▸"}</i> ${lab}</b><span>${n} ${n===1?"encadene":"encadenes"} · +${fmt(p)}</span></button>`;
+    if(!op)return head;
+    return head+
      g.as.slice(0,S.dayOpen?.has(g.d)?g.as.length:4).map(a=>`<div class="ai bi"><span><b>${ascDesc(a)}</b><br><span class="sub">${SECTIONS.find(s=>s.id===a.sec)?.name||""} · ${esc(a.style)}</span></span><span class="ap">+${fmt(pts(a))}</span></div>`).join("")+
      (g.as.length>4?`<button class="link dmore" data-dmore="${g.d}">${S.dayOpen?.has(g.d)?"Ver menos":`Ver más (${g.as.length-4})`}</button>`:"")}).join("")}</div>`}
 
@@ -1838,6 +1842,7 @@ function perfil(){
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
+  document.querySelectorAll("[data-dtg]").forEach(b=>b.onclick=()=>{const d=b.dataset.dtg,o=S.dayTg||(S.dayTg=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
   if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};bindAv();if($("#vsb"))$("#vsb").onclick=()=>{S.vsid=u.id;S.vps=null;S.view="vs";S.scrollTop=true;render()};if($("#rcz"))$("#rcz").onclick=()=>recapOpen();if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
