@@ -122,6 +122,7 @@ button.link{background:none;border:0;color:var(--deep);font-weight:600;text-deco
 .new{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:var(--gold);color:#1b2226;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;vertical-align:2px}
 .tag.nwtag{border-color:var(--gold);color:var(--ink);font-weight:600}
 .news{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 12px 4px;margin-top:4px}
+.news .nwk{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:12px 0 2px}.news .nwk:first-of-type{margin-top:2px}
 .news header{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
 .nit{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:9px 2px}
 .nit>span{min-width:0}
@@ -950,10 +951,14 @@ const isNew=r=>{if(!r.created)return false;const[y,m,d]=r.created.split("-").map
 const newOf=sec=>S.routes.filter(r=>r.sec===sec&&r.active&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")||(a.line||0)-(b.line||0));
 const zoneOf=r=>r.sec==="boulder"?r.zone:LINES[r.line]?.zone;
 const NEWB='<span class="new">Nueva</span>',NEWBM='<span class="new">Nuevo</span>';
+/* Novedades por semanas (de lunes a domingo): «Esta semana», «Semana pasada» o «Semana del 27 oct» */
+const nwkStart=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-(x.getDay()+6)%7);return x};
+function nwkLabel(c){if(!c)return"";const[y,m,d]=c.split("-").map(Number),w=nwkStart(new Date(y,m-1,d)),n=nwkStart(new Date()),k=Math.round((n-w)/6048e5);
+  return k<=0?"Esta semana":k===1?"Semana pasada":"Semana del "+w.toLocaleDateString("es-ES",{day:"numeric",month:"short"})}
 function newsBox(){const ns=newOf(S.sec);if(!ns.length)return"";const bl=S.sec==="boulder",max=30;
   return `<section class="news" aria-label="Novedades"><header><h3>Novedades</h3><span class="sub">${ns.length} ${bl?(ns.length===1?"bloque montado":"bloques montados"):(ns.length===1?"vía montada":"vías montadas")} en los últimos ${NEW_DAYS} días</span></header>
-  ${ns.slice(0,max).map(r=>bl?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b><br><span class="sub">${BSECT.find(z=>z.id===r.zone)?.name||""} · ${fdate(r.created)}</span></span></button>`
-   :`<button class="nit" data-nr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}<br><span class="sub">${ZONES[S.sec]?.find(z=>z.id===zoneOf(r))?.name||""} · ${fdate(r.created)}</span></span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`).join("")}
+  ${ns.slice(0,max).map((r,i,L)=>{const w=nwkLabel(r.created);return(i&&nwkLabel(L[i-1].created)===w?"":`<div class="nwk">${w}</div>`)+(bl?`<button class="nit" data-nr="${r.id}"><span class="bsw" style="background:${bbg(r.color)}"></span><span><b>${BCOL[r.color]?.[0]||""}</b><br><span class="sub">${BSECT.find(z=>z.id===r.zone)?.name||""} · ${fdate(r.created)}</span></span></button>`
+   :`<button class="nit" data-nr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]}"></span><span><b>Línea ${r.line}</b> · ${HOLDS[r.hold]?.[0]||""}<br><span class="sub">${ZONES[S.sec]?.find(z=>z.id===zoneOf(r))?.name||""} · ${fdate(r.created)}</span></span><span class="gr" style="color:${gcol(r.grade)}">${r.grade}</span></button>`)}).join("")}
   ${ns.length>max?`<p class="sub" style="margin:6px 0 0">Y ${ns.length-max} más. Toca una pared para verlas todas.</p>`:""}</section>`}
 function bindNews(view){document.querySelectorAll("[data-nr]").forEach(b=>b.onclick=()=>{const r=S.routes.find(x=>x.id===b.dataset.nr);if(!r)return;
   S.zone=zoneOf(r);S.open=r.id;S.arm=null;view();document.querySelector(`[data-r="${r.id}"]`)?.scrollIntoView({behavior:"smooth",block:"center"})})}
