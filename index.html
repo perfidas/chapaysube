@@ -374,7 +374,7 @@ body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 #songbox{min-height:80px;border-radius:12px;overflow:hidden;background:var(--card)}
 #songbox iframe{display:block;border:0;border-radius:12px}
 /* Selector de sección dentro de Mapa y Ranking */
-.secsw{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;margin:4px 0 12px}
+.secsw{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;margin:4px 0 12px}
 .secsw button{border:0;background:none;border-radius:7px;min-height:42px;padding:6px 2px;font:900 17px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--mut)}
 .secsw button.on{background:var(--acc);color:#fff}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -399,7 +399,8 @@ p.rnb{margin:-6px 0 14px}
 .hdays{display:flex;gap:4px;align-items:flex-end}.hdays small{font-size:11px;color:var(--mut);margin-left:2px}
 .dg{width:32px;height:46px;border-radius:5px;background:linear-gradient(#1b2530 50%,#141d26 50%);border:1px solid #26333f;display:grid;place-items:center;font:900 36px/1 var(--disp);color:var(--gold);text-shadow:0 0 10px rgba(255,197,61,.45)}
 .hbar{height:6px;border-radius:99px;background:#22303c;overflow:hidden}.hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
-.board{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.hsec{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:6px}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
 .bcell small{font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
@@ -553,7 +554,7 @@ p.rnb{margin:-6px 0 14px}
 .fba{display:flex;gap:10px;align-items:center}.fba button{min-height:34px;padding:4px 12px;font-size:13px}
 
 /* Perfil: hoy por sección y encadenes por día */
-.tdy{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.tdy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-bottom:6px}
 .tdy>div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .tdy .sic{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tdy b{font:900 30px/1 var(--disp);font-variant-numeric:tabular-nums}.tdy small{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
@@ -660,7 +661,7 @@ p.rnb{margin:-6px 0 14px}
 .rcu{font:700 18px var(--body);color:#dfe7ee}.rcp{margin:4px 0 0;max-width:30ch;color:#dfe7ee;font-size:16px}.rcg{color:var(--gold)}
 .rctap{margin-top:18px;color:var(--mut);font-size:13px}
 .av.rcav{width:120px;height:120px;font-size:52px;border:4px solid var(--acc);box-shadow:0 0 34px rgba(255,61,127,.5)}.av.rcav2{width:64px;height:64px;font-size:28px;border-color:var(--cyan,#2fe0e6)}
-.rcsec{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:360px;margin-top:10px}
+.rcsec{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;width:100%;max-width:360px;margin-top:10px}
 .rcsec>div{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.06);border-radius:12px;padding:10px 4px;color:var(--g1)}.rcsec .z{opacity:.4;color:#dfe7ee}
 .rcsec .sic{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.rcsec b{font:900 28px/1 var(--disp);color:#fff}.rcsec small{font-size:11px;color:#dfe7ee;text-transform:uppercase;letter-spacing:.06em}
 .rcl{display:flex;flex-direction:column;gap:8px;width:100%;max-width:330px;margin-top:8px}.rcl>div{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px}
@@ -706,6 +707,8 @@ const STYLES=[["A vista",1.3],["Encadenada",1]]; /* En vías ya no hay flash; lo
 const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
 const SECTIONS=[{id:"autoseguro",name:"Autoseguro"},{id:"cuerda",name:"Cuerda"},{id:"boulder",name:"Boulder"},{id:"kilter",name:"Kilter"}];
+/* Secciones que cada uno usa: las ocultas (Perfil → Secciones que uso) no salen en inicio, perfil ni pestañas. Nunca se ocultan todas */
+const VSEC=()=>{const h=S.hid;if(!h||!h.size)return SECTIONS;const v=SECTIONS.filter(s=>!h.has(s.id));return v.length?v:SECTIONS};
 /* Boulder: el color es la dificultad, de más fácil a más difícil */
 const BCOL={blanco:["Blanco","#f4f4f4",20],verde:["Verde","#2fa35d",40],amarillo:["Amarillo","#f2c500",70],azul:["Azul","#2a6fdb",110],morado:["Morado","#7d45c4",160],rojo:["Rojo","#d8322a",230],negro:["Negro","#1d1d1d",320],dorado:["Blanco y negro","#555555",450]};
 const BKEYS=Object.keys(BCOL);
@@ -826,6 +829,7 @@ async function loadAll(){
     fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
     fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
     q("liga_points"),q("liga_styles")]);
+  S.hid=S.me?await sb.from("liga_prefs").select("hidden").eq("user_id",S.me).maybeSingle().then(r=>new Set(r.data?.hidden||[])).catch(()=>S.hid||new Set()):new Set();
   S.avs=await sb.from("liga_avatars").select("user_id,v").then(r=>Object.fromEntries((r.data||[]).map(x=>[x.user_id,x.v]))).catch(()=>S.avs||{});
   S.rates=await fetchAll(()=>sb.from("liga_ratings").select("route_id,user_id,stars,feel").order("route_id").order("user_id")).catch(()=>S.rates||[]);S._rm=null;
   const dq=await sb.from("liga_duels").select("*").order("created_at",{ascending:false}).limit(500);S.duels=(dq.data||[]).map(mapD);
@@ -1334,7 +1338,7 @@ function sugFor(sec,need){const c=[];S.routes.forEach(r=>{if(!r.active||r.sec!==
   if(!c.length)return"";c.sort((a,b)=>a[0]-b[0]);const r=c[0][1];
   return sec==="boulder"?`un bloque ${BCOL[r.color][0].toLowerCase()}`:sec==="kilter"?`un ${r.grade} a ${r.angle}°`:`un ${r.grade} encadenado`}
 function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,rows=[];
-  SECTIONS.forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i<0)return;
+  VSEC().forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i<0)return;
     if(i===0){const nx=r[1];rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>${nx?`Vas 1.º: le sacas <b>${fmt(r[0].p-nx.p)} pts</b> a ${esc(nx.name)}.`:"Vas 1.º y nadie más ha puntuado."}</span></div>`);return}
     const a=r[i-1],need=a.p-r[i].p+1,sg=sugFor(s.id,need),bh=r[i+1];
     rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>Te faltan <b>${fmt(need)} pts</b> para pasar a ${esc(a.name)} (${ord(i)})${sg?`: te bastaría ${sg}`:""}.${sprint&&bh?` <span class="sub">${esc(bh.name)} está a ${fmt(r[i].p-bh.p)} pts por detrás.</span>`:""}</span></div>`)});
@@ -1342,11 +1346,11 @@ function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,ro
   return `<section class="goal ${sprint?"spr":""}"><div class="hrow"><span class="k">${sprint?"Sprint final":"Tu objetivo"}</span>${sprint?`<span class="sprb">${dl===1?"Último día":`Quedan ${dl} días`}</span>`:""}</div>${rows.join("")}</section>`}
 /* Avisos de adelantamiento: se comparan los puestos con los que viste la última vez en este móvil */
 const OVK=()=>"liga-pos:"+S.me+":"+bimKey(new Date());
-function posSnap(){const o={};SECTIONS.forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i>=0)o[s.id]={pos:i+1,above:r.slice(0,i).map(x=>x.id)}});return o}
+function posSnap(){const o={};VSEC().forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i>=0)o[s.id]={pos:i+1,above:r.slice(0,i).map(x=>x.id)}});return o}
 function overtakeMsgs(){if(!S.me||!me())return[];let prev=null;try{prev=JSON.parse(localStorage.getItem(OVK())||"null")}catch(e){}
   const now=posSnap();if(!prev){try{localStorage.setItem(OVK(),JSON.stringify(now))}catch(e){}return[]}
   const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),out=[];
-  SECTIONS.forEach(s=>{const p=prev[s.id],n=now[s.id];if(!n)return;
+  VSEC().forEach(s=>{const p=prev[s.id],n=now[s.id];if(!n)return;
     if(!p){out.push({up:1,t:`Ya estás en el ranking de ${secLow(s.id)}: vas ${ord(n.pos)}.`});return}
     const passed=n.above.filter(id=>!p.above.includes(id)&&nm[id]);
     passed.slice(0,2).forEach(id=>out.push({up:0,t:`${nm[id]} te ha pasado en ${secLow(s.id)}.`}));
@@ -1484,7 +1488,7 @@ const SICON={
  kilter:'<svg class="sic" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 4h18l3 22H4z"/>'+[[11,9],[16,9],[21,9],[10.3,15],[16,15],[21.7,15],[9.6,21],[16,21],[22.4,21]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3" fill="currentColor"/>`).join("")+'<path d="M2 30l5-4M30 30l-5-4"/></svg>'};
 const dayOf=t=>isoDay(new Date(t));
 function todayHtml(mine){const td=isoDay(new Date()),hoy=mine.filter(a=>dayOf(a.at)===td);
-  return `<h3 class="pfh">Hoy</h3><div class="tdy">${SECTIONS.map(s=>{const n=hoy.filter(a=>a.sec===s.id).length,nm=s.id==="autoseguro"?"Auto":s.name;
+  return `<h3 class="pfh">Hoy</h3><div class="tdy">${VSEC().map(s=>{const n=hoy.filter(a=>a.sec===s.id).length,nm=s.id==="autoseguro"?"Auto":s.name;
     return `<div class="${n?"on":"z"}" aria-label="${nm}: ${n} hoy">${SICON[s.id]||""}<b>${n}</b><small>${nm}</small></div>`}).join("")}</div>`}
 function lastByDay(last,mine){const td=isoDay(new Date()),y=new Date();y.setDate(y.getDate()-1);const ay=isoDay(y),days=[];
   last.forEach(a=>{const d=dayOf(a.at);let g=days[days.length-1];if(!g||g.d!==d)days.push(g={d,as:[]});g.as.push(a)});
@@ -1641,7 +1645,7 @@ function recapSlides(u){const st=seasonStats(u.id),nm=Object.fromEntries(S.users
   const sl=[];
   sl.push({c:"r0",h:`${av(u.id,u.name,"rcav")}<div class="rck">Temporada ${y}</div><h2 class="rch">Tu temporada en resumen</h2><p class="rcp">${esc(u.name)}, antes de que el 1 de enero empecemos todos de cero, esto es lo que has hecho.</p><span class="rctap">Toca para seguir ›</span>`});
   sl.push({c:"r1",h:`<div class="rck">Has encadenado</div><div class="rcbig">${st.n}</div><div class="rcu">${st.n===1?"vía o bloque":"vías y bloques"}</div>
-    <div class="rcsec">${SECTIONS.map(s=>{const x=st.secs.find(z=>z.s.id===s.id);return `<div class="${x.n?"":"z"}">${SICON[s.id]||""}<b>${x.n}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small></div>`}).join("")}</div>
+    <div class="rcsec">${VSEC().map(s=>{const x=st.secs.find(z=>z.s.id===s.id);return `<div class="${x.n?"":"z"}">${SICON[s.id]||""}<b>${x.n}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small></div>`}).join("")}</div>
     <p class="rcp">${st.weeks} ${st.weeks===1?"semana escalando":"semanas escalando"} este año.</p>`});
   if(act.length)sl.push({c:"r2",h:`<div class="rck">Tu techo</div><h2 class="rch">Lo más duro que has hecho</h2><div class="rcl">${act.map(x=>`<div><span>${x.s.name}</span><b>${bestOf(x.as,x.s.id)}</b></div>`).join("")}</div>`});
   const top=st.secs.filter(x=>x.bp).sort((a,b)=>a.bp.pos-b.bp.pos)[0];
@@ -1782,7 +1786,7 @@ function perfil(){
   const now=new Date(),y=now.getFullYear(),cb=Math.floor(now.getMonth()/2);
   const mine=S.asc.filter(a=>a.u===u.id),yr=mine.filter(a=>new Date(a.at).getFullYear()===y);
   const cur=period("bim");
-  const cards=SECTIONS.map(s=>{const as=yr.filter(a=>a.sec===s.id);
+  const cards=VSEC().map(s=>{const as=yr.filter(a=>a.sec===s.id);
     const br=rankRange(s.id,cur.from,cur.to),bi=br.findIndex(x=>x.id===u.id);
     const ar=annual(s.id),ai=ar.findIndex(x=>x.id===u.id);
     return `<div class="pfc"><h3>${s.name}</h3><div class="kv">
@@ -1790,14 +1794,14 @@ function perfil(){
       <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
       <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
-  const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${SECTIONS.map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
+  const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${VSEC().map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
   /* los últimos 10 días con encadenes (enteros: cada día muestra 4 y «Ver más» despliega el resto) */
   const last=(()=>{const so=[...mine].sort((a,b)=>b.at.localeCompare(a.at)),ds=[...new Set(so.map(a=>dayOf(a.at)))].slice(0,10);return so.filter(a=>ds.includes(dayOf(a.at)))})();
   /* Este bimestre frente al anterior (el actual va hasta hoy) */
   const pf=new Date(cur.from.getFullYear(),cur.from.getMonth()-2,1),pb=BIM[Math.floor(pf.getMonth()/2)];
   const stat=(sec,f,t)=>{const r=rankRange(sec,f,t),i=r.findIndex(x=>x.id===u.id),as=mine.filter(a=>a.sec===sec&&new Date(a.at)>=f&&new Date(a.at)<t);return{p:i>=0?r[i].p:0,n:i>=0?r[i].n:0,pos:i>=0?i+1:0,as}};
   const dl=(a,b)=>{const d=a-b;if(!a&&!b)return"";return `<span class="dl ${d===0?"eq":d>0?"up":"dw"}">${d===0?"= igual":(d>0?"▲ +":"▼ ")+fmt(d)}</span>`};
-  const cmp=SECTIONS.map(s=>{const a=stat(s.id,cur.from,cur.to),b=stat(s.id,pf,cur.from);
+  const cmp=VSEC().map(s=>{const a=stat(s.id,cur.from,cur.to),b=stat(s.id,pf,cur.from);
     return `<div class="cmp"><h3>${s.name}</h3><div><span class="big">${fmt(a.p)}</span> <span class="sub">pts</span> ${dl(a.p,b.p)}</div>
      <div class="kv"><span>${isBl(s.id)?"Bloques":"Vías"}</span><b>${a.n} ${dl(a.n,b.n)}</b>
      <span>Puesto</span><b>${ord(a.pos)} ${a.pos&&b.pos?(a.pos===b.pos?`<span class="dl eq">= igual</span>`:`<span class="dl ${a.pos<b.pos?"up":"dw"}">${a.pos<b.pos?"▲ sube "+(b.pos-a.pos):"▼ baja "+(a.pos-b.pos)}</span>`):""}</b>
@@ -1805,7 +1809,7 @@ function perfil(){
      </div><span class="sub">En ${pb}: ${b.n?`${fmt(b.p)} pts, ${b.n} ${isBl(s.id)?(b.n===1?"bloque":"bloques"):(b.n===1?"vía":"vías")}, ${ord(b.pos)}`:"sin encadenes"}</span></div>`}).join("");
   /* Pirámide: vías o bloques distintos encadenados este año, por grado */
   const has=sec=>yr.some(a=>a.sec===sec);
-  if(!S.psec||(!has(S.psec)&&SECTIONS.some(x=>has(x.id))))S.psec=(SECTIONS.find(x=>has(x.id))||SECTIONS[0]).id;
+  if(!S.psec||(!has(S.psec)&&VSEC().some(x=>has(x.id))))S.psec=(VSEC().find(x=>has(x.id))||SECTIONS[0]).id;
   const ps=S.psec,isB=ps==="boulder",isK=ps==="kilter",keys=isB?BKEYS:isK?KGRADES:GRADES,gc=isK?kgc:gcol,cnt={};
   const seen=new Set();yr.filter(a=>a.sec===ps).forEach(a=>{if(seen.has(a.route))return;seen.add(a.route);cnt[a.grade]=(cnt[a.grade]||0)+1});
   const idx=Object.keys(cnt).map(g=>keys.indexOf(g)).filter(i=>i>=0),mx=Math.max(1,...Object.values(cnt));
@@ -1823,22 +1827,27 @@ function perfil(){
   <p class="sub" style="margin:-4px 0 8px">El bimestre en curso cuenta hasta hoy.</p>
   <div class="cmpw">${cmp}</div>
   <h3 class="pfh">Pirámide de ${isB?"bloques":"grados"} ${y}</h3>
-  <div class="ptabs" role="tablist">${SECTIONS.map(s=>`<button role="tab" data-ps="${s.id}" class="${s.id===ps?"on":""}" aria-selected="${s.id===ps}">${s.name}</button>`).join("")}</div>
+  <div class="ptabs" role="tablist">${VSEC().map(s=>`<button role="tab" data-ps="${s.id}" class="${s.id===ps?"on":""}" aria-selected="${s.id===ps}">${s.name}</button>`).join("")}</div>
   <div class="pyr">${pyr}</div>
   <p class="sub" style="margin:6px 0 0">Cada ${isB||isK?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
   <h3 class="pfh">Puestos por bimestre</h3>
-  <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${SECTIONS.map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${VSEC().map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
   ${todayHtml(mine)}
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?lastByDay(last,mine)
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
-  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner||recapTime()?`<button id="rcz">Ver mi resumen de temporada${S.owner&&!recapTime()?" (vista previa)":""}</button>`:""}${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  ${u.id===S.me?`<h3 class="pfh">Secciones que uso</h3><p class="sub" style="margin:-2px 0 8px">Quita las que no uses y dejarán de salirte. Tus encadenes y puntos se guardan igual.</p><div class="hsec">${SECTIONS.map(s=>`<label class="chk"><input type="checkbox" data-hs="${s.id}" ${S.hid?.has(s.id)?"":"checked"}> ${s.name}</label>`).join("")}</div><h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner||recapTime()?`<button id="rcz">Ver mi resumen de temporada${S.owner&&!recapTime()?" (vista previa)":""}</button>`:""}${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
   if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};bindAv();if($("#vsb"))$("#vsb").onclick=()=>{S.vsid=u.id;S.vps=null;S.view="vs";S.scrollTop=true;render()};if($("#rcz"))$("#rcz").onclick=()=>recapOpen();if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  document.querySelectorAll("[data-hs]").forEach(c=>c.onchange=async()=>{const h=new Set(SECTIONS.map(x=>x.id).filter(id=>!document.querySelector(`[data-hs="${id}"]`).checked));
+    if(h.size===SECTIONS.length){c.checked=true;return toast("Deja al menos una sección")}
+    const old=S.hid;S.hid=h;const{error}=await sb.from("liga_prefs").upsert({user_id:S.me,hidden:[...h],updated_at:new Date().toISOString()});
+    if(error){S.hid=old;c.checked=!c.checked;return toast("No se ha podido guardar: "+error.message)}
+    if(h.has(S.lastSec))S.lastSec=null;if(h.has(S.psec))S.psec=null;const y0=scrollY;perfil();scrollTo(0,y0)});
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
@@ -1881,12 +1890,12 @@ window.onSpotifyIframeApiReady=api=>{window.SPAPI=api;if($("#songbox")&&!S.songP
 function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),R=Object.fromEntries(S.routes.map(r=>[r.id,r])),ev=[];
   /* solo encadenes destacados: vías de 6c+ para arriba (6C en Kilter) y bloques de morado para arriba */
   const big=a=>a.sec==="boulder"?BKEYS.indexOf(a.grade)>=BKEYS.indexOf("morado"):a.sec==="kilter"?KGRADES.indexOf(a.grade)>=KGRADES.indexOf("6C"):GRADES.indexOf(a.grade)>=GRADES.indexOf("6c+");
-  S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a))return;
+  S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a)||S.hid?.has(a.sec))return;
     if(a.sec==="kilter")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
     else if(a.sec==="boulder")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${bbg(a.grade)}"></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
     else ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
   try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
-  SECTIONS.forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
+  VSEC().forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
     if(last)ev.push({t:new Date(last.at).getTime()+2,dot:favDot(r[0].id,r[0].name,`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`),h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
   /* duelos: cuando empiezan y cuando se deciden */
   (S.duels||[]).forEach(d=>{if(d.st!=="aceptado"||!nm[d.ch]||!nm[d.rv])return;const k=d.kind==="dia"?"hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre",sw='<span class="fdot" style="background:var(--acc);color:#fff"><b>⚔</b></span>';
@@ -1897,10 +1906,10 @@ function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.us
 const ago=t=>{const m=(Date.now()-t)/6e4;return m<1?"ahora":m<60?`${Math.round(m)} min`:m<1440?`${Math.round(m/60)} h`:m<2880?"ayer":`${Math.round(m/1440)} días`};
 function home(){
   const p=period("bim"),dl=daysLeft(),tot=(p.to-p.from)/864e5,el=Math.min(100,Math.max(0,(Date.now()-p.from)/864e5/tot*100)),u=me(),pend=S.me&&!u&&!S.owner;
-  const cells=SECTIONS.map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),m=moves(s.id),was=m&&i>=0?m[S.me]:null,d=was?was-(i+1):0;
+  const cells=VSEC().map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),m=moves(s.id),was=m&&i>=0?m[S.me]:null,d=was?was-(i+1):0;
     return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}</button>`}).join("");
-  const myTot=SECTIONS.reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=SECTIONS.filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
-  const news=S.routes.filter(r=>r.active&&r.sec!=="kilter"&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
+  const myTot=VSEC().reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=VSEC().filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
+  const news=S.routes.filter(r=>r.active&&r.sec!=="kilter"&&!S.hid?.has(r.sec)&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
   const ev=feedEvents(),N=S.feedAll?20:4,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
   $("#app").innerHTML=`<section class="hero"><div class="hrow"><div class="hwho"><div class="k">${p.label}</div><h1 class="hello">${u?"Hola, "+esc(u.name):"Liga del rocódromo"}</h1></div>
      <div class="hdays" aria-label="Quedan ${dl} días">${String(dl).split("").map(c=>`<span class="dg">${c}</span>`).join("")}<small>${dl===1?"día":"días"}</small></div></div>
@@ -1938,14 +1947,15 @@ function home(){
     const t=e.target;ok=!t.closest("input,select,textarea,.lchips,.chips,[data-noswipe]");const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now()},{passive:true});
   document.addEventListener("touchend",e=>{if(!ok||S.view!=="sec"||S.edit)return;ok=false;const p=e.changedTouches[0],dx=p.clientX-x0,dy=p.clientY-y0;
     if(Date.now()-t0>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*.5)return;
-    const ids=SECTIONS.map(x=>x.id),i=ids.indexOf(S.sec),j=i+(dx<0?1:-1);if(j<0||j>=ids.length)return;
+    const ids=VSEC().map(x=>x.id),i=ids.indexOf(S.sec),j=i+(dx<0?1:-1);if(j<0||j>=ids.length)return;
     S.sec=S.lastSec=ids[j];S.zone=null;S.open=null;S.arm=null;S.swdir=dx<0?"l":"r";section()},{passive:true})})();
 function section(){
+  if(S.hid?.has(S.sec))S.sec=VSEC()[0].id;
   navBar();
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder")||(S.ved&&(S.sec==="cuerda"||S.sec==="autoseguro")));
   if(!canEdit)S.edit=false;
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
-  <div class="secsw" role="tablist" aria-label="Sección">${SECTIONS.map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
+  <div class="secsw" role="tablist" aria-label="Sección">${VSEC().map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
   <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Mapa"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
