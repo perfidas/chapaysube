@@ -2115,7 +2115,7 @@ async function tOcr(){const q=S.tq,url=q.img,cr={...q.crop};S.tq={...q,st:"read"
   catch(e){err=true}
   if(!S.tq||S.tq.img!==url)return;
   if(!rows.length)rows=[{line:"",n:1,hold:"",grade:"",created:""}];
-  S.tq={st:"rows",img:url,crop:cr,rows,also:false,off:new Set(),on:new Set(),err,none:!rows[0].line&&!rows[0].hold};mapView()}
+  S.tq={st:"rows",img:url,crop:cr,rows,off:new Set(),on:new Set(),err,none:!rows[0].line&&!rows[0].hold};mapView()}
 /* Marco para encuadrar la tablilla: se arrastran las esquinas o el marco entero */
 function bindCrop(){const box=$("#tcb"),fr=$("#tfr"),q=S.tq;if(!box||!fr)return;
   const put=()=>{const c=q.crop;Object.assign(fr.style,{left:c.x0*100+"%",top:c.y0*100+"%",width:(c.x1-c.x0)*100+"%",height:(c.y1-c.y0)*100+"%"})};put();
@@ -2129,10 +2129,10 @@ function bindCrop(){const box=$("#tcb"),fr=$("#tfr"),q=S.tq;if(!box||!fr)return;
     q.crop=c;put()};
   box.onpointerup=box.onpointercancel=()=>{drag=null}}
 const tOther=()=>S.sec==="cuerda"?"autoseguro":"cuerda";
-/* Qué cambia en cada línea: la tablilla manda. Vía igual (mismo color) se corrige, la nueva se añade y la que ya no está se desmonta */
-function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&&GRADES.includes(r.grade)),secs=[S.sec].concat(q.also?[tOther()]:[]),items=[],notes=[];
+/* Qué cambia en cada línea, siempre en cuerda y autoseguro (salvo líneas tachadas): la tablilla manda. Vía igual (mismo color) se corrige, la nueva se añade y la que ya no está se desmonta */
+function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&&GRADES.includes(r.grade)),secs=[S.sec,tOther()],items=[],notes=[];
   const lines=[...new Set(ok.map(r=>+r.line))].sort((a,b)=>a-b);
-  for(const sec of secs)for(const ln of lines){if(UNUSED[sec]?.has(ln)){notes.push(`La línea ${ln} está tachada en ${sec}: no se toca.`);continue}
+  for(const sec of secs)for(const ln of lines){if(UNUSED[sec]?.has(ln)){if(sec===S.sec)notes.push(`La línea ${ln} está tachada en ${sec}: no se toca.`);continue}
     const cur=S.routes.filter(r=>r.active&&r.sec===sec&&r.line===ln),used=new Set();
     ok.filter(r=>+r.line===ln).forEach(t=>{const m=cur.find(c=>!used.has(c.id)&&c.hold===t.hold);
       if(m){used.add(m.id);const ch={};if(m.grade!==t.grade)ch.grade=t.grade;if(t.created&&m.created!==t.created)ch.created=t.created;
@@ -2166,7 +2166,7 @@ function tBox(){const q=S.tq;
      <label>Montada<input type="date" data-tf="created" value="${esc(r.created)}" max="${isoDay(new Date())}"></label>
      <button type="button" class="tdel" data-tdel="${i}" aria-label="Quitar esta fila">✕</button></div>`).join("")}
    <button type="button" class="link" id="tadd">+ Añadir otra vía</button>
-   <label class="chk"><input type="checkbox" id="talso" ${q.also?"checked":""}> Aplicar también en ${tOther()} (la misma vía está en las dos)</label>
+   <div class="sub">Se aplica en cuerda y en autoseguro (si la línea existe en autoseguro).</div>
    <div class="tplan" id="tplan">${tPlanHtml()}</div>
    <button id="tx">Cancelar</button></div>`}
 function bindTBox(){const q=S.tq;
@@ -2179,7 +2179,6 @@ function bindTBox(){const q=S.tq;
     el.classList.toggle("bad",f==="line"?!LINES[+q.rows[i].line]:f==="hold"?!HOLDS[el.value]:f==="grade"?!GRADES.includes(el.value):false);plan()}});
   document.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{q.rows.splice(+b.dataset.tdel,1);if(!q.rows.length)q.rows.push({line:"",n:1,hold:"",grade:"",created:""});mapView()});
   $("#tadd").onclick=()=>{const l=q.rows[q.rows.length-1];q.rows.push({line:l?.line||"",n:(l?.n||0)+1,hold:"",grade:"",created:l?.created||""});mapView()};
-  $("#talso").onchange=e=>{q.also=e.target.checked;plan()};
   const bindPlan=()=>{document.querySelectorAll("[data-tk]").forEach(c=>c.onchange=()=>{const k=c.dataset.tk;if(c.dataset.del)c.checked?q.on.add(k):q.on.delete(k);else c.checked?q.off.delete(k):q.off.add(k);plan()});
     $("#tap").onclick=tApply};
   bindPlan()}
