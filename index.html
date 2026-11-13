@@ -401,6 +401,7 @@ p.rnb{margin:-6px 0 14px}
 .hbar{height:6px;border-radius:99px;background:#22303c;overflow:hidden}.hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
 .hsec{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:6px}
 .rkh{display:flex;justify-content:flex-end;margin:4px 0 -4px}.fdet summary{cursor:pointer;font-weight:700;padding:4px 0;list-style:none}.fdet[open] summary{margin-bottom:8px}.pfset{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:10px 14px}.pfset summary{cursor:pointer;font-weight:700}.pst td,.pst th{text-align:center}.pst td b{font-size:1rem}
+.lempty{display:flex;flex-direction:column;gap:4px;margin:8px 2px 0;font-size:.85rem;color:var(--mut)}.lempty b{color:var(--ink);font-weight:600}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -1793,8 +1794,6 @@ function perfil(){
       <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
       <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
-  const stab=VSEC().map(s=>{const as=yr.filter(a=>a.sec===s.id),br=rankRange(s.id,cur.from,cur.to),bi=br.findIndex(x=>x.id===u.id),ar=annual(s.id),ai=ar.findIndex(x=>x.id===u.id);
-    return `<tr><th scope="row">${s.id==="autoseguro"?"Auto":s.name}</th><td>${bi>=0?`${ord(bi+1)}<br><span class="sub">${fmt(br[bi].p)} pts</span>`:"–"}</td><td>${ai>=0?`${ord(ai+1)}<br><span class="sub">${ar[ai].p} pts</span>`:"–"}</td><td>${new Set(as.map(a=>a.route)).size}</td><td><b>${bestOf(as,s.id)}</b></td></tr>`}).join("");
   const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${VSEC().map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
   /* los últimos 10 días con encadenes (enteros: cada día muestra 4 y «Ver más» despliega el resto) */
   const last=(()=>{const so=[...mine].sort((a,b)=>b.at.localeCompare(a.at)),ds=[...new Set(so.map(a=>dayOf(a.at)))].slice(0,10);return so.filter(a=>ds.includes(dayOf(a.at)))})();
@@ -1808,6 +1807,8 @@ function perfil(){
      <span>Puesto</span><b>${ord(a.pos)} ${a.pos&&b.pos?(a.pos===b.pos?`<span class="dl eq">= igual</span>`:`<span class="dl ${a.pos<b.pos?"up":"dw"}">${a.pos<b.pos?"▲ sube "+(b.pos-a.pos):"▼ baja "+(a.pos-b.pos)}</span>`):""}</b>
      <span>${s.id==="boulder"?"Color máx.":"Grado máx."}</span><b>${bestOf(a.as,s.id)}</b>
      </div><span class="sub">En ${pb}: ${b.n?`${fmt(b.p)} pts, ${b.n} ${isBl(s.id)?(b.n===1?"bloque":"bloques"):(b.n===1?"vía":"vías")}, ${ord(b.pos)}`:"sin encadenes"}</span></div>`}).join("");
+  const stab=VSEC().map(s=>{const as=yr.filter(a=>a.sec===s.id),br=rankRange(s.id,cur.from,cur.to),bi=br.findIndex(x=>x.id===u.id),ar=annual(s.id),ai=ar.findIndex(x=>x.id===u.id);
+    return `<tr><th scope="row">${s.id==="autoseguro"?"Auto":s.name}</th><td>${bi>=0?`${ord(bi+1)}<br><span class="sub">${fmt(br[bi].p)} pts</span>`:"–"}${(()=>{const a=stat(s.id,cur.from,cur.to),b=stat(s.id,pf,cur.from);return a.p||b.p?`<br>${dl(a.p,b.p)}`:""})()}</td><td>${ai>=0?`${ord(ai+1)}<br><span class="sub">${ar[ai].p} pts</span>`:"–"}</td><td>${new Set(as.map(a=>a.route)).size}</td><td><b>${bestOf(as,s.id)}</b></td></tr>`}).join("");
   /* Pirámide: vías o bloques distintos encadenados este año, por grado */
   const has=sec=>yr.some(a=>a.sec===sec);
   if(!S.psec||(!has(S.psec)&&VSEC().some(x=>has(x.id))))S.psec=(VSEC().find(x=>has(x.id))||SECTIONS[0]).id;
@@ -1826,9 +1827,7 @@ function perfil(){
   ${last.length?lastByDay(last,mine):`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene.":"Todavía no ha marcado ningún encadene."}</div>`}
   ${u.id===S.me?projHtml()+folListHtml():""}
   <h3 class="pfh">Por sección</h3><div class="tbl"><table class="postab pst"><thead><tr><th scope="col"></th><th scope="col">Bimestre</th><th scope="col">Anual</th><th scope="col">Vías</th><th scope="col">Máx.</th></tr></thead><tbody>${stab}</tbody></table></div>
-  <h3 class="pfh">${BIM[cb]} frente a ${pb}</h3>
-  <p class="sub" style="margin:-4px 0 8px">El bimestre en curso cuenta hasta hoy.</p>
-  <div class="cmpw">${cmp}</div>
+  <p class="sub" style="margin:4px 0 0">Las flechas comparan con ${pb}.</p>
   <h3 class="pfh">Pirámide de ${isB?"bloques":"grados"} ${y}</h3>
   <div class="ptabs" role="tablist">${VSEC().map(s=>`<button role="tab" data-ps="${s.id}" class="${s.id===ps?"on":""}" aria-selected="${s.id===ps}">${s.name}</button>`).join("")}</div>
   <div class="pyr">${pyr}</div>
@@ -1952,12 +1951,11 @@ function section(){
   navBar();
   const s=SECTIONS.find(x=>x.id===S.sec),hasMap=!!ZONES[S.sec]||S.sec==="boulder",canEdit=hasMap&&(S.owner||(S.bed&&S.sec==="boulder")||(S.ved&&(S.sec==="cuerda"||S.sec==="autoseguro")));
   if(!canEdit)S.edit=false;
-  $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
+  $("#app").innerHTML=`${canEdit&&S.tab==="mapa"?`<div class="top" style="justify-content:flex-end"><button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button></div>`:""}
   <div class="secsw" role="tablist" aria-label="Sección">${VSEC().map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
-  <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
+  <h2 class="vh">${s.name}</h2>${S.me?"":`<div class="sub">Modo consulta: entra para marcar tus vías</div>`}
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
-  $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
-  if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
+  if($("#tg"))$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
   document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{if(b.dataset.sw===S.sec)return;S.sec=S.lastSec=b.dataset.sw;S.zone=null;S.open=null;S.edit=false;S.arm=null;section()});
   
   S.tab==="mapa"?(S.sec==="boulder"?boulderView():S.sec==="kilter"?kilterView():mapView()):rankView();
@@ -2354,11 +2352,14 @@ function mapView(){
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}${crowdHtml()}`;bindNews(mapView);return}
   const fl=fOn(FQ())?`<div class="fnote">Con el filtro activo, las vías que no lo cumplen salen atenuadas. <button class="link" id="fback">Volver a los resultados</button></div>`:"";
   let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>${fl}`;
+  const emp=[],nouse=[];
   for(const num of [...z.nums].sort((a,b)=>a-b)){const rs=routesOf(num);
+    if(!S.edit&&!rs.length){(isOff(num)?nouse:emp).push(num);continue}
     if(isOff(num)&&!rs.length){html+=`<section class="lc off" aria-label="Línea ${num}, no se usa"><header><span class="num">${num}</span><b><s>Línea ${num}</s></b><span class="sub">· No se usa</span></header></section>`;continue}
     html+=`<section class="lc" aria-label="Línea ${num}"><header><span class="num">${num}</span><b>Línea ${num}</b><span class="sub">· ${rs.length} ${rs.length===1?"vía":"vías"}</span></header>
     ${rs.map(routeRow).join("")||`<div class="rt"><div class="hint" style="padding:10px">Sin vías montadas.</div></div>`}
     ${S.edit?`<button class="addr" data-add="${num}">Añadir vía a la línea ${num}</button>`:""}</section>`}
+  if(emp.length||nouse.length)html+=`<div class="lempty">${emp.length?`<span>Sin vías: <b>${emp.join(", ")}</b></span>`:""}${nouse.length?`<span>No se usan: <b>${nouse.join(", ")}</b></span>`:""}</div>`;
   $("#zp").innerHTML=html;
   if($("#fback"))$("#fback").onclick=()=>{S.zone=null;S.open=null;mapView()};
   bindRoutes();
