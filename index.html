@@ -2233,7 +2233,7 @@ function boulderView(){
   $("#body").innerHTML=`${finderHtml()}<div class="map">${bSvg()}</div><div class="bleg">${BKEYS.map(k=>`<span><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</span>`).join("")}</div><div id="zp" style="margin-top:12px"></div>`;
   placeBDots();bindFinder(boulderView);
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
-  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro en el plano para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
   $("#zp").innerHTML=`${S.edit?quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
@@ -2349,7 +2349,7 @@ function mapView(){
   if(ZONES[S.sec])bindFinder(mapView);if(S.edit)bindTBox();
   document.querySelectorAll(".zone").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;mapView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!ZONES[S.sec])return;
-  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}${crowdHtml()}`;bindNews(mapView);return}
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared para ver sus vías.</div>${newsBox()}${crowdHtml()}`;bindNews(mapView);return}
   const fl=fOn(FQ())?`<div class="fnote">Con el filtro activo, las vías que no lo cumplen salen atenuadas. <button class="link" id="fback">Volver a los resultados</button></div>`:"";
   let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>${fl}`;
   const emp=[],nouse=[];
