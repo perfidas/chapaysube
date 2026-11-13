@@ -403,6 +403,8 @@ p.rnb{margin:-6px 0 14px}
 .rkh{display:flex;justify-content:flex-end;margin:4px 0 -4px}.fdet summary{cursor:pointer;font-weight:700;padding:4px 0;list-style:none}.fdet[open] summary{margin-bottom:8px}.pfset{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:10px 14px}.pfset summary{cursor:pointer;font-weight:700}.pst td,.pst th{text-align:center}.pst td b{font-size:1rem}
 .lempty{display:flex;flex-direction:column;gap:4px;margin:8px 2px 0;font-size:.85rem;color:var(--mut)}.lempty b{color:var(--ink);font-weight:600}
 button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text-align:left;cursor:pointer}.dch{font-style:normal;display:inline-block;width:1em;opacity:.7}
+.bcell .gx{display:block;font-style:normal;font-size:.62rem;line-height:1.15;color:var(--mut);margin-top:3px;overflow-wrap:anywhere}
+.rld{border-top:1px solid var(--line);padding:4px 0}.rld>summary{cursor:pointer;font:700 1rem var(--disp,inherit);text-transform:uppercase;letter-spacing:.03em;padding:10px 0;list-style:none;display:flex;justify-content:space-between}.rld>summary::after{content:"▸";opacity:.6}.rld[open]>summary::after{content:"▾"}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -1181,7 +1183,7 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
     if(k==="Logros"){S.view="logros";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
-    if(!sec){S.sec=S.lastSec||"autoseguro";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
+    if(!sec){S.sec=S.lastSec&&!S.hid?.has(S.lastSec)?S.lastSec:mainSec();S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
   if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","notas","vs","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,notas:notasView,vs:vsView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
@@ -1323,6 +1325,8 @@ function rules(){
    <li>Si dos escaladores empatan, va delante quien haya sumado más puntos de vías en el año.</li>
   </ul></article>`;
   $("#bk").onclick=()=>{S.view=S.back||"home";S.scrollTop=true;render()};
+  /* cada apartado plegado: se abre al tocar su título */
+  {const ar=document.querySelector("article.rl");if(ar)[...ar.querySelectorAll(":scope>h3")].forEach(h=>{const d=document.createElement("details");d.className="rld";const sm=document.createElement("summary");sm.innerHTML=h.innerHTML;d.appendChild(sm);let n=h.nextSibling;while(n&&!(n.nodeType===1&&n.tagName==="H3")){const nx=n.nextSibling;d.appendChild(n);n=nx}h.replaceWith(d)})}
 }
 
 
@@ -1338,7 +1342,9 @@ function sugFor(sec,need){const c=[];S.routes.forEach(r=>{if(!r.active||r.sec!==
     const p=pts({sec,grade:r.grade,route:r.id,style:isBl(sec)?"Encadenado":"Encadenada"});if(p>=need)c.push([p,r])});
   if(!c.length)return"";c.sort((a,b)=>a[0]-b[0]);const r=c[0][1];
   return sec==="boulder"?`un bloque ${BCOL[r.color][0].toLowerCase()}`:sec==="kilter"?`un ${r.grade} a ${r.angle}°`:`un ${r.grade} encadenado`}
-function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,rows=[];
+/* Sección principal: donde más has encadenado este año (si no, la primera que usas) */
+function mainSec(){const y=new Date().getFullYear(),c={};S.asc.forEach(a=>{if(a.u===S.me&&new Date(a.at).getFullYear()===y&&!S.hid?.has(a.sec))c[a.sec]=(c[a.sec]||0)+1});const t=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];return t?t[0]:VSEC()[0].id}
+function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,rows=[];if(!sprint)return"";
   VSEC().forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i<0)return;
     if(i===0){const nx=r[1];rows.push(`<div class="gl"><b>${s.id==="autoseguro"?"Auto":secName(s.id)}</b><span>${nx?`Vas 1.º: le sacas <b>${fmt(r[0].p-nx.p)} pts</b> a ${esc(nx.name)}.`:"Vas 1.º y nadie más ha puntuado."}</span></div>`);return}
     const a=r[i-1],need=a.p-r[i].p+1,sg=sugFor(s.id,need),bh=r[i+1];
@@ -1798,7 +1804,7 @@ function perfil(){
       <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
       <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
-  const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${VSEC().map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
+  const rows=Array.from({length:cb+1},(_,b)=>b).reverse().filter(b=>b===cb||VSEC().some(s=>rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)).some(x=>x.id===u.id))).map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${VSEC().map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
   /* los últimos 10 días con encadenes (enteros: cada día muestra 4 y «Ver más» despliega el resto) */
   const last=(()=>{const so=[...mine].sort((a,b)=>b.at.localeCompare(a.at)),ds=[...new Set(so.map(a=>dayOf(a.at)))].slice(0,10);return so.filter(a=>ds.includes(dayOf(a.at)))})();
   /* Este bimestre frente al anterior (el actual va hasta hoy) */
@@ -1820,7 +1826,7 @@ function perfil(){
   const seen=new Set();yr.filter(a=>a.sec===ps).forEach(a=>{if(seen.has(a.route))return;seen.add(a.route);cnt[a.grade]=(cnt[a.grade]||0)+1});
   const idx=Object.keys(cnt).map(g=>keys.indexOf(g)).filter(i=>i>=0),mx=Math.max(1,...Object.values(cnt));
   const pyr=idx.length?keys.slice(Math.min(...idx),Math.max(...idx)+1).reverse().map(g=>{const n=cnt[g]||0;
-    return `<div class="pr ${n?"":"z"}"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gc(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gc(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
+    if(!n)return"";return `<div class="pr"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gc(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gc(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}${S.owner&&u.id!==S.me&&avUrl(u.id)?`<button class="link dng avx" id="avx">${S.arm==="avx"?"Pulsa otra vez para quitar su foto":"Quitar su foto"}</button>`:""}
@@ -1911,7 +1917,7 @@ const ago=t=>{const m=(Date.now()-t)/6e4;return m<1?"ahora":m<60?`${Math.round(m
 function home(){
   const p=period("bim"),dl=daysLeft(),tot=(p.to-p.from)/864e5,el=Math.min(100,Math.max(0,(Date.now()-p.from)/864e5/tot*100)),u=me(),pend=S.me&&!u&&!S.owner;
   const cells=VSEC().map(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me),m=moves(s.id),was=m&&i>=0?m[S.me]:null,d=was?was-(i+1):0;
-    return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}</button>`}).join("");
+    return `<button class="bcell ${i===0?"g":""}" data-gr="${s.id}"><b>${i>=0?ord(i+1):"–"}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small>${i<0?`<em class="sub">${r.length?"sin puntos":"nadie aún"}</em>`:d>0?`<em class="up">▲ ${d}</em>`:d<0?`<em class="dw">▼ ${-d}</em>`:`<em class="sub">${fmt(r[i].p)} pts</em>`}${i>0?`<em class="gx">a ${fmt(r[i-1].p-r[i].p+1)} de ${esc(r[i-1].name)}</em>`:i===0&&r[1]?`<em class="gx">+${fmt(r[0].p-r[1].p)} sobre ${esc(r[1].name)}</em>`:""}</button>`}).join("");
   const myTot=VSEC().reduce((t,s)=>t+(ranking(s.id,"bim").find(x=>x.id===S.me)?.p||0),0),lead=VSEC().filter(s=>ranking(s.id,"bim")[0]?.id===S.me&&S.me).map(s=>s.name.toLowerCase());
   const news=S.routes.filter(r=>r.active&&r.sec!=="kilter"&&!S.hid?.has(r.sec)&&isNew(r)).sort((a,b)=>(b.created||"").localeCompare(a.created||"")).slice(0,14);
   const ev=feedEvents(),N=S.feedAll?20:4,dd=c=>c?c.split("-").reverse().slice(0,2).join("."):"";
@@ -2375,7 +2381,7 @@ const STY={"A vista":["s-av",`<svg viewBox="0 0 24 24" aria-hidden="true"><path 
  "Encadenada":["s-en",`<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.2 4.2 0 0 0-6-6l-1.2 1.2"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.2 4.2 0 0 0 6 6l1.2-1.2"/></g></svg>`]};
 function routeRow(r){
   const h=HOLDS[r.hold]||["Sin color","var(--line)"],a=myAsc(r.id),open=S.open===r.id;
-  const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?r.created.split("-").reverse().join("."):"";
+  const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?new Date(r.created+"T12:00").toLocaleDateString("es-ES",{day:"numeric",month:"short"}).replace(".",""):"";
   return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
   <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}${S.proj.has(r.id)?PJS:""}</span><span class="tb-gr">${r.grade}</span></span>
   <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
