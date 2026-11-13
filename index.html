@@ -767,7 +767,7 @@ const ZONES={cuerda:(()=>{
   const build=H4=>{const w4=Math.sqrt(len(10)**2-H4*H4),dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H4),dq,d3,[1,0],[Math.sin(ang),-Math.cos(ang)]];
     let cur=[40,40];const arr=[];
     walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
-      if(i>0)cur=[cur[0]+d[0]*G+(i===4?14:0),cur[1]+d[1]*G];
+      if(i>0){const g=i===4?6:G;cur=[cur[0]+d[0]*g,cur[1]+d[1]*g]}
       const end=[cur[0]+d[0]*len(n),cur[1]+d[1]*len(n)];
       arr.push({id,name,n,pts:[cur,end],side,...(wide?{wide:1}:{})});cur=end});return arr};
   const arr=build(H);
