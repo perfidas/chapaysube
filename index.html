@@ -639,6 +639,56 @@ p.rnb{margin:-6px 0 14px}
 .dfx-t p{margin:6px 0 0;font-size:15px}.dfx-t small{display:block;color:var(--mut);margin-top:4px}
 .dfx-go{margin-top:14px;padding:11px 28px;animation:dfxup .5s ease both 1.4s}@keyframes dfxup{from{opacity:0;transform:translateY(14px)}}
 @media (prefers-reduced-motion:reduce){.dfx,.dfx *{animation:none!important}.dfx-sp,.dfx-fl{display:none}}
+/* Tu temporada en resumen */
+.recapb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:0 0 12px;padding:14px 16px;border:0;border-radius:12px;text-align:left;color:#fff;background:linear-gradient(120deg,#ff3d7f,#7a1340 55%,#0f6c78);font:900 22px/1.05 var(--disp);text-transform:uppercase;letter-spacing:.03em;box-shadow:0 6px 20px rgba(255,61,127,.25)}
+.recapb small{display:block;font:500 13px var(--body);text-transform:none;letter-spacing:0;opacity:.9;margin-top:3px}
+.rcv{position:fixed;inset:0;z-index:85;background:#05090d;color:#fff;display:flex;flex-direction:column;outline:none;user-select:none;-webkit-user-select:none}
+.rcbar{display:flex;gap:4px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0}.rcbar i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;position:relative}
+.rcbar i.done{background:#fff}.rcbar i.on::after{content:"";position:absolute;inset:0;background:#fff;transform-origin:left;animation:rcfill 6s linear forwards}
+@keyframes rcfill{from{transform:scaleX(0)}}
+.rcx{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));right:10px;min-height:0;width:40px;height:40px;padding:0;border:0;background:transparent;color:#fff;font-size:20px;z-index:2}
+.rcs{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 22px calc(28px + env(safe-area-inset-bottom,0px));text-align:center;animation:rcin .5s ease both}
+@keyframes rcin{from{opacity:0;transform:translateY(18px)}}
+.r0,.r7{background:radial-gradient(circle at 50% 30%,rgba(255,61,127,.35),transparent 60%)}.r1{background:radial-gradient(circle at 50% 40%,rgba(47,224,230,.28),transparent 60%)}
+.r2{background:radial-gradient(circle at 50% 40%,rgba(63,210,139,.28),transparent 60%)}.r3{background:radial-gradient(circle at 50% 40%,rgba(255,197,61,.3),transparent 60%)}
+.r4{background:radial-gradient(circle at 50% 40%,rgba(167,139,250,.32),transparent 60%)}.r5{background:radial-gradient(circle at 50% 40%,rgba(255,61,127,.3),transparent 60%)}.r6{background:radial-gradient(circle at 50% 40%,rgba(255,197,61,.28),transparent 60%)}
+.rck{font:700 12px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.rch{margin:0;font:900 40px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;text-wrap:balance}
+.rcbig{font:900 120px/.9 var(--disp);animation:rcpop .6s cubic-bezier(.3,1.6,.5,1) both .15s}.rcof{font-size:56px;opacity:.6}
+@keyframes rcpop{from{transform:scale(.4);opacity:0}}
+.rcu{font:700 18px var(--body);color:#dfe7ee}.rcp{margin:4px 0 0;max-width:30ch;color:#dfe7ee;font-size:16px}.rcg{color:var(--gold)}
+.rctap{margin-top:18px;color:var(--mut);font-size:13px}
+.av.rcav{width:120px;height:120px;font-size:52px;border:4px solid var(--acc);box-shadow:0 0 34px rgba(255,61,127,.5)}.av.rcav2{width:64px;height:64px;font-size:28px;border-color:var(--cyan,#2fe0e6)}
+.rcsec{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:360px;margin-top:10px}
+.rcsec>div{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.06);border-radius:12px;padding:10px 4px;color:var(--g1)}.rcsec .z{opacity:.4;color:#dfe7ee}
+.rcsec .sic{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.rcsec b{font:900 28px/1 var(--disp);color:#fff}.rcsec small{font-size:11px;color:#dfe7ee;text-transform:uppercase;letter-spacing:.06em}
+.rcl{display:flex;flex-direction:column;gap:8px;width:100%;max-width:330px;margin-top:8px}.rcl>div{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px}
+.rcl span{color:#dfe7ee}.rcl b{font:900 30px/1 var(--disp);display:inline-flex;align-items:center;gap:6px}
+.rcriv{display:flex;align-items:center;gap:12px;margin-top:12px;text-align:left}
+.rcmed{display:flex;gap:14px;justify-content:center;margin-top:12px}.rcmed>div{display:flex;flex-direction:column;align-items:center;gap:4px;width:92px}.rcmed small{font-size:12px;color:#dfe7ee}.rcm{width:70px;height:80px}
+.rcsum{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-top:6px}.rcsum>div{background:rgba(255,255,255,.07);border-radius:10px;padding:10px}
+.rcsum b{display:block;font:900 36px/1 var(--disp)}.rcsum small{color:#dfe7ee;font-size:12px}
+.rcbtn{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;margin-top:10px}.rcbtn button{min-height:46px}
+@media (prefers-reduced-motion:reduce){.rcs,.rcbig{animation:none}.rcbar i.on::after{animation:none;transform:scaleX(1)}}
+/* Cara a cara */
+.vsbtn{display:block;width:100%;margin:0 0 12px}
+.vsh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(255,61,127,.18),transparent 45%,transparent 55%,rgba(47,224,230,.18));border:1px solid var(--line);border-radius:14px;padding:14px 10px}
+.vsh>div{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}.vsh b{font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.03em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vsh small{color:var(--mut);font-size:12px}
+.av.vsa{width:72px;height:72px;font-size:32px;border:3px solid var(--acc)}.av.vsb2{border-color:var(--cyan,#2fe0e6)}
+.vsx{font:900 36px/1 var(--disp);color:#fff;text-shadow:2px 2px 0 var(--acc)}
+.vsres{text-align:center;font:900 22px/1.1 var(--disp);text-transform:uppercase;letter-spacing:.03em;color:var(--gold);margin:12px 0}
+.vst{display:flex;flex-direction:column;gap:6px}
+.vsr{display:grid;grid-template-columns:64px 1fr 64px;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.vsv{font:700 20px/1 var(--disp);color:var(--mut);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vsr .vsv:last-child{text-align:right}.vsv.win{color:#fff}
+.vsr .vsv.win:first-child{color:var(--acc)}.vsr .vsv.win:last-child{color:var(--cyan,#2fe0e6)}
+.vsl{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12.5px;color:var(--mut);text-align:center}
+.vsb{display:flex;justify-content:center;width:100%;height:6px;background:#131d26;border-radius:3px;overflow:hidden}.vsb i{display:block;height:100%}.vsb .ba{background:var(--acc);margin-left:auto}.vsb .bb{background:var(--cyan,#2fe0e6);margin-right:auto}
+.vsb{position:relative}.vsb .ba{position:absolute;right:50%;top:0}.vsb .bb{position:absolute;left:50%;top:0}
+.vpyr{display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.vph{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:2px}.vph span:first-child{color:var(--acc)}.vph span:last-child{color:var(--cyan,#2fe0e6)}
+.vpr{display:grid;grid-template-columns:22px 1fr 44px 1fr 22px;align-items:center;gap:6px}.vpr b{text-align:center;font:700 14px var(--disp);display:flex;justify-content:center}
+.vpt{height:12px;background:#131d26;border-radius:3px;overflow:hidden;display:flex}.vpt i{display:block;height:100%;background:var(--cyan,#2fe0e6);border-radius:3px}.vpt.l{justify-content:flex-end}.vpt.l i{background:var(--acc)}
+.vpn{font:700 13px var(--disp);color:var(--mut);text-align:center}
 </style>
 
 </head>
@@ -1113,7 +1163,7 @@ const NAVI={Inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1
 function navBar(){const hide=["login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view);document.body.classList.toggle("hasnav",!hide);
   let n=$("#bnav");if(hide){if(n)n.hidden=true;return}
   if(!n){n=document.createElement("nav");n.id="bnav";n.className="bnav";n.setAttribute("aria-label","Navegación");document.body.appendChild(n)}n.hidden=false;
-  const sec=!["home","rules","perfil","approvals","logros","buzon","notas"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
+  const sec=!["home","rules","perfil","approvals","logros","buzon","notas","vs"].includes(S.view),cur=S.view==="home"?"Inicio":S.view==="logros"?"Logros":S.view==="perfil"&&S.pid===S.me?"Perfil":sec?(S.tab==="ranking"?"Ranking":"Zona"):"";
   n.innerHTML=`<div>${Object.keys(NAVI).map(k=>`<button data-nav="${k}" class="${k===cur?"on":""}" ${k===cur?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[k]}</svg>${k}</button>`).join("")}</div>`;
   n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;S.arm=null;S.scrollTop=true;
     if(k==="Inicio"){S.view="home";S.edit=false;return render()}
@@ -1121,7 +1171,7 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec||"autoseguro";S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
 function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
-  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","notas","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,notas:notasView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
+  if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","notas","vs","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,notas:notasView,vs:vsView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
 const _render=render;render=function(){_render();if(!["loading","error","setup","login","name","forgot","newpw"].includes(S.view))setTimeout(checkUnlocks,350)};
 function loadingView(){if(!S.splash){$("#app").innerHTML=`<div class="hint" style="padding-top:40vh">Cargando la liga…</div>`;return}if($("#app .boot"))return;$("#app").innerHTML=`<div class="boot" role="status"><svg viewBox="0 0 256 330" aria-label="Cargando la liga">
@@ -1565,6 +1615,108 @@ function duelFx(d,forCh){const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name
   document.body.appendChild(o);const close=()=>o.remove();o.querySelector("#dfxgo").onclick=close;o.onclick=e=>{if(e.target===o)close()};o.onkeydown=e=>{if(e.key==="Escape")close()};
   setTimeout(()=>o.querySelector("#dfxgo")?.focus(),1500)}
 
+/* ---------- Tu temporada en resumen: del 20 de diciembre al cierre del año (el 1 de enero se borra todo) ---------- */
+const recapTime=()=>{const n=new Date();return n.getMonth()===11&&n.getDate()>=20};
+const dayKey2=t=>{const d=new Date(t);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+function seasonStats(uid,y=new Date().getFullYear()){
+  const as=S.asc.filter(a=>a.u===uid&&new Date(a.at).getFullYear()===y);
+  const secs=SECTIONS.map(s=>{const L=as.filter(a=>a.sec===s.id),r=annual(s.id,y),i=r.findIndex(x=>x.id===uid),h=i>=0?r[i].hist:[];
+    const bp=h.length?h.reduce((m,x)=>x.pos<m.pos?x:m,h[0]):null;
+    return{s,as:L,n:new Set(L.map(a=>a.route)).size,p:L.reduce((t,a)=>t+pts(a),0),lp:i>=0?i+1:0,bp}});
+  const days={};as.forEach(a=>{const k=dayKey2(a.at),o=days[k]||(days[k]={k,n:0,p:0});o.n++;o.p+=pts(a)});
+  const bd=Object.values(days).sort((a,b)=>b.p-a.p)[0]||null,weeks=new Set(as.map(a=>weekOf(new Date(a.at)).from.getTime())).size;
+  const du=(S.duels||[]).filter(d=>(d.ch===uid||d.rv===uid)&&d.st==="aceptado"&&duelOver(d)&&new Date(d.end).getFullYear()===y);
+  const riv={};du.forEach(d=>{const o=d.ch===uid?d.rv:d.ch;riv[o]=(riv[o]||0)+1});const rv=Object.entries(riv).sort((a,b)=>b[1]-a[1])[0];
+  let lg=[];try{const o=computeLogros(y)[uid]||{};lg=LCAT.filter(c=>o[c.id]?.ok).sort((a,b)=>LORDER.indexOf(b.t)-LORDER.indexOf(a.t))}catch(e){}
+  return{y,as,secs,n:new Set(as.map(a=>a.route)).size,p:as.reduce((t,a)=>t+pts(a),0),bd,weeks,du,won:du.filter(d=>duelWinner(d)===uid).length,rv,lg}}
+function recapSlides(u){const st=seasonStats(u.id),nm=Object.fromEntries(S.users.map(x=>[x.id,x.name])),y=st.y,act=st.secs.filter(x=>x.n);
+  const sl=[];
+  sl.push({c:"r0",h:`${av(u.id,u.name,"rcav")}<div class="rck">Temporada ${y}</div><h2 class="rch">Tu temporada en resumen</h2><p class="rcp">${esc(u.name)}, antes de que el 1 de enero empecemos todos de cero, esto es lo que has hecho.</p><span class="rctap">Toca para seguir ›</span>`});
+  sl.push({c:"r1",h:`<div class="rck">Has encadenado</div><div class="rcbig">${st.n}</div><div class="rcu">${st.n===1?"vía o bloque":"vías y bloques"}</div>
+    <div class="rcsec">${SECTIONS.map(s=>{const x=st.secs.find(z=>z.s.id===s.id);return `<div class="${x.n?"":"z"}">${SICON[s.id]||""}<b>${x.n}</b><small>${s.id==="autoseguro"?"Auto":s.name}</small></div>`}).join("")}</div>
+    <p class="rcp">${st.weeks} ${st.weeks===1?"semana escalando":"semanas escalando"} este año.</p>`});
+  if(act.length)sl.push({c:"r2",h:`<div class="rck">Tu techo</div><h2 class="rch">Lo más duro que has hecho</h2><div class="rcl">${act.map(x=>`<div><span>${x.s.name}</span><b>${bestOf(x.as,x.s.id)}</b></div>`).join("")}</div>`});
+  const top=st.secs.filter(x=>x.bp).sort((a,b)=>a.bp.pos-b.bp.pos)[0];
+  sl.push({c:"r3",h:`<div class="rck">En la liga</div><div class="rcbig">${fmt(st.p)}</div><div class="rcu">puntos sumados</div>
+    ${top?`<p class="rcp">Tu mejor puesto: <b class="rcg">${top.bp.pos}.º en ${top.s.name.toLowerCase()}</b> en ${BIM[top.bp.b]}.</p>`:`<p class="rcp">Este año no has entrado en el top 10 de ningún bimestre. ¡En ${y+1} a por ello!</p>`}
+    <div class="rcl">${act.filter(x=>x.lp).map(x=>`<div><span>${x.s.name} · temporada</span><b>${x.lp}.º</b></div>`).join("")}</div>`});
+  if(st.bd)sl.push({c:"r4",h:`<div class="rck">Tu mejor día</div><h2 class="rch">${new Date(st.bd.k+"T12:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})}</h2>
+    <div class="rcbig">${st.bd.n}</div><div class="rcu">${st.bd.n===1?"encadene":"encadenes"} · ${fmt(st.bd.p)} puntos</div>`});
+  sl.push({c:"r5",h:`<div class="rck">Duelos</div>${st.du.length?`<div class="rcbig">${st.won}<span class="rcof">/${st.du.length}</span></div><div class="rcu">${st.won===1?"duelo ganado":"duelos ganados"}</div>
+    ${st.rv?`<div class="rcriv">${av(st.rv[0],nm[st.rv[0]],"rcav2")}<p class="rcp">Tu gran rival: <b>${esc(nm[st.rv[0]]||"")}</b><br>${st.rv[1]} ${st.rv[1]===1?"duelo":"duelos"} entre vosotros</p></div>`:""}`
+    :`<h2 class="rch">Sin duelos este año</h2><p class="rcp">En ${y+1}, reta a alguien desde su perfil.</p>`}`});
+  sl.push({c:"r6",h:`<div class="rck">Logros</div><div class="rcbig">${st.lg.length}</div><div class="rcu">${st.lg.length===1?"logro conseguido":"logros conseguidos"}</div>
+    ${st.lg.length?`<div class="rcmed">${st.lg.filter((c,i,L)=>L.findIndex(z=>z.n===c.n)===i).slice(0,3).map(c=>`<div>${medal(c.p,c.t,"rcm")}<small>${esc(c.n)}</small></div>`).join("")}</div>`:""}`});
+  sl.push({c:"r7",fin:1,h:`<div class="rck">Temporada ${y}</div>${av(u.id,u.name,"rcav")}<h2 class="rch">${esc(u.name)}</h2>
+    <div class="rcsum"><div><b>${st.n}</b><small>vías y bloques</small></div><div><b>${fmt(st.p)}</b><small>puntos</small></div><div><b>${top?top.bp.pos+".º":"–"}</b><small>mejor puesto</small></div><div><b>${st.lg.length}</b><small>logros</small></div></div>
+    <p class="rcp">El 1 de enero empezamos todos de cero. ¡Nos vemos en la pared!</p>
+    <div class="rcbtn"><button class="pri" id="rcsh">Compartir mi resumen</button><button id="rcx2">Cerrar</button></div>`});
+  return{sl,st}}
+function recapOpen(u=me()){if(!u||$("#rcv"))return;const{sl,st}=recapSlides(u);let i=0,tm=null;
+  const o=document.createElement("div");o.id="rcv";o.className="rcv";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Tu temporada en resumen");
+  const draw=()=>{clearTimeout(tm);o.innerHTML=`<div class="rcbar">${sl.map((_,k)=>`<i class="${k<i?"done":k===i?"on":""}"></i>`).join("")}</div>
+    <button class="rcx" id="rcx" aria-label="Cerrar">✕</button><div class="rcs ${sl[i].c}" aria-live="polite">${sl[i].h}</div>`;
+    o.querySelector("#rcx").onclick=close;const x2=o.querySelector("#rcx2");if(x2)x2.onclick=close;const shb=o.querySelector("#rcsh");if(shb)shb.onclick=e=>{e.stopPropagation();recapShare(u,st)};
+    if(!sl[i].fin)tm=setTimeout(()=>{i++;draw()},6000)};
+  const close=()=>{clearTimeout(tm);o.remove()};
+  o.onclick=e=>{if(e.target.closest("button"))return;const r=o.getBoundingClientRect();if(e.clientX<r.width*.3){if(i>0){i--;draw()}}else if(i<sl.length-1){i++;draw()}};
+  o.onkeydown=e=>{if(e.key==="Escape")close();if(e.key==="ArrowRight"&&i<sl.length-1){i++;draw()}if(e.key==="ArrowLeft"&&i>0){i--;draw()}};
+  o.tabIndex=-1;document.body.appendChild(o);draw();o.focus()}
+/* La imagen para compartir: 1080×1350 dibujada en el móvil */
+async function recapShare(u,st){const c=document.createElement("canvas");c.width=1080;c.height=1350;const x=c.getContext("2d");
+  try{await document.fonts?.ready}catch(e){}
+  const g=x.createLinearGradient(0,0,1080,1350);g.addColorStop(0,"#3a0f24");g.addColorStop(.55,"#0f1720");g.addColorStop(1,"#0b3a40");x.fillStyle=g;x.fillRect(0,0,1080,1350);
+  const D='"Big Shoulders Display", Impact, sans-serif',B='Rubik, system-ui, sans-serif';
+  x.textAlign="center";x.fillStyle="#ffc53d";x.font=`700 34px ${B}`;x.fillText(`CHAPA Y SUBE · TEMPORADA ${st.y}`,540,120);
+  const url=avUrl(u.id);let drew=false;
+  if(url){try{const im=await new Promise((ok,ko)=>{const i=new Image();i.crossOrigin="anonymous";i.onload=()=>ok(i);i.onerror=ko;i.src=url});x.save();x.beginPath();x.arc(540,300,130,0,7);x.clip();x.drawImage(im,410,170,260,260);x.restore();drew=true}catch(e){}}
+  if(!drew){x.fillStyle="#22303c";x.beginPath();x.arc(540,300,130,0,7);x.fill();x.fillStyle="#ff3d7f";x.font=`900 140px ${D}`;x.fillText(([...u.name][0]||"?").toUpperCase(),540,350)}
+  x.strokeStyle="#ff3d7f";x.lineWidth=10;x.beginPath();x.arc(540,300,135,0,7);x.stroke();
+  x.fillStyle="#fff";x.font=`900 110px ${D}`;x.fillText(u.name.toUpperCase(),540,560);
+  const top=st.secs.filter(s=>s.bp).sort((a,b)=>a.bp.pos-b.bp.pos)[0];
+  const cells=[[st.n,"vías y bloques"],[fmt(st.p),"puntos"],[top?top.bp.pos+".º":"–",top?"mejor puesto · "+top.s.name.toLowerCase():"mejor puesto"],[st.lg.length,"logros"]];
+  cells.forEach(([v,l],k)=>{const cx=k%2?780:300,cy=k<2?760:1010;x.fillStyle="rgba(255,255,255,.06)";x.fillRect(cx-220,cy-140,440,210);
+    x.fillStyle=k===2?"#ffc53d":"#fff";x.font=`900 120px ${D}`;x.fillText(String(v),cx,cy+10);x.fillStyle="#8ea0ad";x.font=`500 32px ${B}`;x.fillText(l,cx,cy+55)});
+  x.fillStyle="#eef3f6";x.font=`500 36px ${B}`;x.fillText("El 1 de enero, todos de cero. ¡Nos vemos en la pared!",540,1250);
+  let blob;try{blob=await new Promise(r=>c.toBlob(r,"image/png"))}catch(e){}
+  if(!blob)return toast("No se ha podido crear la imagen.");
+  const f=new File([blob],`temporada-${st.y}.png`,{type:"image/png"});
+  try{if(navigator.canShare?.({files:[f]})){await navigator.share({files:[f],title:`Mi temporada ${st.y}`});return}}catch(e){if(e.name==="AbortError")return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("Imagen guardada.")}
+
+/* ---------- Cara a cara: tú frente a otro escalador ---------- */
+function vsView(){const a=me(),b=S.users.find(x=>x.id===S.vsid);if(!a||!b){S.view="home";return render()}
+  const y=new Date().getFullYear(),cur=period("bim"),A=seasonStats(a.id,y),Bs=seasonStats(b.id,y);
+  const bim=id=>SECTIONS.map(s=>{const r=rankRange(s.id,cur.from,cur.to),i=r.findIndex(x=>x.id===id);return{s,p:i>=0?r[i].p:0,pos:i>=0?i+1:0}});
+  const ba=bim(a.id),bb=bim(b.id),sum=L=>L.reduce((t,x)=>t+x.p,0);
+  const gi=(as,sec)=>{const K=sec==="boulder"?BKEYS:sec==="kilter"?KGRADES:GRADES;return as.length?Math.max(...as.map(x=>K.indexOf(x.grade))):-1};
+  const vias=st=>st.secs.filter(x=>x.s.id==="cuerda"||x.s.id==="autoseguro").flatMap(x=>x.as);
+  const h2h=(S.duels||[]).filter(d=>d.st==="aceptado"&&duelOver(d)&&((d.ch===a.id&&d.rv===b.id)||(d.ch===b.id&&d.rv===a.id)));
+  const wa=h2h.filter(d=>duelWinner(d)===a.id).length,wb=h2h.filter(d=>duelWinner(d)===b.id).length;
+  const rows=[["Puntos este bimestre",sum(ba),sum(bb),fmt],...SECTIONS.map((s,k)=>[`${s.name} · bimestre`,ba[k].p,bb[k].p,fmt]),
+    ["Vías y bloques "+y,A.n,Bs.n],["Puntos "+y,A.p,Bs.p,fmt],
+    ["Grado máx. en vía",gi(vias(A),"x"),gi(vias(Bs),"x"),v=>v<0?"–":GRADES[v]],
+    ["Color máx. en boulder",gi(A.secs[2].as,"boulder"),gi(Bs.secs[2].as,"boulder"),v=>v<0?"–":BCOL[BKEYS[v]][0]],
+    ["Grado máx. en Kilter",gi(A.secs[3].as,"kilter"),gi(Bs.secs[3].as,"kilter"),v=>v<0?"–":KGRADES[v]],
+    ["Semanas escalando",A.weeks,Bs.weeks],["Logros "+y,A.lg.length,Bs.lg.length],["Duelos entre vosotros",wa,wb]];
+  let wA=0,wB=0;
+  const rh=rows.map(([l,va,vb,f=String])=>{const t=Math.max(va,vb,0),pa=t>0?Math.max(0,va)/t*100:0,pb=t>0?Math.max(0,vb)/t*100:0,w=va>vb?"a":vb>va?"b":"";if(w==="a")wA++;if(w==="b")wB++;
+    return `<div class="vsr"><span class="vsv ${w==="a"?"win":""}">${f(va)}</span><span class="vsl">${l}<span class="vsb"><i class="ba" style="width:${pa/2}%"></i><i class="bb" style="width:${pb/2}%"></i></span></span><span class="vsv ${w==="b"?"win":""}">${f(vb)}</span></div>`}).join("");
+  const ps=S.vps||"autoseguro",K=ps==="boulder"?BKEYS:ps==="kilter"?KGRADES:GRADES,cnt=st=>{const c={},seen=new Set();st.secs.find(x=>x.s.id===ps).as.forEach(x=>{if(seen.has(x.route))return;seen.add(x.route);c[x.grade]=(c[x.grade]||0)+1});return c};
+  const ca=cnt(A),cb=cnt(Bs),idx=[...Object.keys(ca),...Object.keys(cb)].map(g=>K.indexOf(g)).filter(i=>i>=0),mx=Math.max(1,...Object.values(ca),...Object.values(cb));
+  const lab=g=>ps==="boulder"?`<i class="pip" style="background:${bbg(g)}"></i>`:`<span style="color:${ps==="kilter"?kgc(g):gcol(g)}">${g}</span>`;
+  const pyr=idx.length?K.slice(Math.min(...idx),Math.max(...idx)+1).reverse().map(g=>`<div class="vpr"><span class="vpn">${ca[g]||""}</span><span class="vpt l"><i style="width:${(ca[g]||0)/mx*100}%"></i></span><b>${lab(g)}</b><span class="vpt"><i style="width:${(cb[g]||0)/mx*100}%"></i></span><span class="vpn">${cb[g]||""}</span></div>`).join(""):`<div class="empty" style="padding:8px">Ninguno de los dos tiene encadenes en esta sección este año.</div>`;
+  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
+   <section class="vsh"><div>${av(a.id,a.name,"vsa")}<b>${esc(a.name)}</b><small>Tú</small></div><span class="vsx">VS</span><div>${av(b.id,b.name,"vsa vsb2")}<b>${esc(b.name)}</b><small>&nbsp;</small></div></section>
+   <p class="vsres">${wA===wB?`Vais empatados: ${wA} a ${wB}`:wA>wB?`Le ganas en ${wA} de ${rows.length}`:`Te gana en ${wB} de ${rows.length}`}</p>
+   <div class="vst">${rh}</div>
+   <h3 class="pfh">Pirámide ${y}</h3>
+   <div class="ptabs" role="tablist">${SECTIONS.map(s=>`<button role="tab" data-vps="${s.id}" class="${s.id===ps?"on":""}" aria-selected="${s.id===ps}">${s.name}</button>`).join("")}</div>
+   <div class="vpyr"><div class="vph"><span>${esc(a.name)}</span><span>${esc(b.name)}</span></div>${pyr}</div>
+   ${duelForm(b)?"":`<p class="sub" style="margin-top:12px">Puedes retarle a un duelo desde su perfil.</p>`}`;
+  $("#bk").onclick=()=>{S.view="perfil";S.pid=b.id;S.scrollTop=true;render()};
+  document.querySelectorAll("[data-vps]").forEach(t=>t.onclick=()=>{S.vps=t.dataset.vps;const y0=scrollY;vsView();scrollTo(0,y0)})}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1654,7 +1806,7 @@ function perfil(){
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   ${cromo(u,y,cur)}${S.owner&&u.id!==S.me&&avUrl(u.id)?`<button class="link dng avx" id="avx">${S.arm==="avx"?"Pulsa otra vez para quitar su foto":"Quitar su foto"}</button>`:""}
-  ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${duelForm(u)}
+  ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${S.me&&u.id!==S.me&&me()?`<button class="vsbtn" id="vsb">Compararme con ${esc(u.name)}</button>`:""}${duelForm(u)}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml()+folListHtml():""}
@@ -1672,13 +1824,13 @@ function perfil(){
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?lastByDay(last,mine)
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
-  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  ${u.id===S.me?`<h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner||recapTime()?`<button id="rcz">Ver mi resumen de temporada${S.owner&&!recapTime()?" (vista previa)":""}</button>`:""}${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
-  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};bindAv();if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};bindAv();if($("#vsb"))$("#vsb").onclick=()=>{S.vsid=u.id;S.vps=null;S.view="vs";S.scrollTop=true;render()};if($("#rcz"))$("#rcz").onclick=()=>recapOpen();if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
@@ -1748,6 +1900,7 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
+  ${recapTime()&&me()&&S.asc.some(a=>a.u===S.me)?`<button class="recapb" id="rcb"><span>Tu temporada ${new Date().getFullYear()}<small>Mira tu resumen antes de que todo empiece de cero</small></span><span aria-hidden="true">›</span></button>`:""}
   ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Reportar fallos y sugerencias</span></button></div><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
   ${S.owner&&fbNew()?`<button class="pendb" id="fbv">${fbNew()} ${fbNew()===1?"mensaje nuevo":"mensajes nuevos"} en el buzón ›</button>`:""}
@@ -1761,7 +1914,7 @@ function home(){
   ${crowdHtml()}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
-  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();dfxCheck();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
+  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();dfxCheck();if($("#rcb"))$("#rcb").onclick=()=>recapOpen();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
   if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
