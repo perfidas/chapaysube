@@ -619,6 +619,26 @@ p.rnb{margin:-6px 0 14px}
 .avcw{display:grid;place-items:center}.avcw canvas{width:min(260px,70vw);height:auto;aspect-ratio:1;border-radius:50%;touch-action:none;cursor:grab;border:2px solid var(--line)}
 .avpick{display:block;text-align:center;padding:11px;border-radius:8px;cursor:pointer;background:var(--acc);color:#fff;font-weight:600}
 .avx{display:block;margin:-6px 0 10px}
+
+/* Animación de duelo aceptado */
+.dfx{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;background:radial-gradient(circle at 50% 42%,rgba(255,61,127,.28),transparent 60%),rgba(5,9,13,.97);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:dfxin .3s ease both,dfxsh .35s linear .7s}
+@keyframes dfxin{from{opacity:0}}@keyframes dfxsh{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.dfx-ring{position:relative;width:min(390px,100%);height:190px}
+.dfx-p{position:absolute;top:30px;display:flex;flex-direction:column;align-items:center;gap:6px;width:46%;min-width:0}
+.dfx-p b{font:900 22px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av.dfa{width:104px;height:104px;font-size:44px;border-width:4px}
+.dfx-l{left:0;animation:dfxl .55s cubic-bezier(.5,0,.3,1.4) both .15s}.dfx-l .av{border-color:var(--acc);box-shadow:0 0 30px rgba(255,61,127,.6)}
+.dfx-r{right:0;animation:dfxr .55s cubic-bezier(.5,0,.3,1.4) both .15s}.dfx-r .av{border-color:var(--cyan,#2fe0e6);box-shadow:0 0 30px rgba(47,224,230,.6)}
+@keyframes dfxl{from{transform:translateX(-260px) rotate(-20deg)}}@keyframes dfxr{from{transform:translateX(260px) rotate(20deg)}}
+.dfx-vs{position:absolute;left:50%;top:62px;transform:translateX(-50%);font:900 58px/1 var(--disp);color:#fff;text-shadow:0 0 18px var(--acc),3px 3px 0 var(--acc);animation:dfxvs .45s cubic-bezier(.3,1.8,.5,1) both .65s;z-index:2}
+@keyframes dfxvs{from{transform:translateX(-50%) scale(4);opacity:0}}
+.dfx-fl{position:absolute;inset:-40px;background:#fff;opacity:0;pointer-events:none;animation:dfxfl .5s ease .7s;border-radius:50%}@keyframes dfxfl{0%{opacity:.7}100%{opacity:0}}
+.dfx-sp{position:absolute;left:50%;top:92px;width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0;animation:dfxsp .7s ease-out forwards .7s}
+@keyframes dfxsp{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(var(--x),var(--y))}}
+.dfx-t{text-align:center;animation:dfxup .5s ease both 1.05s}.dfx-t h2{margin:0;font:900 34px/1 var(--disp);text-transform:uppercase;letter-spacing:.04em;color:var(--gold)}
+.dfx-t p{margin:6px 0 0;font-size:15px}.dfx-t small{display:block;color:var(--mut);margin-top:4px}
+.dfx-go{margin-top:14px;padding:11px 28px;animation:dfxup .5s ease both 1.4s}@keyframes dfxup{from{opacity:0;transform:translateY(14px)}}
+@media (prefers-reduced-motion:reduce){.dfx,.dfx *{animation:none!important}.dfx-sp,.dfx-fl{display:none}}
 </style>
 
 </head>
@@ -1301,7 +1321,8 @@ function duelsHtml(){if(!S.me||!me())return"";const nm=Object.fromEntries(S.user
    ${act.map(card).join("")}${fin.map(card).join("")}
    ${out.map(d=>`<div class="duel out"><div>Has retado a <b>${esc(nm[d.rv])}</b> en ${secLow(d.sec)}, ${kd(d)}. Esperando respuesta.</div><button class="link" data-dno="${d.id}">Retirar el reto</button></div>`).join("")}</section>`}
 async function duelAnswer(id,ok){if(S.busy)return;S.busy=true;const{data,error}=await sb.rpc("liga_duel_answer",{p_id:id,p_ok:ok});S.busy=false;
-  if(error)return toast("No se ha podido: "+error.message);applyRows(data);toast(ok?"¡Duelo aceptado! Ya cuentan los puntos.":"Hecho.");render()}
+  if(error)return toast("No se ha podido: "+error.message);applyRows(data);render();
+  if(ok){const d=(S.duels||[]).find(x=>x.id===id);if(d){dfxSeen(d.id);duelFx(d,false)}else toast("¡Duelo aceptado! Ya cuentan los puntos.")}else toast("Hecho.")}
 function bindDuels(){document.querySelectorAll("[data-dok]").forEach(b=>b.onclick=()=>duelAnswer(b.dataset.dok,true));document.querySelectorAll("[data-dno]").forEach(b=>b.onclick=()=>duelAnswer(b.dataset.dno,false))}
 function duelForm(u){const st=duelStats(u.id),f=S.dform;
   const rec=st.w+st.l+st.t?`<span class="sub">Duelos de ${esc(u.name)}: ${st.w} ganados · ${st.l} perdidos${st.t?` · ${st.t} empatados`:""}</span>`:"";
@@ -1528,6 +1549,22 @@ async function avSave(blob){const{error}=await sb.storage.from("avatars").upload
 async function avRemove(uid){const a=await sb.storage.from("avatars").remove([`${uid}.jpg`]),b=await sb.from("liga_avatars").delete().eq("user_id",uid);
   if(a.error||b.error)return toast("No se ha podido quitar la foto.");delete S.avs[uid];toast("Foto quitada.")}
 
+/* Animación al aceptar un duelo: las dos fotos chocan con un «VS». La ve quien acepta y, una vez, quien retó */
+const DFXK=()=>"liga-dfx:"+S.me;
+const dfxSeen=id=>{try{const L=JSON.parse(localStorage.getItem(DFXK())||"[]");if(!L.includes(id)){L.push(id);localStorage.setItem(DFXK(),JSON.stringify(L.slice(-40)))}}catch(e){}};
+function dfxCheck(){if(!S.me||$("#dfx"))return;let L=[];try{L=JSON.parse(localStorage.getItem(DFXK())||"[]")}catch(e){return}
+  const d=(S.duels||[]).find(d=>d.ch===S.me&&d.st==="aceptado"&&!duelOver(d)&&!L.includes(d.id)&&Date.now()-new Date(d.start)<7*864e5);
+  if(d){dfxSeen(d.id);duelFx(d,true)}}
+function duelFx(d,forCh){const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),rid=d.ch===S.me?d.rv:d.ch,kd=d.kind==="dia"?"solo hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre";
+  const o=document.createElement("div");o.id="dfx";o.className="dfx";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-labelledby","dfxt");
+  o.innerHTML=`<div class="dfx-ring"><div class="dfx-p dfx-l">${av(S.me,nm[S.me],"dfa")}<b>${esc(nm[S.me]||"Tú")}</b></div><div class="dfx-vs" aria-hidden="true">VS</div>
+    <div class="dfx-p dfx-r">${av(rid,nm[rid],"dfa")}<b>${esc(nm[rid]||"")}</b></div>
+    ${Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2,r=70+Math.random()*60;return `<i class="dfx-sp" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r).toFixed(0)}px"></i>`}).join("")}<div class="dfx-fl"></div></div>
+   <div class="dfx-t"><h2 id="dfxt">¡Duelo aceptado!</h2><p>${esc(secName(d.sec))} · ${kd}</p><small>${forCh?`${esc(nm[rid]||"")} ha aceptado tu reto. ¡Empieza ahora!`:"Empieza ahora. Quien sume más puntos, gana."}</small></div>
+   <button class="pri dfx-go" id="dfxgo">¡Vamos!</button>`;
+  document.body.appendChild(o);const close=()=>o.remove();o.querySelector("#dfxgo").onclick=close;o.onclick=e=>{if(e.target===o)close()};o.onkeydown=e=>{if(e.key==="Escape")close()};
+  setTimeout(()=>o.querySelector("#dfxgo")?.focus(),1500)}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1724,7 +1761,7 @@ function home(){
   ${crowdHtml()}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
-  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
+  $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();dfxCheck();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
   if($("#out"))$("#out").onclick=()=>sb.auth.signOut();if($("#lin"))$("#lin").onclick=()=>{S.reg=false;needLogin()};
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#fmore"))$("#fmore").onclick=()=>{S.feedAll=!S.feedAll;const y0=scrollY;home();scrollTo(0,y0)};
