@@ -411,6 +411,13 @@ button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text
 .styles .sbi{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;font-size:.9rem;padding-left:8px;padding-right:8px;min-width:0}
 .lbd .nm{color:var(--ink);overflow-wrap:normal;word-break:normal;hyphens:auto;-webkit-hyphens:auto}.lbd .nm.lw{font-size:12px}.lbd.off .nm{color:var(--mut)}
 .start{background:linear-gradient(135deg,#1d2a35,#16212b);border:1px solid var(--acc);border-radius:14px;padding:14px 16px;margin:12px 0}.start ol{margin:8px 0 12px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}.start .pri{width:100%}
+.vbx{margin:10px 0;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#131d26}
+.bth{all:unset;box-sizing:border-box;display:flex;width:100%;justify-content:space-between;align-items:center;cursor:pointer;min-height:28px}.bth>span:first-child{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.bth:focus-visible{outline:2px solid var(--acc);border-radius:6px}
+.vit{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.vbx .bth+.vit{margin-top:6px}
+.vpl{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--acc);color:#fff;font-size:15px;flex:none;text-decoration:none}
+.vtx{flex:1;min-width:0;color:inherit;text-decoration:none}.vtx b{display:block}.vtx .sub{font-size:.8rem}
+.bmg{min-height:0;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);font-size:.8rem;flex:none}.bmg.on{border-color:var(--acc);color:var(--ink)}
+.vadd{margin-top:8px;width:100%}.vfm{margin-top:8px}.vfm input{width:100%;margin:6px 0 4px}.vfm .acts{display:flex;gap:8px;margin-top:6px}.vfm .acts button{flex:1}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -843,6 +850,7 @@ async function loadAll(){
   S.hid=S.me?await sb.from("liga_prefs").select("hidden").eq("user_id",S.me).maybeSingle().then(r=>new Set(r.data?.hidden||[])).catch(()=>S.hid||new Set()):new Set();
   S.avs=await sb.from("liga_avatars").select("user_id,v").then(r=>Object.fromEntries((r.data||[]).map(x=>[x.user_id,x.v]))).catch(()=>S.avs||{});
   S.rates=await fetchAll(()=>sb.from("liga_ratings").select("route_id,user_id,stars,feel").order("route_id").order("user_id")).catch(()=>S.rates||[]);S._rm=null;
+  if(S.me){S.betas=await fetchAll(()=>sb.from("liga_betas").select("route_id,user_id,url,tip,created_at").order("route_id").order("user_id")).catch(()=>S.betas||[]);S.blikes=await fetchAll(()=>sb.from("liga_beta_likes").select("route_id,author_id,user_id").order("route_id").order("author_id").order("user_id")).catch(()=>S.blikes||[])}
   const dq=await sb.from("liga_duels").select("*").order("created_at",{ascending:false}).limit(500);S.duels=(dq.data||[]).map(mapD);
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
   st.forEach(x=>{(x.kind==="via"?SM:BSM)[x.style]=+x.mult});
@@ -1530,6 +1538,40 @@ function rateLine(r){if(!RSEC(r))return"";const q=rateOf(r.id),m=myRate(r.id),do
   const sum=q?`<span>${q.avg!=null?`<b class="rst">★ ${f1(q.avg)}</b> `:""}<span class="sub">${q.n} ${q.n===1?"nota":"notas"}${fs?" · "+fs:""}</span></span>`:`<span class="sub">Aún nadie la ha puntuado.</span>`;
   const mine=done?(m?`<span class="rtm"><span class="sub">Tu nota</span> ${m.stars?`<span class="rst" aria-label="${m.stars} estrellas">${starTxt(m.stars)}</span>`:""}${m.feel?` <span class="sub">${m.stars?"· ":""}${FEEL[m.feel]}</span>`:""}<button class="link" id="rtb">Cambiar</button></span>`:`<button class="link" id="rtb">Puntuar esta vía</button>`):"";
   return `<div class="rtl">${sum}${mine}</div>`}
+/* Betas en vídeo: un enlace (Instagram, YouTube o TikTok) por persona y vía/bloque. Plegado al abrir; se ven 3 y «Ver todos» */
+const BURL=/^https:\/\/([a-z0-9-]+\.)?(instagram\.com|youtube\.com|youtu\.be|tiktok\.com)\//i;
+const bNet=u=>/tiktok/i.test(u)?"TikTok":/instagram/i.test(u)?"Instagram":"YouTube";
+function betasHtml(r){if(!S.me||r.sec==="kilter")return"";const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),done=!!myAsc(r.id),bl=isBl(r.sec);
+  const lk=(S.blikes||[]).filter(l=>l.route_id===r.id);
+  const L=(S.betas||[]).filter(b=>b.route_id===r.id&&(nm[b.user_id]||b.user_id===S.me)).map(b=>({...b,n:lk.filter(l=>l.author_id===b.user_id).length,mine:lk.some(l=>l.author_id===b.user_id&&l.user_id===S.me)}))
+    .sort((a,b)=>(b.user_id===S.me)-(a.user_id===S.me)||(S.fol.has(b.user_id))-(S.fol.has(a.user_id))||b.n-a.n||b.created_at.localeCompare(a.created_at));
+  const op=S.bopen?.has(r.id),form=S.bform===r.id,all=S.ball===r.id,mineB=L.find(b=>b.user_id===S.me);
+  const head=`<button class="bth" data-btg="${r.id}" aria-expanded="${op||form}"><span>▶ Betas en vídeo${L.length?` · ${L.length}`:""}</span><span class="sub">${op||form?"Ocultar ▾":L.length?"Ver ▸":done?"＋ Añadir":""}</span></button>`;
+  if(!op&&!form)return L.length||done?`<div class="vbx">${head}</div>`:"";
+  const row=b=>`<div class="vit"><a class="vpl" href="${esc(b.url)}" target="_blank" rel="noopener" aria-label="Ver vídeo de ${esc(b.user_id===S.me?"ti":nm[b.user_id])}">▶</a><a class="vtx" href="${esc(b.url)}" target="_blank" rel="noopener"><b>${b.user_id===S.me?"Tú":esc(nm[b.user_id])} · ${bNet(b.url)}</b><span class="sub">${b.tip?`«${esc(b.tip)}» · `:""}${ago(new Date(b.created_at).getTime())}</span></a>
+    ${b.user_id===S.me?`<button class="link" data-bdel="${r.id}|${b.user_id}">Quitar</button>`:`<button class="bmg ${b.mine?"on":""}" data-blk="${r.id}|${b.user_id}" aria-pressed="${b.mine}" title="Me ha servido">👍${b.n?` ${b.n}`:""}</button>${S.owner?`<button class="link" data-bdel="${r.id}|${b.user_id}">Quitar</button>`:""}`}</div>`;
+  const vis=all?L:L.slice(0,3);
+  const fm=`<form class="vfm" data-bform="${r.id}"><label class="sub" for="bu-${r.id}">Pega el enlace de tu vídeo (Instagram, YouTube o TikTok)${mineB?". Sustituye al que tienes.":""}</label><input id="bu-${r.id}" name="u" type="url" inputmode="url" required placeholder="https://www.instagram.com/reel/…" value="${esc(mineB?.url||"")}"><input name="t" maxlength="120" placeholder="Un consejo corto (opcional)" value="${esc(mineB?.tip||"")}"><div class="acts"><button type="button" data-bcan="${r.id}">Cancelar</button><button class="pri" type="submit">Guardar</button></div></form>`;
+  return `<div class="vbx">${head}${vis.map(row).join("")}${L.length>3&&!all?`<button class="link" data-ball="${r.id}">Ver ${L.length===4?"el otro":"los "+L.length}</button>`:""}
+    ${form?fm:done?`<button class="vadd" data-badd="${r.id}">${mineB?"Cambiar mi vídeo":"＋ Añadir mi vídeo"}</button>`:L.length?"":`<div class="sub">Cuando ${bl?"lo":"la"} hagas podrás subir tu beta.</div>`}</div>`}
+function bindBetas(view){const re=()=>{const y=scrollY;view();scrollTo(0,y)},T=(S.bopen=S.bopen||new Set());
+  document.querySelectorAll("[data-btg]").forEach(b=>b.onclick=()=>{const id=b.dataset.btg;if(T.has(id)||S.bform===id){T.delete(id);S.bform=null}else{const has=(S.betas||[]).some(x=>x.route_id===id);has?T.add(id):(S.bform=id)}re()});
+  document.querySelectorAll("[data-badd]").forEach(b=>b.onclick=()=>{S.bform=b.dataset.badd;re();setTimeout(()=>$("#bu-"+S.bform)?.focus(),50)});
+  document.querySelectorAll("[data-bcan]").forEach(b=>b.onclick=()=>{S.bform=null;re()});
+  document.querySelectorAll("[data-ball]").forEach(b=>b.onclick=()=>{S.ball=b.dataset.ball;re()});
+  document.querySelectorAll("[data-bform]").forEach(f=>f.onsubmit=async e=>{e.preventDefault();if(S.busy)return;const id=f.dataset.bform,u=f.u.value.trim(),t=f.t.value.trim()||null;
+    if(!BURL.test(u))return toast("Pega un enlace de Instagram, YouTube o TikTok");
+    S.busy=true;const{data,error}=await sb.from("liga_betas").upsert({route_id:id,user_id:S.me,url:u,tip:t,created_at:new Date().toISOString()}).select();S.busy=false;
+    if(error)return toast("No se ha podido guardar: "+error.message);
+    S.betas=(S.betas||[]).filter(x=>!(x.route_id===id&&x.user_id===S.me)).concat(data);S.blikes=(S.blikes||[]).filter(l=>!(l.route_id===id&&l.author_id===S.me));S.bform=null;T.add(id);toast("Beta guardada");re()});
+  document.querySelectorAll("[data-bdel]").forEach(b=>b.onclick=async()=>{const[id,u]=b.dataset.bdel.split("|");if(!confirm2(b))return;const{error}=await sb.from("liga_betas").delete().eq("route_id",id).eq("user_id",u);
+    if(error)return toast("No se ha podido quitar: "+error.message);S.betas=S.betas.filter(x=>!(x.route_id===id&&x.user_id===u));re()});
+  document.querySelectorAll("[data-blk]").forEach(b=>b.onclick=async()=>{const[id,a]=b.dataset.blk.split("|"),on=b.classList.contains("on");
+    const q=on?sb.from("liga_beta_likes").delete().eq("route_id",id).eq("author_id",a).eq("user_id",S.me):sb.from("liga_beta_likes").insert({route_id:id,author_id:a});
+    const{error}=await q;if(error)return toast("No se ha podido guardar: "+error.message);
+    S.blikes=on?S.blikes.filter(l=>!(l.route_id===id&&l.author_id===a&&l.user_id===S.me)):(S.blikes||[]).concat({route_id:id,author_id:a,user_id:S.me});re()})}
+/* Botón que pide un segundo toque para confirmar */
+function confirm2(b){if(b.dataset.arm){return true}b.dataset.arm=1;b.textContent="¿Seguro?";setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent="Quitar"}},3000);return false}
 function rateOpen(r){if(!S.me||$("#rts"))return;const m=myRate(r.id),st={n:m?.stars||0,f:m?.feel||null};
   const d=document.createElement("div");d.id="rts";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","rtt");
   const draw=()=>{d.innerHTML=`<div class="fbp rtp"><h2 id="rtt">¿Qué tal la ${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}?</h2>
@@ -2296,7 +2338,7 @@ function bRow(b){
   <span class="gr" style="color:var(--mut)">${c[2]}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo lo has hecho? Un bloque ${c[0].toLowerCase()} vale ${c[2]} puntos.</div>
   <div class="styles">${BSTYLES.map(([st,m])=>`<button data-st="${st}" class="${a&&a.style===st?"on":""}">${st}<small>+${Math.round(c[2]*m)}</small></button>`).join("")}</div>
-  ${kingHtml(b)}${whoHtml(b)}${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
+  ${betasHtml(b)}${kingHtml(b)}${whoHtml(b)}${fwHtml(b)}${projBtn(b)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarlo":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Color (dificultad)<select id="bc">${BKEYS.map(k=>`<option value="${k}" ${k===b.color?"selected":""}>${BCOL[k][0]}</option>`).join("")}</select></label>
   <label>Color de presas<select id="bh">${HOLDS[b.hold]?"":`<option value="" selected disabled>Elige el color</option>`}${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===b.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
   <label>Fecha de creación<input type="date" id="ec" value="${b.created||""}" max="${isoDay(new Date())}"></label>
@@ -2304,7 +2346,7 @@ function bRow(b){
   <button class="pri" id="esv">Guardar cambios</button><button class="dng" id="edl">${S.arm==="del"?"Pulsa otra vez: desmontar":"Desmontar bloque"}</button>
   <span class="sub full">Cuando se quite el bloque, usa “Desmontar bloque”: los encadenes que ya tenía siguen contando en el ranking.</span></div>`:""}
   </div>`:""}</div>`}
-function bindB(z){
+function bindB(z){bindBetas(()=>boulderView());
   document.querySelectorAll(".hd").forEach(b=>b.onclick=()=>{S.open=S.open===b.dataset.r?null:b.dataset.r;S.arm=null;boulderView()});
   const b=S.routes.find(x=>x.id===S.open);if(!b)return;
   document.querySelectorAll("[data-st]").forEach(x=>x.onclick=()=>markAscent(b,x.dataset.st));
@@ -2400,7 +2442,7 @@ function routeRow(r){
   <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:""}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
-  ${rateLine(r)}${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
+  ${rateLine(r)}${betasHtml(r)}${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
   ${S.edit?`<div class="ed"><label>Grado<select id="eg">${GRADES.map(g=>`<option ${g===r.grade?"selected":""}>${g}</option>`).join("")}</select></label>
   <label class="full">Fecha de creación<input type="date" id="ec" value="${r.created||""}" max="${isoDay(new Date())}"></label>
   <label>Color de presas<select id="eh">${Object.entries(HOLDS).map(([k,v])=>`<option value="${k}" ${k===r.hold?"selected":""}>${v[0]}</option>`).join("")}</select></label>
@@ -2414,7 +2456,7 @@ function bindRoutes(){
     S.arm=null;addRoute({sec:S.sec,line:num,grade:"6a",hold,created:isoDay(new Date())})});
   const r=S.routes.find(x=>x.id===S.open);if(!r)return;
   document.querySelectorAll("[data-st]").forEach(b=>b.onclick=async()=>{const was=!!myAsc(r.id);await markAscent(r,b.dataset.st);if(!was&&myAsc(r.id)&&RSEC(r)&&!myRate(r.id))rateOpen(r)});
-  if($("#rtb"))$("#rtb").onclick=()=>rateOpen(r);
+  if($("#rtb"))$("#rtb").onclick=()=>rateOpen(r);bindBetas(()=>render());
   if($("#pj"))$("#pj").onclick=()=>toggleProj(r);bindWho(r,mapView);
   if($("#rm"))$("#rm").onclick=()=>{if(S.arm!=="rm"){S.arm="rm";return mapView()}S.arm=null;unmark(r)};
   if(S.edit){
