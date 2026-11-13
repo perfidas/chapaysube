@@ -754,21 +754,23 @@ const BIM=["Ene–Feb","Mar–Abr","May–Jun","Jul–Ago","Sep–Oct","Nov–Di
 const SP=24,GAP=8,lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
 let BOX=null,WX=[0,0];
 /* Líneas que existen en la pared pero no se usan en cada sección: salen tachadas y no admiten vías */
-const UNUSED={cuerda:new Set([15]),autoseguro:new Set([15,22,23,27,28,29,30,31,32,33,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66])};
+const UNUSED={cuerda:new Set([15]),autoseguro:new Set([15,22,23,25,27,28,29,30,31,32,33,41,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66])};
 const isOff=n=>!!UNUSED[S.sec]?.has(n);
 const ZONES={cuerda:(()=>{
   const ang=12*Math.PI/180,h=82,len=n=>n*SP;
   /* Cada pared mantiene su longitud (proporcional a sus líneas) y entre una y otra queda un hueco G */
   /* Pared 2 y Pared 5 a la misma altura: Pared 3 (9 líneas) y Pared 4 (10) suben lo mismo, la 4 algo más inclinada */
-  const G=18,H=208,w3=Math.sqrt(len(9)**2-H*H),w4=Math.sqrt(len(10)**2-H*H),un=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
-  const dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H),un(w3,H),[1,0],[Math.sin(ang),-Math.cos(ang)]];
-  const walls=[["p1","Pared 6",26,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3","Pared 3",9,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
-  let cur=[40,40];const arr=[];
-  walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
-    if(i>0)cur=[cur[0]+d[0]*G+(i===3?14:0),cur[1]+d[1]*G];
-    const end=[cur[0]+d[0]*len(n),cur[1]+d[1]*len(n)];
-    arr.push({id,name,n,pts:[cur,end],side,...(wide?{wide:1}:{})});cur=end});
-
+  const G=18,H=208,w3=Math.sqrt(len(9)**2-H*H),un=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
+  /* La Pared 3 se queda con la 15–21 (misma inclinación) y la 22, 23 y 25 van en una pared perpendicular a ella, entre la Pared 3 y la 4 */
+  const d3=un(w3,H),TA=-60*Math.PI/180,dq=[d3[0]*Math.cos(TA)-d3[1]*Math.sin(TA),d3[0]*Math.sin(TA)+d3[1]*Math.cos(TA)];
+  const walls=[["p1","Pared 6",26,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3c","Pared 3.2",3,-1],["p3","Pared 3.1",7,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
+  const build=H4=>{const w4=Math.sqrt(len(10)**2-H4*H4),dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H4),dq,d3,[1,0],[Math.sin(ang),-Math.cos(ang)]];
+    let cur=[40,40];const arr=[];
+    walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
+      if(i>0)cur=[cur[0]+d[0]*G+(i===4?14:0),cur[1]+d[1]*G];
+      const end=[cur[0]+d[0]*len(n),cur[1]+d[1]*len(n)];
+      arr.push({id,name,n,pts:[cur,end],side,...(wide?{wide:1}:{})});cur=end});return arr};
+  const arr=build(H);
   /* Interior girado 180° */
   const mx=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[0]))),my=Math.max(...arr.flatMap(z=>z.pts.map(p=>p[1]))),R=p=>[mx-p[0]+28,my-p[1]+44];
   arr.forEach(z=>z.pts=z.pts.map(R));
@@ -798,9 +800,9 @@ const VB={w:Math.ceil(WX[1]+28),h:Math.ceil(Math.max(BOX.y+BOX.h,...ZONES.cuerda
 /* Numeración de líneas: seguida desde la Pared 1 */
 /* Interior numerado al revés (la antigua 37 es la 1); la zona exterior sigue después */
 /* Primer número de cada pared. Las paredes del interior se numeran en sentido contrario a como se dibujan.
-   No existen las líneas 24, 25 (entre la Pared 3 y la 4) ni la 36 (entre la Pared 4 y la 5). */
-const FIRST={p4:1,p4b:6,a2:11,p3:15,p2:26,a1:37,p1:42,p1b:55,x1:68,x2:76};
-const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
+   No existe la línea 24 (la 22, 23 y 25 están en la Pared 3.2) ni la 36 (entre la Pared 4 y la 5). */
+const FIRST={p4:1,p4b:6,a2:11,p3:15,p3c:22,p2:26,a1:37,p1:42,p1b:55,x1:68,x2:76};
+const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id==="p3c"?[25,23,22][i]:z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
 /* Autoseguro usa las mismas paredes y líneas que cuerda, con sus propias vías y su propio ranking */
 ZONES.autoseguro=ZONES.cuerda;
 
@@ -2325,8 +2327,7 @@ function mapSvg(){
       const off=isOff(num),hit=HS?rs.some(r=>HS.has(r.id)):null;
       dots+=`<circle class="ldot ${nw?"nw":""} ${dn?"dn":""} ${rs.length?"":"none"} ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" cx="${f(x)}" cy="${f(y)}" r="11"/><text class="lnum ${all?"dn":""} ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" x="${f(x)}" y="${f(y+4.5)}" text-anchor="middle">${num}</text>${off?`<line class="strike" x1="${f(x-9)}" y1="${f(y)}" x2="${f(x+9)}" y2="${f(y)}"/>`:""}`}
     const nx=-dy*z.side,ny=dx*z.side,m=lerp(p,q,.5),lx=m[0]+nx*24,ly=m[1]+ny*24+4,anc=nx>.3?"start":nx<-.3?"end":"middle";
-    g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}
-    <text class="zlab ${sel?"sel":""}" x="${f(lx)}" y="${f(ly)}" text-anchor="${anc}">${z.name.replace("Exterior · ","")}</text></g>`});
+    g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}</g>`});
   return `<svg viewBox="0 0 ${VB.w} ${VB.h}" role="img" aria-label="Vista cenital de la zona de cuerda">
     <rect class="inset" x="${BOX.x}" y="${BOX.y}" width="${BOX.w}" height="${BOX.h}" rx="6"/>
     <text class="area" x="${BOX.x+12}" y="${BOX.y+20}">ZONA EXTERIOR</text>${g}</svg>`}
