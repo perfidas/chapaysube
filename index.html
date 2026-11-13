@@ -400,6 +400,7 @@ p.rnb{margin:-6px 0 14px}
 .dg{width:32px;height:46px;border-radius:5px;background:linear-gradient(#1b2530 50%,#141d26 50%);border:1px solid #26333f;display:grid;place-items:center;font:900 36px/1 var(--disp);color:var(--gold);text-shadow:0 0 10px rgba(255,197,61,.45)}
 .hbar{height:6px;border-radius:99px;background:#22303c;overflow:hidden}.hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--gold))}
 .hsec{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:6px}
+.rkh{display:flex;justify-content:flex-end;margin:4px 0 -4px}.fdet summary{cursor:pointer;font-weight:700;padding:4px 0;list-style:none}.fdet[open] summary{margin-bottom:8px}.pfset{margin-top:22px;border:1px solid var(--line);border-radius:12px;padding:10px 14px}.pfset summary{cursor:pointer;font-weight:700}.pst td,.pst th{text-align:center}.pst td b{font-size:1rem}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -1151,8 +1152,6 @@ function logrosView(){
   ${near?`<div class="lnext">${medal(near.p,near.t)}<div><small>Lo tienes cerca</small><div><b>${esc(near.n)}</b> · <span class="sub">${near.secName} · ${esc(near.d)}</span></div><div class="lbar"><span style="width:${mine[near.id].v/mine[near.id].m*100}%"></span></div><div class="sub">${mine[near.id].v} de ${mine[near.id].m}</div></div></div>`:""}
   <div class="lchips" role="tablist">${LSECS.map(([k,n])=>`<button role="tab" aria-selected="${k===f}" class="${k===f?"on":""}" data-ls="${k}">${n} · ${got.filter(c=>c.sec===k).length}/${LCAT.filter(c=>c.sec===k).length}</button>`).join("")}</div>
   <div class="lbadges">${LCAT.filter(c=>c.sec===f).map(c=>{const x=mine[c.id]||{v:0,m:1};return `<button class="lbd ${x.ok?"":"off"} ${recent(c.id)?"new":""}" data-lg="${c.id}">${medal(c.p,c.t)}<span class="nm ${c.n.split(" ").some(w=>w.length>11)?"lw":""}">${esc(c.n)}</span>${x.ok?`<span class="ds">${recent(c.id)?"¡Nueva!":LTIER[c.t][2]}</span>`:`<span class="pg">${x.v} / ${x.m}<span class="lbar"><span style="width:${x.v/x.m*100}%"></span></span></span>`}</button>`}).join("")}</div>
-  <h3 class="pfh">Lo último en la liga</h3>
-  <div class="lfeed">${feed.slice(0,12).map(e=>`<button class="lfi" data-lg="${e.c.id}">${medal(e.c.p,e.c.t)}<span><b>${esc(nm[e.uid]||"")}</b> ha conseguido <b style="color:${LTIER[e.c.t][0]}">${esc(e.c.n)}</b> <span class="sub">· ${e.c.secName}</span></span><small>${ago(e.at)}</small></button>`).join("")||'<div class="empty">Todavía nadie ha conseguido logros esta temporada.</div>'}</div>
   <div id="lsheet"></div>`;
   document.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{S.lsec=b.dataset.ls;const y0=scrollY;logrosView();scrollTo(0,y0)});
   document.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>logroSheet(b.dataset.lg,all))}
@@ -1339,9 +1338,9 @@ function sugFor(sec,need){const c=[];S.routes.forEach(r=>{if(!r.active||r.sec!==
   return sec==="boulder"?`un bloque ${BCOL[r.color][0].toLowerCase()}`:sec==="kilter"?`un ${r.grade} a ${r.angle}°`:`un ${r.grade} encadenado`}
 function goalHtml(){if(!S.me||!me())return"";const dl=daysLeft(),sprint=dl<=7,rows=[];
   VSEC().forEach(s=>{const r=ranking(s.id,"bim"),i=r.findIndex(x=>x.id===S.me);if(i<0)return;
-    if(i===0){const nx=r[1];rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>${nx?`Vas 1.º: le sacas <b>${fmt(r[0].p-nx.p)} pts</b> a ${esc(nx.name)}.`:"Vas 1.º y nadie más ha puntuado."}</span></div>`);return}
+    if(i===0){const nx=r[1];rows.push(`<div class="gl"><b>${s.id==="autoseguro"?"Auto":secName(s.id)}</b><span>${nx?`Vas 1.º: le sacas <b>${fmt(r[0].p-nx.p)} pts</b> a ${esc(nx.name)}.`:"Vas 1.º y nadie más ha puntuado."}</span></div>`);return}
     const a=r[i-1],need=a.p-r[i].p+1,sg=sugFor(s.id,need),bh=r[i+1];
-    rows.push(`<div class="gl"><b>${secName(s.id)}</b><span>Te faltan <b>${fmt(need)} pts</b> para pasar a ${esc(a.name)} (${ord(i)})${sg?`: te bastaría ${sg}`:""}.${sprint&&bh?` <span class="sub">${esc(bh.name)} está a ${fmt(r[i].p-bh.p)} pts por detrás.</span>`:""}</span></div>`)});
+    rows.push(`<div class="gl"><b>${s.id==="autoseguro"?"Auto":secName(s.id)}</b><span>Te faltan <b>${fmt(need)} pts</b> para pasar a ${esc(a.name)} (${ord(i)})${sg?`: te bastaría ${sg}`:""}.${sprint&&bh?` <span class="sub">${esc(bh.name)} está a ${fmt(r[i].p-bh.p)} pts por detrás.</span>`:""}</span></div>`)});
   if(!rows.length)return"";
   return `<section class="goal ${sprint?"spr":""}"><div class="hrow"><span class="k">${sprint?"Sprint final":"Tu objetivo"}</span>${sprint?`<span class="sprb">${dl===1?"Último día":`Quedan ${dl} días`}</span>`:""}</div>${rows.join("")}</section>`}
 /* Avisos de adelantamiento: se comparan los puestos con los que viste la última vez en este móvil */
@@ -1537,7 +1536,7 @@ function rateOpen(r){if(!S.me||$("#rts"))return;const m=myRate(r.id),st={n:m?.st
 
 /* Las vías según la gente: mejores, regaladas y duras (solo vías montadas de cuerda y autoseguro) */
 const rateMini=r=>{const q=rateOf(r.id);return q&&(q.avg!=null||q.top)?`<small class="rmini">${[q.avg!=null?"★ "+f1(q.avg):"",q.top?FEEL[q.top].toLowerCase():""].filter(Boolean).join(" · ")}</small>`:""};
-function crowdList(k){const L=S.routes.filter(r=>r.active&&RSEC(r)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q);
+function crowdList(k){const L=S.routes.filter(r=>r.active&&RSEC(r)&&(S.view!=="sec"||r.sec===S.sec)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q);
   if(k==="top")return L.filter(x=>x.q.avg!=null).sort((a,b)=>b.q.avg-a.q.avg||b.q.ns-a.q.ns);
   return L.filter(x=>x.q.top===k).sort((a,b)=>b.q.c[k]-a.q.c[k]||b.q.n-a.q.n)}
 function crowdHtml(){const k=S.cg||"top",L=crowdList(k).slice(0,5);if(!crowdList("top").length)return"";
@@ -1794,6 +1793,8 @@ function perfil(){
       <span>Anual ${y}</span><b>${ai>=0?`${ord(ai+1)} · ${ar[ai].p} pts de liga`:"–"}</b>
       <span>${isBl(s.id)?"Bloques":"Vías"} encadenad${isBl(s.id)?"os":"as"} en ${y}</span><b>${new Set(as.map(a=>a.route)).size}</b>
       <span>${s.id==="boulder"?"Color más difícil":"Grado más difícil"}</span><b>${bestOf(as,s.id)}</b></div></div>`}).join("");
+  const stab=VSEC().map(s=>{const as=yr.filter(a=>a.sec===s.id),br=rankRange(s.id,cur.from,cur.to),bi=br.findIndex(x=>x.id===u.id),ar=annual(s.id),ai=ar.findIndex(x=>x.id===u.id);
+    return `<tr><th scope="row">${s.id==="autoseguro"?"Auto":s.name}</th><td>${bi>=0?`${ord(bi+1)}<br><span class="sub">${fmt(br[bi].p)} pts</span>`:"–"}</td><td>${ai>=0?`${ord(ai+1)}<br><span class="sub">${ar[ai].p} pts</span>`:"–"}</td><td>${new Set(as.map(a=>a.route)).size}</td><td><b>${bestOf(as,s.id)}</b></td></tr>`}).join("");
   const rows=Array.from({length:cb+1},(_,b)=>b).reverse().map(b=>`<tr><th scope="row">${BIM[b]}${b===cb?'<br><span class="sub">en curso</span>':""}</th>${VSEC().map(s=>{const r=rankRange(s.id,new Date(y,b*2,1),new Date(y,b*2+2,1)),i=r.findIndex(x=>x.id===u.id);return `<td class="${i>=0&&i<3?"med"+(i+1):""}">${i>=0?ord(i+1):"–"}</td>`}).join("")}</tr>`).join("");
   /* los últimos 10 días con encadenes (enteros: cada día muestra 4 y «Ver más» despliega el resto) */
   const last=(()=>{const so=[...mine].sort((a,b)=>b.at.localeCompare(a.at)),ds=[...new Set(so.map(a=>dayOf(a.at)))].slice(0,10);return so.filter(a=>ds.includes(dayOf(a.at)))})();
@@ -1821,9 +1822,10 @@ function perfil(){
   ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${S.me&&u.id!==S.me&&me()?`<button class="vsbtn" id="vsb">Compararme con ${esc(u.name)}</button>`:""}${duelForm(u)}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   ${todayHtml(mine)}
-  <div class="pf-grid">${cards}</div>
+  <h3 class="pfh">Últimos encadenes</h3>
+  ${last.length?lastByDay(last,mine):`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene.":"Todavía no ha marcado ningún encadene."}</div>`}
   ${u.id===S.me?projHtml()+folListHtml():""}
-  ${vitrinaHtml(u.id)}
+  <h3 class="pfh">Por sección</h3><div class="tbl"><table class="postab pst"><thead><tr><th scope="col"></th><th scope="col">Bimestre</th><th scope="col">Anual</th><th scope="col">Vías</th><th scope="col">Máx.</th></tr></thead><tbody>${stab}</tbody></table></div>
   <h3 class="pfh">${BIM[cb]} frente a ${pb}</h3>
   <p class="sub" style="margin:-4px 0 8px">El bimestre en curso cuenta hasta hoy.</p>
   <div class="cmpw">${cmp}</div>
@@ -1833,10 +1835,8 @@ function perfil(){
   <p class="sub" style="margin:6px 0 0">Cada ${isB||isK?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
   <h3 class="pfh">Puestos por bimestre</h3>
   <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${VSEC().map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
-  <h3 class="pfh">Últimos encadenes</h3>
-  ${last.length?lastByDay(last,mine)
-   :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
-  ${u.id===S.me?`<h3 class="pfh">Secciones que uso</h3><p class="sub" style="margin:-2px 0 8px">Quita las que no uses y dejarán de salirte. Tus encadenes y puntos se guardan igual.</p><div class="hsec">${SECTIONS.map(s=>`<label class="chk"><input type="checkbox" data-hs="${s.id}" ${S.hid?.has(s.id)?"":"checked"}> ${s.name}</label>`).join("")}</div><h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner||recapTime()?`<button id="rcz">Ver mi resumen de temporada${S.owner&&!recapTime()?" (vista previa)":""}</button>`:""}${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div>`:""}`;
+  ${vitrinaHtml(u.id)}
+  ${u.id===S.me?`<details class="pfset"><summary>⚙ Ajustes</summary><h3 class="pfh">Secciones que uso</h3><p class="sub" style="margin:-2px 0 8px">Quita las que no uses y dejarán de salirte. Tus encadenes y puntos se guardan igual.</p><div class="hsec">${SECTIONS.map(s=>`<label class="chk"><input type="checkbox" data-hs="${s.id}" ${S.hid?.has(s.id)?"":"checked"}> ${s.name}</label>`).join("")}</div><h3 class="pfh">Tu cuenta</h3><div class="acts">${S.owner||recapTime()?`<button id="rcz">Ver mi resumen de temporada${S.owner&&!recapTime()?" (vista previa)":""}</button>`:""}${S.owner?`<button id="apv">Escaladores${pendCount()?` · ${pendCount()} pendientes`:""}</button><button id="ntz">Notas de las vías</button><button id="fbz">Buzón${fbNew()?` · ${fbNew()} nuevos`:""}</button><button id="bkp">Descargar copia de seguridad (Excel)</button>`:""}<button id="frf">Actualizar la app</button><button class="dng" id="out">Salir de mi cuenta</button></div></details>`:""}`;
   if($("#apv"))$("#apv").onclick=()=>{S.view="approvals";S.arm=null;S.scrollTop=true;render()};
   if($("#folb"))$("#folb").onclick=()=>toggleFollow(u.id);bindDuelForm(u);
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
@@ -1917,18 +1917,16 @@ function home(){
     ${pend?`<div class="sub">Tu cuenta está pendiente de aprobar. <button class="link" id="out">Salir</button></div>`
      :S.me?`<div class="board">${cells}</div><div class="hrow"><span class="sub">${fmt(myTot)} puntos este bimestre</span>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:""}</div>`
      :`<div class="hrow"><span class="sub">Entra para marcar tus vías y salir en el ranking.</span><button class="pri" id="lin">Entrar</button></div>`}</section>
+  ${verifHtml()}${duelsHtml()}${S.owner&&fbNew()?`<button class="pendb" id="fbv">${fbNew()} ${fbNew()===1?"mensaje nuevo":"mensajes nuevos"} en el buzón ›</button>`:""}${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
   ${recapTime()&&me()&&S.asc.some(a=>a.u===S.me)?`<button class="recapb" id="rcb"><span>Tu temporada ${new Date().getFullYear()}<small>Mira tu resumen antes de que todo empiece de cero</small></span><span aria-hidden="true">›</span></button>`:""}
-  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Reportar fallos y sugerencias</span></button></div><span>El 31 de diciembre a medianoche se borran todos los puntos, encadenes, logros, duelos y estadísticas. El 1 de enero empezamos todos de cero. Las vías y bloques montados se quedan.</span></section>`:""}
+  ${Date.now()<new Date(2027,0,1).getTime()?`<section class="beta" role="note"><div class="betah"><b>Liga en pruebas</b><button class="betab" id="fbb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Reportar fallos y sugerencias</span></button></div><span class="sub" style="font-size:.75rem">Todo vuelve a cero el 1 de enero.</span></section>`:""}
   ${ovHtml()}${goalHtml()}
-  ${S.owner&&fbNew()?`<button class="pendb" id="fbv">${fbNew()} ${fbNew()===1?"mensaje nuevo":"mensajes nuevos"} en el buzón ›</button>`:""}
-  ${S.owner&&pendCount()?`<button class="pendb" id="apv">${pendCount()} ${pendCount()===1?"escalador espera":"escaladores esperan"} tu aprobación ›</button>`:""}
-  ${verifHtml()}${duelsHtml()}
+
   <div class="hrow hk"><span class="k">Lo que está pasando</span><span class="live">● En directo</span></div>
   <section class="feed2">${ev.length?ev.slice(0,N).map((e,k)=>`<button class="fi2" ${e.r?`data-fr="${e.r.id}"`:e.lg?'data-fl="1"':""}>${e.dot}<span>${e.h}</span><small>${ago(e.t)}</small></button>`).join(""):'<div class="empty">Esta semana todavía no ha pasado nada. ¡Estrena tú la liga!</div>'}
    ${ev.length>4?`<button class="link fmore" id="fmore">${S.feedAll?"Ver menos":"Ver más"}</button>`:""}</section>
   ${news.length?`<div class="hrow hk"><span class="k">Recién montadas</span><span class="sub">${news.length}</span></div>
   <div class="hz" data-noswipe>${news.map(r=>{const bl=r.sec==="boulder";return `<button class="tbm" data-fr="${r.id}"><i style="background:${bl?bbg(r.color):HOLDS[r.hold]?.[1]||"var(--line)"}"></i><span><span class="tt">${bl?esc(BSECT.find(z=>z.id===r.zone)?.short||BSECT.find(z=>z.id===r.zone)?.name||""):r.line+" · "+(HOLDS[r.hold]?.[0]||"")}</span><b>${bl?(BCOL[r.color]?.[0]||""):esc(r.grade)}</b><span class="tt">${bl?"Boulder":dd(r.created)}</span></span></button>`}).join("")}</div>`:""}
-  ${crowdHtml()}
   <section class="song" aria-label="La canción de la liga"><div class="songlab">♪ La canción de la liga</div><div id="songbox"></div></section>
   <button class="rbtn" id="rls">Cómo se puntúa</button>`;
   $("#rls").onclick=openRules;mountSong();bindOv();bindDuels();bindVerif();dfxCheck();if($("#rcb"))$("#rcb").onclick=()=>recapOpen();if($("#fbb"))$("#fbb").onclick=fbOpen;if($("#fbv"))$("#fbv").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};
@@ -1957,12 +1955,11 @@ function section(){
   $("#app").innerHTML=`<div class="top"><button id="bk">Inicio</button>${canEdit?`<button id="tg" class="${S.edit?"on":""}">${S.edit?"Editor activado":"Modo editor"}</button>`:""}</div>
   <div class="secsw" role="tablist" aria-label="Sección">${VSEC().map(x=>`<button role="tab" data-sw="${x.id}" class="${x.id===S.sec?"on":""}" aria-selected="${x.id===S.sec}">${x.id==="autoseguro"?"Auto":x.name}</button>`).join("")}</div>
   <h2 class="vh">${s.name}</h2><div class="sub">${S.me?"Escalando como "+esc(me()?.name||""):"Modo consulta: entra para marcar tus vías"}</div>
-  <div class="tabs" role="tablist"><button role="tab" id="t1" class="${S.tab==="mapa"?"on":""}" aria-selected="${S.tab==="mapa"}">${S.sec==="kilter"?"Mis bloques":"Mapa"}</button><button role="tab" id="t2" class="${S.tab==="ranking"?"on":""}" aria-selected="${S.tab==="ranking"}">Ranking</button></div>
   <div id="body" class="${S.swdir?"sw"+S.swdir:""}"></div>`;S.swdir=null;
   $("#bk").onclick=()=>{S.view="home";S.edit=false;S.scrollTop=true;render()};
   if(canEdit)$("#tg").onclick=()=>{S.edit=!S.edit;S.arm=null;if(S.edit)S.qk=null;section()};
   document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{if(b.dataset.sw===S.sec)return;S.sec=S.lastSec=b.dataset.sw;S.zone=null;S.open=null;S.edit=false;S.arm=null;section()});
-  $("#t1").onclick=()=>{S.tab="mapa";section()};$("#t2").onclick=()=>{S.tab="ranking";section()};
+  
   S.tab==="mapa"?(S.sec==="boulder"?boulderView():S.sec==="kilter"?kilterView():mapView()):rankView();
 }
 
@@ -2313,14 +2310,14 @@ function fMatch(r,f){
   return true}
 const fHits=()=>{const f=FQ();return fOn(f)?S.routes.filter(r=>r.sec===S.sec&&r.active&&!isOff(r.line)&&fMatch(r,f)):null};
 function finderHtml(){const f=FQ(),bl=S.sec==="boulder",opt=(v,l,cur)=>`<option value="${v}" ${v===cur?"selected":""}>${l}</option>`;
-  return `<section class="finder" aria-label="Buscar ${bl?"bloques":"vías"}"><div class="frow">
+  return `<details class="finder fdet" ${fOn(f)?"open":""}><summary>🔍 Buscar ${bl?"bloque":"vía"}${fOn(f)?" · filtros activos":""}</summary><div class="frow">
   ${bl?`<label class="fl" for="fcol">Dificultad<select id="fcol">${opt("","Todas",f.col)}${BKEYS.map(k=>opt(k,BCOL[k][0],f.col)).join("")}</select></label>`
     :`<label class="fl" for="fmin">Grado desde<select id="fmin">${opt("","Cualquiera",f.min)}${GRADES.map(g=>opt(g,g,f.min)).join("")}</select></label>
   <label class="fl" for="fmax">hasta<select id="fmax">${opt("","Cualquiera",f.max)}${GRADES.map(g=>opt(g,g,f.max)).join("")}</select></label>
   <label class="fl fl2" for="frt">Según la gente<select id="frt">${opt("","Todas",f.rt)}${opt("top","★ 4 o más",f.rt)}${opt("regalada","Regaladas",f.rt)}${opt("dura","Duras",f.rt)}</select></label>`}
 </div>
   <div class="frow2">${S.me?`<label class="chk" for="ftd"><input type="checkbox" id="ftd" ${f.todo?"checked":""}> Solo ${bl?"los":"las"} que no he hecho este bimestre</label>`:"<span></span>"}
-  ${fOn(f)?`<button class="link" id="fclr">Quitar filtros</button>`:""}</div></section>`}
+  ${fOn(f)?`<button class="link" id="fclr">Quitar filtros</button>`:""}</div></details>`}
 function bindFinder(view){const f=FQ(),set=(k,v)=>{f[k]=v;S.zone=null;S.open=null;view()};
   [["fmin","min"],["fmax","max"],["fh","hold"],["fcol","col"],["frt","rt"]].forEach(([id,k])=>{const e=$("#"+id);if(e)e.onchange=()=>{const v=e.value;
     if(k==="min"&&v&&f.max&&GRADES.indexOf(f.max)<GRADES.indexOf(v))f.max="";if(k==="max"&&v&&f.min&&GRADES.indexOf(f.min)>GRADES.indexOf(v))f.min="";set(k,v)}});
@@ -2354,7 +2351,7 @@ function mapView(){
   if(ZONES[S.sec])bindFinder(mapView);if(S.edit)bindTBox();
   document.querySelectorAll(".zone").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;mapView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!ZONES[S.sec])return;
-  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}`;bindNews(mapView);return}
+  if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca una pared en el mapa para ver sus líneas y vías.</div>${newsBox()}${crowdHtml()}`;bindNews(mapView);return}
   const fl=fOn(FQ())?`<div class="fnote">Con el filtro activo, las vías que no lo cumplen salen atenuadas. <button class="link" id="fback">Volver a los resultados</button></div>`:"";
   let html=`<div class="top" style="margin:0 0 8px"><h3>${z.name}</h3><span class="sub">Líneas ${z.lo}–${z.hi}</span></div>${fl}`;
   for(const num of [...z.nums].sort((a,b)=>a-b)){const rs=routesOf(num);
