@@ -789,9 +789,9 @@ const ZONES={cuerda:(()=>{
      toward=(P,Q,d)=>{const l=Math.hypot(Q[0]-P[0],Q[1]-P[1]);return[P[0]+(Q[0]-P[0])*d/l,P[1]+(Q[1]-P[1])*d/l]};
    /* «bend» empuja el punto de unión hacia dentro de la sala: las dos mitades se inclinan hacia el interior */
    arr.splice(k,1,{id:"p1b",name:"Pared 6.2",n:13,pts:[A,toward(M,A,7)],side:-1},{id:"p1",name:"Pared 6.1",n:13,pts:[toward(M,B,7),B],side:-1})}
-  /* La Pared 1 se parte en dos sobre la misma recta: 1.1 (1–5) y 1.2 (6–10) */
-  {const k=arr.findIndex(z=>z.id==="p4"),[A,B]=arr[k].pts,M=lerp(A,B,.5),L=Math.hypot(B[0]-A[0],B[1]-A[1]),g=7/L;
-   arr.splice(k,1,{id:"p4b",name:"Pared 1.2",n:5,pts:[A,lerp(A,B,.5-g)],side:-1},{id:"p4",name:"Pared 1.1",n:5,pts:[lerp(A,B,.5+g),B],side:-1})}
+  /* La Pared 1 se parte en dos sobre la misma recta: 1.1 (1–6) y 1.2 (7–10) */
+  {const k=arr.findIndex(z=>z.id==="p4"),[A,B]=arr[k].pts,L=Math.hypot(B[0]-A[0],B[1]-A[1]),g=7/L;
+   arr.splice(k,1,{id:"p4b",name:"Pared 1.2",n:4,pts:[A,lerp(A,B,.4-g)],side:-1},{id:"p4",name:"Pared 1.1",n:6,pts:[lerp(A,B,.4+g),B],side:-1})}
   const cx=BOX.x+20+len(4)+18+10,cy=BOX.y+42+len(8);
   arr.push(
    {id:"x1",name:"Exterior · lado largo",n:8,pts:[[cx,cy-len(8)],[cx,cy]],side:-1},
@@ -802,7 +802,7 @@ const VB={w:Math.ceil(WX[1]+28),h:Math.ceil(Math.max(BOX.y+BOX.h,...ZONES.cuerda
 /* Interior numerado al revés (la antigua 37 es la 1); la zona exterior sigue después */
 /* Primer número de cada pared. Las paredes del interior se numeran en sentido contrario a como se dibujan.
    No existe la línea 24 (la 22, 23 y 25 están en la Pared 3.2) ni la 36 (entre la Pared 4 y la 5). */
-const FIRST={p4:1,p4b:6,a2:11,p3:15,p3c:22,p2:26,a1:37,p1:42,p1b:55,x1:68,x2:76};
+const FIRST={p4:1,p4b:7,a2:11,p3:15,p3c:22,p2:26,a1:37,p1:42,p1b:55,x1:68,x2:76};
 const LINES={};(()=>{for(const s in ZONES)ZONES[s].forEach(z=>{z.nums=[];for(let i=0;i<z.n;i++){const num=z.id==="p3c"?[25,23,22][i]:z.id[0]==="x"?FIRST[z.id]+i:FIRST[z.id]+z.n-1-i;z.nums.push(num);LINES[num]={num,zone:z.id,slot:i,sec:s}}z.lo=Math.min(...z.nums);z.hi=Math.max(...z.nums)})})();
 /* Autoseguro usa las mismas paredes y líneas que cuerda, con sus propias vías y su propio ranking */
 ZONES.autoseguro=ZONES.cuerda;
