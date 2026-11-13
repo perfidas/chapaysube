@@ -1499,48 +1499,49 @@ const FEEL={regalada:"Regalada",grado:"En su grado",dura:"Dura"},RSEC=r=>r.sec==
 function rIdx(){if(!S._rm){S._rm=new Map();(S.rates||[]).forEach(x=>{let l=S._rm.get(x.route_id);if(!l)S._rm.set(x.route_id,l=[]);l.push(x)})}return S._rm}
 function rateOf(id){const L=rIdx().get(id);if(!L||!L.length)return null;const c={regalada:0,grado:0,dura:0};L.forEach(x=>{if(x.feel)c[x.feel]++});
   const top=c.regalada>c.dura&&c.regalada>c.grado?"regalada":c.dura>c.regalada&&c.dura>c.grado?"dura":null;
-  return{avg:L.reduce((t,x)=>t+x.stars,0)/L.length,n:L.length,c,top}}
+  const sL=L.filter(x=>x.stars);return{avg:sL.length?sL.reduce((t,x)=>t+x.stars,0)/sL.length:null,ns:sL.length,n:L.length,c,top}}
 const myRate=id=>S.me?(rIdx().get(id)||[]).find(x=>x.user_id===S.me):null;
 const f1=v=>v.toFixed(1).replace(".",",");
 /* En la tablilla: la media de estrellas y, si la mayoría coincide, la etiqueta */
-const rateTag=r=>{if(!RSEC(r))return"";const q=rateOf(r.id);return q?`<span class="tb-rt" title="${q.n} ${q.n===1?"nota":"notas"}">★ ${f1(q.avg)}${q.top?` <i class="rtg ${q.top}">${FEEL[q.top]}</i>`:""}</span>`:""};
+const rateTag=r=>{if(!RSEC(r))return"";const q=rateOf(r.id);return q&&(q.avg!=null||q.top)?`<span class="tb-rt" title="${q.n} ${q.n===1?"nota":"notas"}">${q.avg!=null?`★ ${f1(q.avg)}`:""}${q.top?` <i class="rtg ${q.top}">${FEEL[q.top]}</i>`:""}</span>`:""};
 const starTxt=n=>"★".repeat(n)+"☆".repeat(5-n);
 function rateLine(r){if(!RSEC(r))return"";const q=rateOf(r.id),m=myRate(r.id),done=!!myAsc(r.id);
   const fs=q?Object.keys(FEEL).filter(k=>q.c[k]).map(k=>`${FEEL[k].toLowerCase()} ${q.c[k]}`).join(" · "):"";
-  const sum=q?`<span><b class="rst">★ ${f1(q.avg)}</b> <span class="sub">${q.n} ${q.n===1?"nota":"notas"}${fs?" · "+fs:""}</span></span>`:`<span class="sub">Aún nadie la ha puntuado.</span>`;
-  const mine=done?(m?`<span class="rtm"><span class="sub">Tu nota</span> <span class="rst" aria-label="${m.stars} estrellas">${starTxt(m.stars)}</span>${m.feel?` <span class="sub">· ${FEEL[m.feel]}</span>`:""}<button class="link" id="rtb">Cambiar</button></span>`:`<button class="link" id="rtb">Puntuar esta vía</button>`):"";
+  const sum=q?`<span>${q.avg!=null?`<b class="rst">★ ${f1(q.avg)}</b> `:""}<span class="sub">${q.n} ${q.n===1?"nota":"notas"}${fs?" · "+fs:""}</span></span>`:`<span class="sub">Aún nadie la ha puntuado.</span>`;
+  const mine=done?(m?`<span class="rtm"><span class="sub">Tu nota</span> ${m.stars?`<span class="rst" aria-label="${m.stars} estrellas">${starTxt(m.stars)}</span>`:""}${m.feel?` <span class="sub">${m.stars?"· ":""}${FEEL[m.feel]}</span>`:""}<button class="link" id="rtb">Cambiar</button></span>`:`<button class="link" id="rtb">Puntuar esta vía</button>`):"";
   return `<div class="rtl">${sum}${mine}</div>`}
 function rateOpen(r){if(!S.me||$("#rts"))return;const m=myRate(r.id),st={n:m?.stars||0,f:m?.feel||null};
   const d=document.createElement("div");d.id="rts";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","rtt");
   const draw=()=>{d.innerHTML=`<div class="fbp rtp"><h2 id="rtt">¿Qué tal la ${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}?</h2>
+    <div class="sub c">Puedes poner estrellas, el grado o las dos cosas</div>
     <div class="rstars" role="radiogroup" aria-label="Estrellas">${[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${st.n===i}" aria-label="${i} ${i===1?"estrella":"estrellas"}" data-sn="${i}" class="${i<=st.n?"on":""}">★</button>`).join("")}</div>
-    <div class="sub c">El grado (opcional)</div>
+    <div class="sub c">El grado</div>
     <div class="rfeel">${Object.entries(FEEL).map(([k,v])=>`<button type="button" data-fl="${k}" aria-pressed="${st.f===k}" class="${st.f===k?"on":""}">${v}</button>`).join("")}</div>
-    <div class="drow"><button type="button" id="rtc">Ahora no</button><button class="pri" type="button" id="rto" ${st.n?"":"disabled"}>Guardar</button></div></div>`;
-    d.querySelectorAll("[data-sn]").forEach(b=>b.onclick=()=>{st.n=+b.dataset.sn;draw();d.querySelector(`[data-sn="${st.n}"]`)?.focus()});
+    <div class="drow"><button type="button" id="rtc">Ahora no</button><button class="pri" type="button" id="rto" ${st.n||st.f?"":"disabled"}>Guardar</button></div></div>`;
+    d.querySelectorAll("[data-sn]").forEach(b=>b.onclick=()=>{st.n=st.n===+b.dataset.sn?0:+b.dataset.sn;draw();d.querySelector(`[data-sn="${st.n}"]`)?.focus()});
     d.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{st.f=st.f===b.dataset.fl?null:b.dataset.fl;draw()});
     d.querySelector("#rtc").onclick=close;d.querySelector("#rto").onclick=save};
   const close=()=>d.remove();
-  const save=async()=>{if(!st.n||S.busy)return;S.busy=true;d.querySelector("#rto").disabled=true;
-    const q=m?await sb.from("liga_ratings").update({stars:st.n,feel:st.f,updated_at:new Date().toISOString()}).eq("route_id",r.id).eq("user_id",S.me)
-             :await sb.from("liga_ratings").insert({route_id:r.id,stars:st.n,feel:st.f});
+  const save=async()=>{if(!(st.n||st.f)||S.busy)return;S.busy=true;d.querySelector("#rto").disabled=true;
+    const q=m?await sb.from("liga_ratings").update({stars:st.n||null,feel:st.f,updated_at:new Date().toISOString()}).eq("route_id",r.id).eq("user_id",S.me)
+             :await sb.from("liga_ratings").insert({route_id:r.id,stars:st.n||null,feel:st.f});
     S.busy=false;if(q.error){d.querySelector("#rto").disabled=false;return toast("No se ha podido guardar la nota: "+q.error.message)}
-    S.rates=(S.rates||[]).filter(x=>!(x.route_id===r.id&&x.user_id===S.me)).concat({route_id:r.id,user_id:S.me,stars:st.n,feel:st.f});S._rm=null;
+    S.rates=(S.rates||[]).filter(x=>!(x.route_id===r.id&&x.user_id===S.me)).concat({route_id:r.id,user_id:S.me,stars:st.n||null,feel:st.f});S._rm=null;
     close();toast("Nota guardada.");redraw()};
   d.onclick=e=>{if(e.target===d)close()};d.onkeydown=e=>{if(e.key==="Escape")close()};
   draw();document.body.appendChild(d);d.querySelector("[data-sn]")?.focus()}
 
 /* Las vías según la gente: mejores, regaladas y duras (solo vías montadas de cuerda y autoseguro) */
-const rateMini=r=>{const q=rateOf(r.id);return q?`<small class="rmini">★ ${f1(q.avg)}${q.top?" · "+FEEL[q.top].toLowerCase():""}</small>`:""};
+const rateMini=r=>{const q=rateOf(r.id);return q&&(q.avg!=null||q.top)?`<small class="rmini">${[q.avg!=null?"★ "+f1(q.avg):"",q.top?FEEL[q.top].toLowerCase():""].filter(Boolean).join(" · ")}</small>`:""};
 function crowdList(k){const L=S.routes.filter(r=>r.active&&RSEC(r)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q);
-  if(k==="top")return L.sort((a,b)=>b.q.avg-a.q.avg||b.q.n-a.q.n);
+  if(k==="top")return L.filter(x=>x.q.avg!=null).sort((a,b)=>b.q.avg-a.q.avg||b.q.ns-a.q.ns);
   return L.filter(x=>x.q.top===k).sort((a,b)=>b.q.c[k]-a.q.c[k]||b.q.n-a.q.n)}
 function crowdHtml(){const k=S.cg||"top",L=crowdList(k).slice(0,5);if(!crowdList("top").length)return"";
   const T={top:"Mejores",regalada:"Regaladas",dura:"Duras"};
   return `<div class="hrow hk"><span class="k">Las vías según la gente</span></div><section class="crowd">
    <div class="cgt" role="tablist">${Object.entries(T).map(([v,l])=>`<button role="tab" aria-selected="${k===v}" class="${k===v?"on":""}" data-cg="${v}">${l}</button>`).join("")}</div>
    ${L.length?L.map(({r,q},i)=>`<button class="cgr" data-fr="${r.id}"><i>${i+1}</i><span class="sw" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"></span><span><b>Línea ${r.line} · ${r.grade}</b> <span class="sub">${r.sec==="autoseguro"?"auto":"cuerda"} · ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</span></span>
-     <span class="cgv">${k==="top"?`★ ${f1(q.avg)}`:`${q.c[k]} de ${q.n}`}<small>${k==="top"?`${q.n} ${q.n===1?"nota":"notas"}`:"la ven "+T[k].toLowerCase().replace(/s$/,"")}</small></span></button>`).join("")
+     <span class="cgv">${k==="top"?`★ ${f1(q.avg)}`:`${q.c[k]} de ${q.n}`}<small>${k==="top"?`${q.ns} ${q.ns===1?"nota":"notas"}`:"la ven "+T[k].toLowerCase().replace(/s$/,"")}</small></span></button>`).join("")
      :`<div class="sub" style="padding:8px 2px">Ninguna vía montada tiene mayoría de «${T[k].toLowerCase().replace(/s$/,"")}» todavía.</div>`}</section>`}
 /* Solo el administrador: las vías que la gente ve regaladas o duras, para pasárselo a quien monta */
 function notasView(){if(!S.owner){S.view="home";return render()}
@@ -1548,7 +1549,7 @@ function notasView(){if(!S.owner){S.view="home";return render()}
   const L=S.routes.filter(r=>r.active&&RSEC(r)).map(r=>({r,q:rateOf(r.id)})).filter(x=>x.q&&(x.q.c.regalada||x.q.c.dura));
   const grp=k=>L.filter(x=>x.q.top===k).sort((a,b)=>b.q.c[k]-a.q.c[k]||a.r.line-b.r.line),mix=L.filter(x=>!x.q.top).sort((a,b)=>a.r.line-b.r.line);
   const row=({r,q})=>`<button class="ntr" data-fr="${r.id}"><span class="sw" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"></span><span><b>${sec(r)} · línea ${r.line} · ${col(r)} · ${r.grade}</b><br>
-    <span class="sub">★ ${f1(q.avg)} · ${q.n} ${q.n===1?"nota":"notas"} — regalada ${q.c.regalada} · en su grado ${q.c.grado} · dura ${q.c.dura}</span></span></button>`;
+    <span class="sub">${q.avg!=null?`★ ${f1(q.avg)} · `:""}${q.n} ${q.n===1?"nota":"notas"} — regalada ${q.c.regalada} · en su grado ${q.c.grado} · dura ${q.c.dura}</span></span></button>`;
   const txt=k=>grp(k).map(({r,q})=>`- ${sec(r)}, línea ${r.line} ${col(r)} (${r.grade}): ${q.c[k]} de ${q.n} la ven ${k}`).join("\n");
   const R=grp("regalada"),D=grp("dura");
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div><h2>Notas de las vías</h2>
@@ -2294,7 +2295,7 @@ const fOn=f=>!!(f.min||f.max||f.hold||f.col||f.todo||f.rt);
 function fMatch(r,f){
   if(f.hold&&r.hold!==f.hold)return false;
   if(f.todo&&myAsc(r.id))return false;
-  if(f.rt){const q=rateOf(r.id);if(!q)return false;if(f.rt==="top"?q.avg<4:q.top!==f.rt)return false}
+  if(f.rt){const q=rateOf(r.id);if(!q)return false;if(f.rt==="top"?!(q.avg>=4):q.top!==f.rt)return false}
   if(r.sec==="boulder")return !f.col||r.color===f.col;
   const i=GRADES.indexOf(r.grade);
   if(f.min&&i<GRADES.indexOf(f.min))return false;
