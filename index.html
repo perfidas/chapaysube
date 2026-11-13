@@ -604,6 +604,21 @@ p.rnb{margin:-6px 0 14px}
 .cgr .sw,.ntr .sw{width:8px;height:28px;border-radius:3px;display:block}
 .cgv{font:700 15px/1.1 var(--disp);color:var(--gold);text-align:right;white-space:nowrap}.cgv small{display:block;font:500 11px var(--body);color:var(--mut)}
 .ntl{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+/* Fotos de perfil */
+.av{display:inline-grid;place-items:center;flex:none;width:32px;height:32px;border-radius:50%;object-fit:cover;background:#22303c;border:1.5px solid rgba(255,255,255,.18)}
+.av.ini{background:color-mix(in srgb,var(--avc) 22%,#16212b);color:var(--avc);font:900 15px/1 var(--disp);border-color:color-mix(in srgb,var(--avc) 55%,transparent)}
+.av.xl{width:76px;height:76px;font-size:36px;border-width:2px}
+.av.rk{width:34px;height:34px}.av.pd{width:46px;height:46px;font-size:20px;margin-bottom:2px}.av.du{width:30px;height:30px;font-size:14px;margin-bottom:3px}
+.rk .rkb{grid-template-columns:30px 34px 1fr auto}
+.pc .pos{order:1}.pc .av{order:0}
+.dsc .dot .av{align-self:flex-end}
+.cav{position:relative;flex:none;padding:0;border:0;background:none;min-height:0;border-radius:50%;display:inline-block}
+.cav .avp{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font:700 15px/26px var(--body);text-align:center;border:2px solid #121b24}
+.fav{position:relative;width:32px;height:32px;display:block}.fav .av{width:32px;height:32px}
+.fav .fdot{position:absolute;right:-5px;bottom:-5px;width:17px;height:17px;border:2px solid var(--card)}.fav .fdot b{display:none}.fav .fdot .crown{width:10px;height:7px}
+.avcw{display:grid;place-items:center}.avcw canvas{width:min(260px,70vw);height:auto;aspect-ratio:1;border-radius:50%;touch-action:none;cursor:grab;border:2px solid var(--line)}
+.avpick{display:block;text-align:center;padding:11px;border-radius:8px;cursor:pointer;background:var(--acc);color:#fff;font-weight:600}
+.avx{display:block;margin:-6px 0 10px}
 </style>
 
 </head>
@@ -738,6 +753,7 @@ async function loadAll(){
     fetchAll(()=>sb.from("liga_routes").select("*").order("id")),
     fetchAll(()=>sb.from("liga_ascents").select("id,user_id,route_id,sec,grade,style,done_at").order("id")),
     q("liga_points"),q("liga_styles")]);
+  S.avs=await sb.from("liga_avatars").select("user_id,v").then(r=>Object.fromEntries((r.data||[]).map(x=>[x.user_id,x.v]))).catch(()=>S.avs||{});
   S.rates=await fetchAll(()=>sb.from("liga_ratings").select("route_id,user_id,stars,feel").order("route_id").order("user_id")).catch(()=>S.rates||[]);S._rm=null;
   const dq=await sb.from("liga_duels").select("*").order("created_at",{ascending:false}).limit(500);S.duels=(dq.data||[]).map(mapD);
   gp.forEach(x=>{if(x.kind==="via")GP[x.grade]=x.pts;else if(BCOL[x.grade])BCOL[x.grade][2]=x.pts});
@@ -1278,7 +1294,7 @@ function duelsHtml(){if(!S.me||!me())return"";const nm=Object.fromEntries(S.user
   const kd=d=>d.kind==="dia"?"solo hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre",ot=d=>d.ch===S.me?d.rv:d.ch;
   const card=d=>{const[a,b]=duelScore(d),mineP=d.ch===S.me?a:b,theirs=d.ch===S.me?b:a,o=nm[ot(d)],w=duelWinner(d);
     return `<div class="duel ${w?(w===S.me?"won":w==="empate"?"tie":"lost"):""}"><div class="dsec">${secName(d.sec)}${d.kind==="dia"?" · sesión":""} · ${w?(w===S.me?"¡Has ganado!":w==="empate"?"Empate":"Has perdido"):`quedan ${left(d)}`}</div>
-      <div class="dsc"><span class="dme"><small>Tú</small><b>${fmt(mineP)}</b></span><span class="dvs">VS</span><span class="dot"><small>${esc(o)}</small><b>${fmt(theirs)}</b></span></div>
+      <div class="dsc"><span class="dme">${av(S.me,me()?.name,"du")}<small>Tú</small><b>${fmt(mineP)}</b></span><span class="dvs">VS</span><span class="dot">${av(ot(d),o,"du")}<small>${esc(o)}</small><b>${fmt(theirs)}</b></span></div>
       ${!w?`<div class="dbar"><i style="width:${mineP+theirs?Math.round(mineP/(mineP+theirs)*100):50}%"></i></div>`:""}</div>`};
   return `<div class="hrow hk"><span class="k">Duelos</span></div><section class="duels">
    ${inv.map(d=>`<div class="duel inv"><div><b>${esc(nm[d.ch])}</b> te reta en ${secLow(d.sec)}, ${kd(d)}.</div><div class="drow"><button class="pri" data-dok="${d.id}">Aceptar</button><button data-dno="${d.id}">Rechazar</button></div></div>`).join("")}
@@ -1468,6 +1484,50 @@ function notasView(){if(!S.owner){S.view="home";return render()}
   if($("#ntc"))$("#ntc").onclick=async()=>{const t=`Vías que la gente ve regaladas:\n${txt("regalada")||"- ninguna"}\n\nVías que la gente ve duras:\n${txt("dura")||"- ninguna"}`;
     try{await navigator.clipboard.writeText(t);toast("Lista copiada. Pégala en WhatsApp o donde quieras.")}catch(e){toast("No se ha podido copiar en este móvil.")}}}
 
+/* ---------- Fotos de perfil: se recortan en el móvil a 256×256 y se guardan en Supabase (carpeta pública «avatars») ---------- */
+const avUrl=id=>S.avs?.[id]?`${CFG.url}/storage/v1/object/public/avatars/${id}.jpg?v=${S.avs[id]}`:null;
+const AVC=["#ff3d7f","#2fe0e6","#3fd28b","#ffc53d","#a78bfa","#ff8a4c"];
+function av(id,name,cls=""){const u=avUrl(id);if(u)return `<img class="av ${cls}" src="${u}" alt="" loading="lazy" decoding="async">`;
+  let h=0;for(const c of String(id||""))h=(h*31+c.charCodeAt(0))>>>0;const ch=[...String(name||"?").trim()][0]||"?";
+  return `<span class="av ini ${cls}" style="--avc:${AVC[h%AVC.length]}" aria-hidden="true">${esc(ch.toUpperCase())}</span>`}
+const favDot=(id,name,dot)=>`<span class="fav">${av(id,name,"fd")}${dot}</span>`;
+function avHead(u){const mine=u.id===S.me&&me();
+  return mine?`<button class="cav" id="avb" aria-label="${avUrl(u.id)?"Cambiar o quitar tu foto":"Poner una foto"}">${av(u.id,u.name,"xl")}<span class="avp" aria-hidden="true">${avUrl(u.id)?"✎":"+"}</span></button>`:`<span class="cav">${av(u.id,u.name,"xl")}</span>`}
+function bindAv(){if($("#avb"))$("#avb").onclick=avSheet;
+  if($("#avx"))$("#avx").onclick=async()=>{if(S.arm!=="avx"){S.arm="avx";return perfil()}S.arm=null;await avRemove(S.pid);perfil()}}
+function avSheet(){if($("#avs"))return;const has=!!avUrl(S.me),d=document.createElement("div");d.id="avs";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","avt");
+  d.innerHTML=`<div class="fbp"><h2 id="avt">Tu foto</h2><p class="sub">La verá toda la liga: en tu perfil, el ranking, los duelos y «Está pasando».</p>
+   <label class="pri avpick">Elegir foto o hacer una<input type="file" accept="image/*" id="avf" hidden></label>
+   ${has?`<button id="avd" class="dng">Quitar mi foto</button>`:""}<button id="avc">Cancelar</button></div>`;
+  document.body.appendChild(d);const close=()=>d.remove();d.onclick=e=>{if(e.target===d)close()};d.onkeydown=e=>{if(e.key==="Escape")close()};
+  d.querySelector("#avc").onclick=close;d.querySelector("#avd")?.addEventListener("click",async()=>{close();await avRemove(S.me);redraw()});
+  d.querySelector("#avf").onchange=e=>{const f=e.target.files?.[0];if(!f)return;close();avCrop(f)}}
+/* Encuadre: arrastrar para mover y la barra para acercar */
+function avCrop(file){const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{
+  const d=document.createElement("div");d.id="avs";d.className="fbs";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","avt");
+  d.innerHTML=`<div class="fbp"><h2 id="avt">Encuadra tu foto</h2><div class="avcw"><canvas id="avcv" width="520" height="520"></canvas></div>
+   <label class="fl" for="avz">Acercar<input type="range" id="avz" min="1" max="4" step="0.01" value="1"></label>
+   <span class="sub">Arrastra la foto para colocarla.</span><div class="drow"><button id="avc">Cancelar</button><button class="pri" id="avo">Guardar</button></div></div>`;
+  document.body.appendChild(d);const cv=d.querySelector("#avcv"),cx=cv.getContext("2d"),W=520,base=W/Math.min(im.width,im.height);let z=1,ox=0,oy=0;
+  const lim=()=>{const s=base*z,mx=Math.max(0,(im.width*s-W)/2),my=Math.max(0,(im.height*s-W)/2);ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy))};
+  const draw=(c=cx,w=W)=>{const s=base*z*w/W;c.fillStyle="#0f1720";c.fillRect(0,0,w,w);c.drawImage(im,w/2-im.width*s/2+ox*w/W,w/2-im.height*s/2+oy*w/W,im.width*s,im.height*s)};
+  draw();let drag=null;
+  cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect();drag={x:e.clientX,y:e.clientY,ox,oy,k:W/r.width}};
+  cv.onpointermove=e=>{if(!drag)return;ox=drag.ox+(e.clientX-drag.x)*drag.k;oy=drag.oy+(e.clientY-drag.y)*drag.k;lim();draw()};
+  cv.onpointerup=cv.onpointercancel=()=>drag=null;
+  d.querySelector("#avz").oninput=e=>{z=+e.target.value;lim();draw()};
+  const close=()=>{d.remove();URL.revokeObjectURL(url)};d.querySelector("#avc").onclick=close;d.onkeydown=e=>{if(e.key==="Escape")close()};
+  d.querySelector("#avo").onclick=async()=>{const b=d.querySelector("#avo");b.disabled=true;b.textContent="Subiendo…";
+    const o=document.createElement("canvas");o.width=o.height=256;draw(o.getContext("2d"),256);
+    const blob=await new Promise(r=>o.toBlob(r,"image/jpeg",.85));const ok=blob&&await avSave(blob);if(ok)close();else{b.disabled=false;b.textContent="Guardar"}}};
+  im.onerror=()=>{URL.revokeObjectURL(url);toast("No se ha podido abrir esa imagen.")};im.src=url}
+async function avSave(blob){const{error}=await sb.storage.from("avatars").upload(`${S.me}.jpg`,blob,{upsert:true,contentType:"image/jpeg",cacheControl:"31536000"});
+  if(error){toast("No se ha podido subir la foto: "+error.message);return false}
+  const v=Date.now(),q=await sb.from("liga_avatars").upsert({user_id:S.me,v});if(q.error){toast("No se ha podido guardar la foto: "+q.error.message);return false}
+  (S.avs||(S.avs={}))[S.me]=v;toast("Foto guardada.");redraw();return true}
+async function avRemove(uid){const a=await sb.storage.from("avatars").remove([`${uid}.jpg`]),b=await sb.from("liga_avatars").delete().eq("user_id",uid);
+  if(a.error||b.error)return toast("No se ha podido quitar la foto.");delete S.avs[uid];toast("Foto quitada.")}
+
 /* ---------- Seguir escaladores: solo lo ves tú; al abrir una vía o un bloque salen los que sigues que la han hecho ---------- */
 const FICO={eyes:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.8 3.2-5.5 6-5.5s5.2 1.7 6 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.6.8 2.6 2.4 3 5.2"/></svg>',
  plus:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
@@ -1516,7 +1576,7 @@ function cromo(u,y,cur){const yr=S.asc.filter(a=>a.u===u.id&&new Date(a.at).getF
   const pos=SECTIONS.map(s=>{const r=rankRange(s.id,cur.from,cur.to),i=r.findIndex(x=>x.id===u.id);return{s,i,p:i>=0?r[i].p:0}});
   const best=pos.filter(x=>x.i>=0).sort((a,b)=>a.i-b.i)[0],lead=pos.filter(x=>x.i===0).map(x=>x.s.name.toLowerCase());
   const n=new Set(yr.map(a=>a.route)).size,tot=pos.reduce((t,x)=>t+x.p,0);
-  return `<section class="cromo" aria-label="Ficha de ${esc(u.name)}"><div class="hd"><span class="cwho"><h2 class="nm">${esc(u.name)}</h2>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:`<span class="ctag plain">Temporada ${y}${u.id===S.me?" · Tu perfil":""}</span>`}</span></div>
+  return `<section class="cromo" aria-label="Ficha de ${esc(u.name)}"><div class="hd">${avHead(u)}<span class="cwho"><h2 class="nm">${esc(u.name)}</h2>${lead.length?`<span class="ctag">♛ Líder de ${lead.join(" y ")}</span>`:`<span class="ctag plain">Temporada ${y}${u.id===S.me?" · Tu perfil":""}</span>`}</span></div>
    <div class="cstats"><div class="mx">${vg?`<span class="cmini"><i></i><span><small>Grado máx.</small><b>${vg}</b></span></span>`:`<span><b>–</b><span>Grado máx.</span></span>`}</div>
     <div class="${best&&best.i===0?"g":""}"><b>${best?ord(best.i+1):"–"}</b><span>${best?best.s.name:"Puesto"}</span></div>
     <div><b>${n}</b><span>${n===1?"Vía":"Vías"} ${y}</span></div><div><b>${fmt(tot)}</b><span>Puntos bim.</span></div></div></section>`}
@@ -1556,7 +1616,7 @@ function perfil(){
     return `<div class="pr ${n?"":"z"}"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gc(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gc(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
-  ${cromo(u,y,cur)}
+  ${cromo(u,y,cur)}${S.owner&&u.id!==S.me&&avUrl(u.id)?`<button class="link dng avx" id="avx">${S.arm==="avx"?"Pulsa otra vez para quitar su foto":"Quitar su foto"}</button>`:""}
   ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${duelForm(u)}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
   <div class="pf-grid">${cards}</div>
@@ -1581,7 +1641,7 @@ function perfil(){
   document.querySelectorAll("[data-fp]").forEach(b=>b.onclick=()=>openProfile(b.dataset.fp));
   document.querySelectorAll("[data-dmore]").forEach(b=>b.onclick=()=>{const d=b.dataset.dmore,o=S.dayOpen||(S.dayOpen=new Set());o.has(d)?o.delete(d):o.add(d);const y0=scrollY;perfil();scrollTo(0,y0)});
   document.querySelectorAll("[data-fu]").forEach(b=>b.onclick=()=>{const k="fu"+b.dataset.fu;if(S.arm!==k){S.arm=k;return perfil()}S.arm=null;toggleFollow(b.dataset.fu)});
-  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
+  if($("#bkp"))$("#bkp").onclick=backup;if($("#fbz"))$("#fbz").onclick=()=>{S.view="buzon";S.arm=null;S.scrollTop=true;render()};if($("#ntz"))$("#ntz").onclick=()=>{S.view="notas";S.scrollTop=true;render()};bindAv();if($("#out"))$("#out").onclick=()=>sb.auth.signOut();
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
   $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
@@ -1625,12 +1685,12 @@ function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.us
   /* solo encadenes destacados: vías de 6c+ para arriba (6C en Kilter) y bloques de morado para arriba */
   const big=a=>a.sec==="boulder"?BKEYS.indexOf(a.grade)>=BKEYS.indexOf("morado"):a.sec==="kilter"?KGRADES.indexOf(a.grade)>=KGRADES.indexOf("6C"):GRADES.indexOf(a.grade)>=GRADES.indexOf("6c+");
   S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a))return;
-    if(a.sec==="kilter")ev.push({t,dot:`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
-    else if(a.sec==="boulder")ev.push({t,dot:`<span class="fdot" style="background:${bbg(a.grade)}"></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
-    else ev.push({t,dot:`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`,h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
+    if(a.sec==="kilter")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
+    else if(a.sec==="boulder")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${bbg(a.grade)}"></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
+    else ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
   try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
   SECTIONS.forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
-    if(last)ev.push({t:new Date(last.at).getTime()+2,dot:`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`,h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
+    if(last)ev.push({t:new Date(last.at).getTime()+2,dot:favDot(r[0].id,r[0].name,`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`),h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
   /* duelos: cuando empiezan y cuando se deciden */
   (S.duels||[]).forEach(d=>{if(d.st!=="aceptado"||!nm[d.ch]||!nm[d.rv])return;const k=d.kind==="dia"?"hoy":d.kind==="semana"?"una semana":"hasta fin de bimestre",sw='<span class="fdot" style="background:var(--acc);color:#fff"><b>⚔</b></span>';
     const ts=new Date(d.start).getTime();if(now-ts<wk&&!duelOver(d))ev.push({t:ts,dot:sw,h:`<b>${esc(nm[d.ch])}</b> y <b>${esc(nm[d.rv])}</b> se baten en duelo <span class="sub">· ${secLow(d.sec)}, ${k}</span>`});
@@ -2136,8 +2196,8 @@ const CROWN=`<svg class="crown" viewBox="0 0 26 16" aria-hidden="true"><path fil
 /* Puesto de cada uno hace 24 h, para marcar quién ha bajado o subido */
 function moves(sec){const{from,to}=period("bim"),ago=new Date(Date.now()-864e5);if(ago<=from)return null;const m={};rankRange(sec,from,ago).forEach((x,i)=>m[x.id]=i+1);return m}
 const mvTag=(m,id,i)=>{if(!m||!m[id])return"";const d=m[id]-(i+1);return d<0?`<span class="mv dw" title="Hace 24 h iba ${m[id]}.º">▼ ${-d}</span>`:d>0?`<span class="mv up" title="Hace 24 h iba ${m[id]}.º">▲ ${d}</span>`:""};
-function rkList(r,year,m){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}" aria-label="${i===0?"Líder: ":""}${esc(x.name)}"><span class="pos">${i===0?CROWN:""}${i+1}${mvTag(m,x.id,i)}</span><span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
-function podium(r,year){return `<div class="pod">${[0,1,2].map(i=>{const x=r[i];return x?`<button class="pc p${i+1}" data-u="${x.id}"><span class="pos">${i+1}.º</span><b>${esc(x.name)}</b><small>${fmt(x.p)} ${year?"pts de liga":"pts"}</small></button>`:`<div class="pc nope"><span class="pos">${i+1}.º</span><small>Sin puntuar</small></div>`}).join("")}</div>`}
+function rkList(r,year,m){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}" aria-label="${i===0?"Líder: ":""}${esc(x.name)}"><span class="pos">${i===0?CROWN:""}${i+1}${mvTag(m,x.id,i)}</span>${av(x.id,x.name,"rk")}<span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
+function podium(r,year){return `<div class="pod">${[0,1,2].map(i=>{const x=r[i];return x?`<button class="pc p${i+1}" data-u="${x.id}">${av(x.id,x.name,"pd")}<span class="pos">${i+1}.º</span><b>${esc(x.name)}</b><small>${fmt(x.p)} ${year?"pts de liga":"pts"}</small></button>`:`<div class="pc nope"><span class="pos">${i+1}.º</span><small>Sin puntuar</small></div>`}).join("")}</div>`}
 const years=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
 function closedBims(y){const n=new Date(),cy=n.getFullYear();return Array.from({length:y<cy?6:y===cy?Math.floor(n.getMonth()/2):0},(_,b)=>b)}
 function hcard(title,r,year,k){const open=S.hopen===k;
