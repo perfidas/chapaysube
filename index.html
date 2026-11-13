@@ -554,7 +554,7 @@ p.rnb{margin:-6px 0 14px}
 .fba{display:flex;gap:10px;align-items:center}.fba button{min-height:34px;padding:4px 12px;font-size:13px}
 
 /* Perfil: hoy por sección y encadenes por día */
-.tdy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-bottom:6px}
+.tdy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-bottom:16px}
 .tdy>div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .tdy .sic{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tdy b{font:900 30px/1 var(--disp);font-variant-numeric:tabular-nums}.tdy small{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
@@ -1820,6 +1820,7 @@ function perfil(){
   ${cromo(u,y,cur)}${S.owner&&u.id!==S.me&&avUrl(u.id)?`<button class="link dng avx" id="avx">${S.arm==="avx"?"Pulsa otra vez para quitar su foto":"Quitar su foto"}</button>`:""}
   ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${S.me&&u.id!==S.me&&me()?`<button class="vsbtn" id="vsb">Compararme con ${esc(u.name)}</button>`:""}${duelForm(u)}
   ${u.id===S.me?(S.ren?`<form id="rnf" class="rnf" novalidate><label class="fl" for="rnn">Nombre nuevo (se verá también en «Mis vías»). Después no podrás cambiarlo en dos meses.<input id="rnn" maxlength="30" autocomplete="nickname" value="${esc(u.name)}"></label><span class="err" id="rne" role="alert" hidden></span><div class="row"><button class="pri" type="submit" id="rngo">Guardar</button><button type="button" id="rnx">Cancelar</button></div></form>`:(S.nameNext&&new Date(S.nameNext)>new Date()?`<p class="sub rnb">Podrás volver a cambiar tu nombre el ${new Date(S.nameNext).toLocaleDateString("es-ES",{day:"numeric",month:"long"})}.</p>`:`<button class="link rnb" id="rnb">Cambiar mi nombre</button><span class="sub rnh">Solo se puede cambiar una vez cada dos meses.</span>`)):""}
+  ${todayHtml(mine)}
   <div class="pf-grid">${cards}</div>
   ${u.id===S.me?projHtml()+folListHtml():""}
   ${vitrinaHtml(u.id)}
@@ -1832,7 +1833,6 @@ function perfil(){
   <p class="sub" style="margin:6px 0 0">Cada ${isB||isK?"bloque":"vía"} cuenta una vez, aunque la hayas repetido en otro bimestre.</p>
   <h3 class="pfh">Puestos por bimestre</h3>
   <div class="tbl"><table class="postab"><thead><tr><th scope="col">Bimestre</th>${VSEC().map(s=>`<th scope="col">${s.name}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
-  ${todayHtml(mine)}
   <h3 class="pfh">Últimos encadenes</h3>
   ${last.length?lastByDay(last,mine)
    :`<div class="empty">${u.id===S.me?"Aún no has marcado ningún encadene. Entra en una sección, toca una pared y marca cómo hiciste la vía.":"Todavía no ha marcado ningún encadene."}</div>`}
