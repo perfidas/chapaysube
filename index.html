@@ -763,7 +763,7 @@ const ZONES={cuerda:(()=>{
   const G=18,H=208,w3=Math.sqrt(len(9)**2-H*H),un=(x,y)=>{const l=Math.hypot(x,y);return[x/l,y/l]};
   /* La Pared 3 se queda con la 15–21 (misma inclinación) y la 22, 23 y 25 van en una pared perpendicular a ella, entre la Pared 3 y la 4 */
   const d3=un(w3,H),TA=-60*Math.PI/180,dq=[d3[0]*Math.cos(TA)-d3[1]*Math.sin(TA),d3[0]*Math.sin(TA)+d3[1]*Math.cos(TA)];
-  const walls=[["p1","Pared 6",26,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3c","Pared 3.2",3,-1],["p3","Pared 3.1",7,-1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
+  const walls=[["p1","Pared 6",26,-1],["a1","Pared 5",5,1,1],["p2","Pared 4",10,-1],["p3c","Pared 3.2",3,-1],["p3","Pared 3.1",7,1],["a2","Pared 2",4,1,1],["p4","Pared 1",10,-1]];
   const build=H4=>{const w4=Math.sqrt(len(10)**2-H4*H4),dirs=[[Math.sin(ang),Math.cos(ang)],[1,0],un(w4,-H4),dq,d3,[1,0],[Math.sin(ang),-Math.cos(ang)]];
     let cur=[40,40];const arr=[];
     walls.forEach(([id,name,n,side,wide],i)=>{const d=dirs[i];
@@ -2327,7 +2327,7 @@ function mapSvg(){
       const off=isOff(num),hit=HS?rs.some(r=>HS.has(r.id)):null;
       dots+=`<circle class="ldot ${nw?"nw":""} ${dn?"dn":""} ${rs.length?"":"none"} ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" cx="${f(x)}" cy="${f(y)}" r="11"/><text class="lnum ${all?"dn":""} ${off?"off":""} ${hit===true?"hit":hit===false?"dim":""}" x="${f(x)}" y="${f(y+4.5)}" text-anchor="middle">${num}</text>${off?`<line class="strike" x1="${f(x-9)}" y1="${f(y)}" x2="${f(x+9)}" y2="${f(y)}"/>`:""}`}
     const nx=-dy*z.side,ny=dx*z.side,m=lerp(p,q,.5),lx=m[0]+nx*24,ly=m[1]+ny*24+4,anc=nx>.3?"start":nx<-.3?"end":"middle";
-    g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}</g>`});
+    g+=`<g class="zone ${sel?"sel":""}" data-z="${z.id}" tabindex="0" role="button" aria-label="${z.name}, líneas ${z.lo} a ${z.hi}"><path class="strip" d="${d}" fill="none" stroke-width="${z.wide?22:18}" stroke-linecap="butt"/><path d="${d}" fill="none" stroke="transparent" stroke-width="34" stroke-linecap="butt"/>${dots}${S.edit?`<text class="zlab ${sel?"sel":""}" x="${f(lx)}" y="${f(ly)}" text-anchor="${anc}">${z.name.replace("Exterior · ","")}</text>`:""}</g>`});
   return `<svg viewBox="0 0 ${VB.w} ${VB.h}" role="img" aria-label="Vista cenital de la zona de cuerda">
     <rect class="inset" x="${BOX.x}" y="${BOX.y}" width="${BOX.w}" height="${BOX.h}" rx="6"/>
     <text class="area" x="${BOX.x+12}" y="${BOX.y+20}">ZONA EXTERIOR</text>${g}</svg>`}
