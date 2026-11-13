@@ -2115,7 +2115,7 @@ async function tOcr(){const q=S.tq,url=q.img,cr={...q.crop};S.tq={...q,st:"read"
   catch(e){err=true}
   if(!S.tq||S.tq.img!==url)return;
   if(!rows.length)rows=[{line:"",n:1,hold:"",grade:"",created:""}];
-  S.tq={st:"rows",img:url,crop:cr,rows,also:false,off:new Set(),err,none:!rows[0].line&&!rows[0].hold};mapView()}
+  S.tq={st:"rows",img:url,crop:cr,rows,also:false,off:new Set(),on:new Set(),err,none:!rows[0].line&&!rows[0].hold};mapView()}
 /* Marco para encuadrar la tablilla: se arrastran las esquinas o el marco entero */
 function bindCrop(){const box=$("#tcb"),fr=$("#tfr"),q=S.tq;if(!box||!fr)return;
   const put=()=>{const c=q.crop;Object.assign(fr.style,{left:c.x0*100+"%",top:c.y0*100+"%",width:(c.x1-c.x0)*100+"%",height:(c.y1-c.y0)*100+"%"})};put();
@@ -2139,13 +2139,15 @@ function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&
         if(Object.keys(ch).length)items.push({k:sec+m.id,op:"upd",sec,ln,id:m.id,ch,txt:`${HOLDS[t.hold][0]}: ${ch.grade?`${m.grade} → ${t.grade}`:t.grade}${ch.created?` · fecha ${fdate(t.created)}`:""}`});
         else items.push({k:sec+m.id,op:"same",sec,ln,txt:`${HOLDS[t.hold][0]} ${t.grade}: ya está igual`})}
       else items.push({k:sec+ln+t.hold+t.grade+(t.n||""),op:"add",sec,ln,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created||isoDay(new Date())},txt:`${HOLDS[t.hold][0]} ${t.grade}${t.created?" · "+fdate(t.created):""}`})});
-    cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",sec,ln,id:c.id,txt:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: ya no está en la tablilla`}))}
+    cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",sec,ln,id:c.id,txt:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: no la he leído en la foto. Márcala solo si ya no está en la tablilla`}))}
   return{items,notes,bad:q.rows.length-ok.length}}
-const TOP={add:["Añadir","up"],upd:["Corregir","eq"],del:["Desmontar","dw"],same:["Igual",""]};
+const TOP={add:["Añadir","up"],upd:["Corregir","eq"],del:["¿Desmontar?","dw"],same:["Igual",""]};
+/* Desmontar nunca va marcado de serie: si la foto se lee mal, no se quita ninguna vía que siga en la tablilla */
+const tOn=(q,i)=>i.op==="del"?q.on.has(i.k):!q.off.has(i.k);
 function tPlanHtml(){const{items,notes,bad}=tPlan(),q=S.tq,secs=[...new Set(items.map(i=>i.sec))];
-  const act=items.filter(i=>i.op!=="same"&&!q.off.has(i.k)).length;
+  const act=items.filter(i=>i.op!=="same"&&tOn(q,i)).length;
   return `${bad?`<div class="sub" style="color:var(--gold)">${bad===1?"Hay 1 fila":"Hay "+bad+" filas"} sin completar (línea, color o grado). No se aplicará${bad===1?"":"n"} hasta que la${bad===1?"":"s"} completes.</div>`:""}
-   ${secs.map(sec=>`<div class="k" style="margin-top:6px">${SECTIONS.find(s=>s.id===sec).name}</div>${items.filter(i=>i.sec===sec).map(i=>`<label class="tpi ${i.op}">${i.op==="same"?'<span class="tck">✓</span>':`<input type="checkbox" data-tk="${i.k}" ${q.off.has(i.k)?"":"checked"}>`}<span><b>Línea ${i.ln} · ${TOP[i.op][0]}</b><br><span class="sub">${esc(i.txt)}</span></span></label>`).join("")}`).join("")}
+   ${secs.map(sec=>`<div class="k" style="margin-top:6px">${SECTIONS.find(s=>s.id===sec).name}</div>${items.filter(i=>i.sec===sec).map(i=>`<label class="tpi ${i.op}">${i.op==="same"?'<span class="tck">✓</span>':`<input type="checkbox" data-tk="${i.k}" data-del="${i.op==="del"?1:""}" ${tOn(q,i)?"checked":""}>`}<span><b>Línea ${i.ln} · ${TOP[i.op][0]}</b><br><span class="sub">${esc(i.txt)}</span></span></label>`).join("")}`).join("")}
    ${notes.map(n=>`<div class="sub">${esc(n)}</div>`).join("")}
    ${items.length?"":`<div class="sub">Completa las filas para ver los cambios.</div>`}
    <button class="pri" id="tap" ${act?"":"disabled"}>${act?`Aplicar ${act} ${act===1?"cambio":"cambios"}`:"No hay cambios que aplicar"}</button>`}
@@ -2178,10 +2180,10 @@ function bindTBox(){const q=S.tq;
   document.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{q.rows.splice(+b.dataset.tdel,1);if(!q.rows.length)q.rows.push({line:"",n:1,hold:"",grade:"",created:""});mapView()});
   $("#tadd").onclick=()=>{const l=q.rows[q.rows.length-1];q.rows.push({line:l?.line||"",n:(l?.n||0)+1,hold:"",grade:"",created:l?.created||""});mapView()};
   $("#talso").onchange=e=>{q.also=e.target.checked;plan()};
-  const bindPlan=()=>{document.querySelectorAll("[data-tk]").forEach(c=>c.onchange=()=>{c.checked?q.off.delete(c.dataset.tk):q.off.add(c.dataset.tk);plan()});
+  const bindPlan=()=>{document.querySelectorAll("[data-tk]").forEach(c=>c.onchange=()=>{const k=c.dataset.tk;if(c.dataset.del)c.checked?q.on.add(k):q.on.delete(k);else c.checked?q.off.delete(k):q.off.add(k);plan()});
     $("#tap").onclick=tApply};
   bindPlan()}
-async function tApply(){if(S.busy)return;const{items}=tPlan(),q=S.tq,todo=items.filter(i=>i.op!=="same"&&!q.off.has(i.k));if(!todo.length)return;
+async function tApply(){if(S.busy)return;const{items}=tPlan(),q=S.tq,todo=items.filter(i=>i.op!=="same"&&tOn(q,i));if(!todo.length)return;
   S.busy=true;$("#tap").disabled=true;$("#tap").textContent="Guardando…";const n={add:0,upd:0,del:0};let err=null;
   try{const adds=todo.filter(i=>i.op==="add").map(i=>i.row);
     if(adds.length){const r=await sb.from("liga_routes").insert(adds).select();if(r.error)throw r.error;applyRows(r.data);n.add=r.data.length}
