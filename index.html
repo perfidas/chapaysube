@@ -405,6 +405,9 @@ p.rnb{margin:-6px 0 14px}
 button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text-align:left;cursor:pointer}.dch{font-style:normal;display:inline-block;width:1em;opacity:.7}
 .bcell .gx{display:block;font-style:normal;font-size:.62rem;line-height:1.15;color:var(--mut);margin-top:3px;overflow-wrap:anywhere}
 .rld{border-top:1px solid var(--line);padding:4px 0}.rld>summary{cursor:pointer;font:700 1rem var(--disp,inherit);text-transform:uppercase;letter-spacing:.03em;padding:10px 0;list-style:none;display:flex;justify-content:space-between}.rld>summary::after{content:"▸";opacity:.6}.rld[open]>summary::after{content:"▾"}
+.rkme{position:sticky;top:6px;z-index:5;display:flex;align-items:center;gap:6px;width:100%;margin:0 0 8px;padding:9px 14px;min-height:0;border:1px solid var(--acc);background:#2a1622;color:var(--ink);border-radius:10px;font-size:.92rem;box-shadow:0 6px 18px rgba(0,0,0,.4)}.rkme span{margin-left:auto;color:var(--acc);font-weight:700;font-size:.8rem}
+.rk .rkb{padding:5px 10px;gap:8px}.rk .av.rk{width:28px;height:28px;font-size:13px}.rk .rkb br{display:none}.rk .rkb b+br+.sub,.rk .rkb .sub{font-size:.75rem;margin-left:6px}.rk .rkb .p{font-size:1.05rem;display:flex;align-items:baseline;gap:4px}.rk .rkb .p small{font-size:.65rem}.rk{gap:4px}
+.styles .sbi{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;font-size:.9rem;padding-left:8px;padding-right:8px;min-width:0}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -1747,7 +1750,7 @@ function toggleFollow(uid){if(!S.me)return needLogin();const on=S.fol.has(uid),n
   return act(async()=>{const q=on?await sb.from("liga_follows").delete().eq("user_id",S.me).eq("followee",uid):await sb.from("liga_follows").insert({followee:uid});
     if(!q.error){on?S.fol.delete(uid):S.fol.add(uid);toast(on?`Has dejado de seguir a ${nm}.`:`Sigues a ${nm}. Verás lo que ha hecho al abrir una vía o un bloque.`)}return q})}
 function fwHtml(r){if(!S.me)return"";const bl=isBl(r.sec),fem=!bl;
-  if(!S.fol.size)return `<div class="fw"><h4>${FICO.eyes}De los que sigues</h4><div class="fwn">Sigue a otros escaladores desde su perfil para ver aquí quién ${fem?"la":"lo"} ha hecho.</div></div>`;
+  if(!S.fol.size)return"";
   const last={};S.asc.forEach(a=>{if(a.route===r.id&&S.fol.has(a.u)&&(!last[a.u]||last[a.u].at<a.at))last[a.u]=a});
   const nm=Object.fromEntries(S.users.map(u=>[u.id,u.name])),done=Object.values(last).filter(a=>nm[a.u]).sort((a,b)=>b.at.localeCompare(a.at));
   const not=[...S.fol].filter(id=>nm[id]&&!last[id]).map(id=>nm[id]);
@@ -1828,7 +1831,7 @@ function perfil(){
   const pyr=idx.length?keys.slice(Math.min(...idx),Math.max(...idx)+1).reverse().map(g=>{const n=cnt[g]||0;
     if(!n)return"";return `<div class="pr"><b>${isB?`<i class="pip" style="background:${bbg(g)}"></i>${BCOL[g][0]}`:`<span style="color:${gc(g)}">${g}</span>`}</b><span class="pt"><span class="pb" style="width:${n?Math.max(4,n/mx*100):0}%;background:${isB?bbg(g):gc(g)}"></span></span><span class="pn">${n}</span></div>`}).join("")
    :`<div class="empty" style="padding:8px">${u.id===S.me?"Aún no has encadenado nada en esta sección este año.":"Todavía no ha encadenado nada en esta sección este año."}</div>`;
-  $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
+  $("#app").innerHTML=`
   ${cromo(u,y,cur)}${S.owner&&u.id!==S.me&&avUrl(u.id)?`<button class="link dng avx" id="avx">${S.arm==="avx"?"Pulsa otra vez para quitar su foto":"Quitar su foto"}</button>`:""}
   ${S.me&&u.id!==S.me&&(me()||S.owner)?folBtn(u):""}${S.me&&u.id!==S.me&&me()?`<button class="vsbtn" id="vsb">Compararme con ${esc(u.name)}</button>`:""}${duelForm(u)}
   ${todayHtml(mine)}
@@ -1858,7 +1861,6 @@ function perfil(){
     if(error){S.hid=old;c.checked=!c.checked;return toast("No se ha podido guardar: "+error.message)}
     if(h.has(S.lastSec))S.lastSec=null;if(h.has(S.psec))S.psec=null;const y0=scrollY;perfil();scrollTo(0,y0)});
   if($("#frf"))$("#frf").onclick=()=>{$("#frf").textContent="Actualizando…";$("#frf").disabled=true;forceRefresh()};
-  $("#bk").onclick=()=>{S.view=S.pback&&S.pback!=="perfil"?S.pback:"home";S.scrollTop=true;render()};
   if($("#pfset"))$("#pfset").ontoggle=e=>{S.setOpen=e.target.open};
   if($("#rnb"))$("#rnb").onclick=()=>{S.ren=true;perfil();$("#rnn").focus();$("#rnn").select()};
   if($("#rnx"))$("#rnx").onclick=()=>{S.ren=false;perfil()};
@@ -1903,7 +1905,7 @@ function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.us
   S.asc.forEach(a=>{const t=new Date(a.at).getTime(),r=R[a.route];if(now-t>wk||!r||!nm[a.u]||!big(a)||S.hid?.has(a.sec))return;
     if(a.sec==="kilter")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:#f4f4f1;color:#1b2226"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho <b>${esc(r.name)}</b> a ${r.angle}°${a.style==="Flash"?" al flash":""} <span class="sub">· kilter</span>`,r});
     else if(a.sec==="boulder")ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${bbg(a.grade)}"></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho un bloque <b>${BCOL[a.grade]?.[0].toLowerCase()||""}</b> en ${BSECT.find(z=>z.id===r.zone)?.name||""}${a.style==="Flash"?" al flash":""}`,r});
-    else ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r})});
+    else ev.push({t,dot:favDot(a.u,nm[a.u],`<span class="fdot" style="background:${HOLDS[r.hold]?.[1]||"var(--line)"}"><b>${esc(a.grade)}</b></span>`),h:`<b>${esc(nm[a.u])}</b> ha hecho la <b>${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()}</b> ${a.style==="A vista"?"a vista":""} <span class="sub">· ${SECTIONS.find(s=>s.id===a.sec).name.toLowerCase()}</span>`,r,u:a.u,sh:`${r.line} ${(HOLDS[r.hold]?.[0]||"").toLowerCase()} (${esc(a.grade)})`})});
   try{const y=new Date().getFullYear(),all=computeLogros(y);for(const u in all)for(const c of LCAT){const x=all[u][c.id];if(x?.ok&&x.at&&LORDER.indexOf(c.t)>=2&&now-new Date(x.at)<wk&&nm[u])ev.push({t:new Date(x.at).getTime()+1,dot:medal(c.p,c.t,"fmed"),h:`<b>${esc(nm[u])}</b> ha conseguido <b style="color:${LTIER[c.t][0]}">${esc(c.n)}</b> <span class="sub">· ${c.secName.toLowerCase()}</span>`,lg:1})}}catch(e){}
   VSEC().forEach(s=>{const m=moves(s.id),r=ranking(s.id,"bim");if(!m||!r[0]||m[r[0].id]===1)return;const last=S.asc.filter(a=>a.u===r[0].id&&a.sec===s.id).sort((a,b)=>b.at.localeCompare(a.at))[0];
     if(last)ev.push({t:new Date(last.at).getTime()+2,dot:favDot(r[0].id,r[0].name,`<span class="fdot" style="background:var(--gold)">${CROWN}</span>`),h:`<b>${esc(r[0].name)}</b> pasa a liderar <b>${s.name.toLowerCase()}</b>`})});
@@ -1912,7 +1914,11 @@ function feedEvents(){const now=Date.now(),wk=7*864e5,nm=Object.fromEntries(S.us
     const ts=new Date(d.start).getTime();if(now-ts<wk&&!duelOver(d))ev.push({t:ts,dot:sw,h:`<b>${esc(nm[d.ch])}</b> y <b>${esc(nm[d.rv])}</b> se baten en duelo <span class="sub">· ${secLow(d.sec)}, ${k}</span>`});
     if(duelOver(d)){const te=new Date(d.end).getTime();if(now-te>wk)return;const[a,b]=duelScore(d),w=duelWinner(d);
       ev.push({t:te,dot:sw,h:w==="empate"?`<b>${esc(nm[d.ch])}</b> y <b>${esc(nm[d.rv])}</b> empatan su duelo <span class="sub">· ${secLow(d.sec)} (${fmt(a)}–${fmt(b)})</span>`:`<b>${esc(nm[w])}</b> gana el duelo a <b>${esc(nm[w===d.ch?d.rv:d.ch])}</b> <span class="sub">· ${secLow(d.sec)} (${fmt(Math.max(a,b))}–${fmt(Math.min(a,b))})</span>`})}});
-  return ev.sort((a,b)=>b.t-a.t)}
+  /* encadenes seguidos de la misma persona el mismo día, en una sola línea */
+  ev.sort((a,b)=>b.t-a.t);const out=[],G={};for(const e of ev){const gk=e.u?e.u+new Date(e.t).toDateString():null,p=gk&&G[gk];
+    if(!p&&gk)G[gk]=e;
+    if(p){p.n=(p.n||1)+1;p.L=(p.L||[p.sh]).concat(e.sh);p.h=`<b>${esc(nm[e.u])}</b> ha hecho <b>${p.n} vías</b> <span class="sub">· ${p.L.join(", ")}</span>`;continue}
+    out.push(e)}return out}
 const ago=t=>{const m=(Date.now()-t)/6e4;return m<1?"ahora":m<60?`${Math.round(m)} min`:m<1440?`${Math.round(m/60)} h`:m<2880?"ayer":`${Math.round(m/1440)} días`};
 function home(){
   const p=period("bim"),dl=daysLeft(),tot=(p.to-p.from)/864e5,el=Math.min(100,Math.max(0,(Date.now()-p.from)/864e5/tot*100)),u=me(),pend=S.me&&!u&&!S.owner;
@@ -2384,7 +2390,7 @@ function routeRow(r){
   const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?new Date(r.created+"T12:00").toLocaleDateString("es-ES",{day:"numeric",month:"short"}).replace(".",""):"";
   return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
   <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}${S.proj.has(r.id)?PJS:""}</span><span class="tb-gr">${r.grade}</span></span>
-  <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:`<span class="sub">Sin hacer</span>`}</span></button>
+  <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:""}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
   ${rateLine(r)}${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
@@ -2417,7 +2423,7 @@ const CROWN=`<svg class="crown" viewBox="0 0 26 16" aria-hidden="true"><path fil
 /* Puesto de cada uno hace 24 h, para marcar quién ha bajado o subido */
 function moves(sec){const{from,to}=period("bim"),ago=new Date(Date.now()-864e5);if(ago<=from)return null;const m={};rankRange(sec,from,ago).forEach((x,i)=>m[x.id]=i+1);return m}
 const mvTag=(m,id,i)=>{if(!m||!m[id])return"";const d=m[id]-(i+1);return d<0?`<span class="mv dw" title="Hace 24 h iba ${m[id]}.º">▼ ${-d}</span>`:d>0?`<span class="mv up" title="Hace 24 h iba ${m[id]}.º">▲ ${d}</span>`:""};
-function rkList(r,year,m){return `<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}" aria-label="${i===0?"Líder: ":""}${esc(x.name)}"><span class="pos">${i===0?CROWN:""}${i+1}${mvTag(m,x.id,i)}</span>${av(x.id,x.name,"rk")}<span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
+function rkList(r,year,m){const mi=r.findIndex(x=>x.id===S.me);return (mi>=6?`<button class="rkme" onclick="document.querySelector('.rkb.me')?.scrollIntoView({behavior:'smooth',block:'center'})">Tú · <b>${mi+1}.º</b> · ${fmt(r[mi].p)} ${year?"pts de liga":"puntos"}<span>Ver ↓</span></button>`:"")+`<ol class="rk">${r.map((x,i)=>`<li><button class="rkb ${x.id===S.me?"me":""} ${i===0?"pod1":""}" data-u="${x.id}" aria-label="${i===0?"Líder: ":""}${esc(x.name)}"><span class="pos">${i===0?CROWN:""}${i+1}${mvTag(m,x.id,i)}</span>${av(x.id,x.name,"rk")}<span><b>${esc(x.name)}</b><br><span class="sub">${year?x.hist.map(h=>`${BIM[h.b]} ${h.pos}.º${h.live?" (en curso)":""}`).join(" · "):unit(x.n,S.sec)}</span></span><span class="p">${fmt(x.p)}<small>${year?"pts de liga":"puntos"}</small></span></button></li>`).join("")}</ol>`}
 function podium(r,year){return `<div class="pod">${[0,1,2].map(i=>{const x=r[i];return x?`<button class="pc p${i+1}" data-u="${x.id}">${av(x.id,x.name,"pd")}<span class="pos">${i+1}.º</span><b>${esc(x.name)}</b><small>${fmt(x.p)} ${year?"pts de liga":"pts"}</small></button>`:`<div class="pc nope"><span class="pos">${i+1}.º</span><small>Sin puntuar</small></div>`}).join("")}</div>`}
 const years=()=>{const ys=new Set(S.asc.map(a=>new Date(a.at).getFullYear()));ys.add(new Date().getFullYear());return[...ys].sort((a,b)=>b-a)};
 function closedBims(y){const n=new Date(),cy=n.getFullYear();return Array.from({length:y<cy?6:y===cy?Math.floor(n.getMonth()/2):0},(_,b)=>b)}
