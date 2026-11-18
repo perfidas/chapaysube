@@ -866,7 +866,7 @@ async function loadAll(){
   if(S.me){const[{data},f]=await Promise.all([sb.from("liga_projects").select("route_id"),sb.from("liga_follows").select("followee")]);S.proj=new Set((data||[]).map(x=>x.route_id));S.fol=new Set((f.data||[]).map(x=>x.followee))}else{S.proj=new Set();S.fol=new Set()}S.asc=a.map(mapA);S.dv=(S.dv||0)+1;
 }
 /* Carga por partes: después de la carga inicial, solo viajan las filas que cambian (tiempo real o la respuesta de lo que guardas) */
-const mapR=x=>{if(x.sec==="kilter")KANG[x.id]=x.angle;return{id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active,name:x.name||"",angle:x.angle??null}};
+const mapR=x=>{if(x.sec==="kilter")KANG[x.id]=x.angle;return{id:x.id,sec:x.sec,line:x.line,zone:x.zone,grade:x.grade,color:x.grade,hold:x.hold||"",created:x.created||"",active:x.active,name:x.name||"",angle:x.angle??null,pos:x.pos??null}};
 const okR=r=>r.sec==="boulder"?!!BCOL[r.grade]:r.sec==="kilter"?KGRADES.includes(r.grade):GRADES.includes(r.grade);
 const mapA=x=>({id:x.id,u:x.user_id,route:x.route_id,sec:x.sec,grade:x.grade,style:x.style,at:x.done_at});
 function setPeople(p){S.dv=(S.dv||0)+1;S.people=p.map(x=>({id:x.user_id,name:x.name,ok:!!x.approved}));S.users=S.people.filter(x=>x.ok)}
