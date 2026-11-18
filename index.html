@@ -2320,10 +2320,8 @@ function bDrag(c,p,L,b,bs,pl){let on=false,len=0;b._pl=pl;
   c.addEventListener("touchmove",e=>{e.preventDefault();if(on){const t=e.touches[0];move(t.clientX,t.clientY)}},{passive:false});
   c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false});
   c.addEventListener("click",e=>e.stopPropagation())}
-function bPendBar(){if(!S.bpend||!S.edit)return"";const n=S.bmv?.size||1;
-  return `<div class="bpend"><button class="pri" id="bps">Guardar</button><button id="bpu">Deshacer</button></div>`}
-function bindPend(){if($("#bpu"))$("#bpu").onclick=()=>{S.bpend=null;S.bmv=null;boulderView()};
-  if($("#bps"))$("#bps").onclick=async()=>{if(S.bsav)return;const P=S.bpend||{},ids=Object.keys(P);if(!ids.length)return;S.bsav=true;toast("Guardando…");let ok=0;
+function bindPend(){if($("#bwu"))$("#bwu").onclick=()=>{S.bpend=null;S.bmv=null;boulderView()};
+  if($("#bws"))$("#bws").onclick=async()=>{if(S.bsav)return;const P=S.bpend||{},ids=Object.keys(P);if(!ids.length)return;S.bsav=true;toast("Guardando…");let ok=0;
     try{for(const id of ids){const{data,error}=await sb.from("liga_routes").update({pos:P[id]}).eq("id",id).select("id,pos");
         if(error){toast("No se ha podido guardar: "+error.message);return}
         if(!data?.length){toast("No se ha guardado: tu cuenta no tiene permiso para editar boulder");return}
@@ -2335,8 +2333,8 @@ function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
   /* La leyenda filtra: toca uno o varios colores para ver solo esos bloques */
   const fc=FQ().cols||[];
-  $("#body").innerHTML=`<div class="map bmapw">${bSvg()}${bPendBar()}</div><div class="bleg bsel" role="group" aria-label="Filtrar por color">${BKEYS.map(k=>`<button type="button" class="${fc.includes(k)?"on":""}" aria-pressed="${fc.includes(k)}" data-bc="${k}"><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</button>`).join("")}${fc.length?`<button type="button" class="link bclr" id="bclr">Quitar</button>`:""}</div><div id="zp" style="margin-top:12px"></div>`;
-  placeBDots();bindPend();
+  $("#body").innerHTML=`<div class="map bmapw">${bSvg()}</div><div class="bleg bsel" role="group" aria-label="Filtrar por color">${BKEYS.map(k=>`<button type="button" class="${fc.includes(k)?"on":""}" aria-pressed="${fc.includes(k)}" data-bc="${k}"><i style="background:${bbg(k)}"></i>${BCOL[k][0]}</button>`).join("")}${fc.length?`<button type="button" class="link bclr" id="bclr">Quitar</button>`:""}</div><div id="zp" style="margin-top:12px"></div>`;
+  placeBDots();
   document.querySelectorAll("[data-bc]").forEach(b=>b.onclick=()=>{const f=FQ(),L=f.cols=f.cols||[],k=b.dataset.bc,i=L.indexOf(k);i>=0?L.splice(i,1):L.push(k);S.zone=null;S.open=null;boulderView()});
   if($("#bclr"))$("#bclr").onclick=()=>{FQ().cols=[];S.zone=null;S.open=null;boulderView()};
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
@@ -2380,7 +2378,7 @@ function bindWed(z,bs){const rail=$("#bwrail");if(!rail)return;const chips=[...r
     c.addEventListener("touchmove",e=>{e.preventDefault();move(e.touches[0].clientX)},{passive:false});
     c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false});c.addEventListener("touchcancel",()=>end())});
   addEventListener("resize",paint,{once:true});
-  if($("#bwu"))$("#bwu").onclick=()=>$("#bpu")?.click();if($("#bws"))$("#bws").onclick=()=>$("#bps")?.click()}
+  bindPend()}
 /* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
 function quickHtml(z,bs){const q=S.qk||(S.qk={pick:null,date:isoDay(new Date())});
   return `<div class="qhere" id="qhere"><span><small>Estás montando en</small><b>${z.name}</b></span><button id="qchg">Cambiar</button></div>
