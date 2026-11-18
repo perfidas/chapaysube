@@ -22,6 +22,8 @@
 :root[data-theme="dark"]{--gold:#ffc53d;--silver:#c3ced6;--bronze:#e0955a;--red:#ff4d5a;--bg:#0f1720;--card:#18232e;--ink:#eef3f6;--mut:#8ea0ad;--line:#26333f;--acc:#ff3d7f;--deep:#ff3d7f;--wall:#2b3a47;--wall2:#6f8797;--floor:#16212b;--block:#22303c;--wallsel:#ff3d7f;--g1:#3fd28b;--g2:#ffb83d;--g3:#ff6b5b;--g4:#c49bff;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body)}
+/* Sin rebote al pasar del borde: en iPhone el rebote arrastraba la barra de abajo */
+html,body{overscroll-behavior-y:none}
 main{max-width:640px;margin:0 auto;padding-block:12px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:.2px;text-wrap:balance}
 h1{font-size:36px;line-height:1}
@@ -284,7 +286,7 @@ button.on{color:#fff}
 #bkp{align-self:center;display:block;margin:10px auto 0;color:var(--mut)}
 /* Barra de navegación inferior */
 body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
-.bnav{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#0b1118;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:15;transform:translate3d(0,0,0);-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#0b1118;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
 .bnav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
 .bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mut);padding:6px 0 4px;min-height:54px;border-radius:10px}
 .bnav button svg{width:24px;height:24px}
