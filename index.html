@@ -2373,11 +2373,12 @@ function bindWed(z,bs){const rail=$("#bwrail");if(!rail)return;const chips=[...r
   const end=()=>{if(!drag)return;const w=W(),P=S.bpend=S.bpend||{};bs.forEach(b=>{const v=Math.round(X[b.id]/w*1000)/1000;if(Math.abs(v-(b._ep??-1))>.001||b.id in P||b.pos==null)P[b.id]=v});drag=null;
     const y0=scrollY;boulderView();scrollTo(0,y0)};
   chips.forEach(c=>{const id=c.dataset.wb;
-    c.addEventListener("pointerdown",e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}start(id,e.clientX)});
-    c.addEventListener("pointermove",e=>move(e.clientX));c.addEventListener("pointerup",end);c.addEventListener("pointercancel",end);
+    /* ratón con pointer; dedo solo con touch (en iPhone el pointercancel cortaba el arrastre a medias) */
+    c.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse")return;e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}start(id,e.clientX)});
+    c.addEventListener("pointermove",e=>{if(e.pointerType==="mouse")move(e.clientX)});c.addEventListener("pointerup",e=>{if(e.pointerType==="mouse")end()});
     c.addEventListener("touchstart",e=>{e.preventDefault();start(id,e.touches[0].clientX)},{passive:false});
     c.addEventListener("touchmove",e=>{e.preventDefault();move(e.touches[0].clientX)},{passive:false});
-    c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false})});
+    c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false});c.addEventListener("touchcancel",()=>end())});
   addEventListener("resize",paint,{once:true});
   if($("#bwu"))$("#bwu").onclick=()=>$("#bpu")?.click();if($("#bws"))$("#bws").onclick=()=>$("#bps")?.click()}
 /* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
