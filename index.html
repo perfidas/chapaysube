@@ -98,7 +98,11 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
 .bz.sel .bwall{stroke:var(--wallsel);stroke-opacity:1}
 .bdot{stroke:var(--ink);stroke-width:1.2}
-.bdot.bdrag{cursor:grab;touch-action:none;r:11px}.bmapw{position:relative}.bpend{position:absolute;left:8px;top:8px;z-index:6;display:flex;flex-direction:column;gap:6px;align-items:stretch;background:rgba(16,23,30,.92);border:1px solid var(--acc);border-radius:12px;padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.5);width:76px;padding:5px;gap:5px}.bpend button{min-height:34px;padding:0 4px;font-size:.78rem}.bpend span{font-size:.72rem;color:var(--mut);text-align:center}.bdot.grab{stroke:var(--acc);stroke-width:3}
+.bdot.bdrag{cursor:grab;touch-action:none;r:11px}.bwed{border:1px solid var(--line);border-radius:14px;padding:12px 14px 10px;margin-bottom:14px;background:#131d26}.bwed h3{margin:0}.bwed .sub{margin:2px 0 8px;font-size:.82rem}
+.bwrail{position:relative;height:56px;margin:0 2px;touch-action:none}.bwline{position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;border-radius:6px;background:var(--acc);opacity:.85}
+.bwchip{position:absolute;top:50%;transform:translateY(-50%);min-height:0;padding:0;border-radius:50%;border:2px solid var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.5);cursor:grab;touch-action:none}.bwchip.grab{transform:translateY(-50%) scale(1.18);border-color:#fff;z-index:2}
+.bwends{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mut);margin-top:2px}.bwact{display:flex;gap:8px;margin-top:10px}.bwact button{flex:1}
+.bmapw{position:relative}.bpend{position:absolute;left:8px;top:8px;z-index:6;display:flex;flex-direction:column;gap:6px;align-items:stretch;background:rgba(16,23,30,.92);border:1px solid var(--acc);border-radius:12px;padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.5);width:76px;padding:5px;gap:5px}.bpend button{min-height:34px;padding:0 4px;font-size:.78rem}.bpend span{font-size:.72rem;color:var(--mut);text-align:center}.bdot.grab{stroke:var(--acc);stroke-width:3}
 .bdot.dn{stroke:var(--g1);stroke-width:3.5}
 .hold{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
 .hold i{width:14px;height:14px;border-radius:3px;border:1px solid var(--mut);display:inline-block}
@@ -768,7 +772,7 @@ const ISLAND="M384.4 240 L363.6 328 L352.4 356 L330 392 L328.4 436 L366 464 L379
       let o=a;for(let j=1;j<bi;j++)o+=Math.hypot(p[j][0]-p[j-1][0],p[j][1]-p[j-1][1]);
       const m=p.length>2&&bl>(b-a)*.5&&bl<(b-a)*.98?o+bl/2:(a+b)/2,p0=at(m-3),p1=at(m+3),tl=Math.hypot(p1[0]-p0[0],p1[1]-p0[1])||1,nx=-(p1[1]-p0[1])/tl*(segs[i][3]||side),ny=(p1[0]-p0[0])/tl*(segs[i][3]||side),c=at(m);
       const anc=Math.abs(nx)>.7?(nx>0?"start":"end"):"middle",lx=c[0]+nx*16,ly=c[1]+ny*16+(ny>.3?10:ny<-.3?0:4);
-      subs.push({id,name:/^[ESO]/.test(sh)?isl(sh):"Sector "+sh,short:sh,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[+lx.toFixed(1),+ly.toFixed(1),anc]})})});
+      subs.push({id,name:/^[ESO]/.test(sh)?isl(sh):"Sector "+sh,short:sh,prv:i?segs[i-1][1]:null,nxt:i<k-1?segs[i+1][1]:null,d:"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L"),lab:[+lx.toFixed(1),+ly.toFixed(1),anc]})})});
   BSECT.unshift(...subs.sort((x,y)=>x.name.localeCompare(y.name,"es",{numeric:true})));
 })();
 const BFLOOR="M293.2 774.4 L330 774.4 L330 774.4 L332.4 816 L341.2 838.4 L330 880 L330 880 L347.6 936 L347.6 936 L320.4 980 L320.4 980 L251.6 950.4 L251.6 950.4 L178 961.2 L178 961.2 L104.4 972 L104.4 972 L74 888 L74 888 L101.2 800 L101.2 800 L98 724 L98 724 L83.6 620 L83.6 620 L45.2 540 L45.2 540 L45.2 472 L45.2 472 L98 352 L98 352 L106 240 L106 240 L108.4 152 L108.4 152 L169.2 102 L169.2 102 L230 52 L230 52 L278 48 L285.8 47.4 L285.8 47.4 L342 43.2 L342 43.2 L335.6 102.4 L403.6 117.6 L450 120 L450 120 L520.4 166.4 L520.4 166.4 L504.4 232 L504.4 232 L490 297.6 L490 297.6 L512.4 352 L512.4 352 L536.4 404 L536.4 404 L518 480 L518 480 L487.6 608 L487.6 608 L502 657.6 Z";
@@ -2288,12 +2292,12 @@ function bSvg(){
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     /* los colocados a mano (pos 0–1 a lo largo de la pared) van en su sitio; el resto se reparte como siempre */
-    const PP=b=>S.bpend&&b.id in S.bpend?S.bpend[b.id]:b.pos,free=bs.filter(b=>PP(b)==null),drag=S.edit;
+    const PP=b=>S.bpend&&b.id in S.bpend?S.bpend[b.id]:b.pos,free=bs.filter(b=>PP(b)==null),drag=false;
     /* sin colocar: si nadie está colocado, repartidos; si no, cada uno al centro del hueco más grande que quede */
     const fp=[];{const fixed=bs.filter(b=>PP(b)!=null).map(PP);if(!fixed.length)free.forEach((_,i)=>fp.push((i+.5)/free.length));
       else free.forEach(()=>{const P=[...fixed,...fp].sort((a,b)=>a-b),E=[0,...P,1];let gi=0,gw=-1;for(let k=0;k<E.length-1;k++){const w=(E[k+1]-E[k])*((k===0||k===E.length-2)?2:1);if(w>gw){gw=w;gi=k}}
         const v=gi===0?E[1]/2:gi===E.length-2?(E[gi]+1)/2:(E[gi]+E[gi+1])/2;fp.push(v)})}
-    bs.forEach((b,i)=>{const fi=free.indexOf(b),pl=PP(b)!=null?L*PP(b):L*fp[fi],pt=p.getPointAtLength(pl),c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.dataset.bid=b.id;if(drag)c.classList.add("bdrag");
+    bs.forEach((b,i)=>{const fi=free.indexOf(b),pl=PP(b)!=null?L*PP(b):L*fp[fi],pt=p.getPointAtLength(pl),_e=(b._ep=pl/L),c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.dataset.bid=b.id;if(drag)c.classList.add("bdrag");
       c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",7);c.setAttribute("fill",b.color==="dorado"?"url(#bgold)":BCOL[b.color][1]);c.setAttribute("class",(drag?"bdrag ":"")+"bdot"+(S.just?.has(b.id)?" jst":isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c);
       /* hecho por mí este bimestre: tick blanco con borde oscuro, se lee sobre cualquier color */
       if(myAsc(b.id)){const t=document.createElementNS("http://www.w3.org/2000/svg","g");t.setAttribute("class","btick");t.setAttribute("transform",`translate(${pt.x} ${pt.y}) scale(.85)`);
@@ -2334,11 +2338,44 @@ function boulderView(){
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro o un color para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
-  $("#zp").innerHTML=`${S.edit?quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
+  $("#zp").innerHTML=`${S.edit?bwedHtml(z,bs)+quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
    </section>${S.edit?renHtml(bs):""}`;
-  bindB(z);if(S.edit)bindQuick(z,bs);
+  bindB(z);if(S.edit){bindQuick(z,bs);bindWed(z,bs)}
 }
+/* Modo editor: la pared del sector estirada a lo ancho; cada bloque es una ficha que se arrastra.
+   Salen equidistantes; al arrastrar empujan a las vecinas sin montarse nunca y vuelven a su sitio si te alejas */
+function bwedHtml(z,bs){if(!bs.length)return"";const n=S.bpend?Object.keys(S.bpend).length:0;
+  return `<section class="bwed"><h3>Coloca los bloques de ${z.name}</h3><p class="sub">Arrastra cada ficha a donde está el bloque en la pared.</p>
+   <div class="bwrail" id="bwrail"><div class="bwline"></div>${bs.map(b=>`<button type="button" class="bwchip" data-wb="${b.id}" style="background:${bbg(b.color)}" aria-label="${BCOL[b.color][0]}">${b.color==="blanco"?"":""}</button>`).join("")}</div>
+   <div class="bwends"><span>${z.prv?"← "+z.prv:"inicio"}</span><span>${z.nxt?z.nxt+" →":"fin"}</span></div>
+   ${n?`<div class="bwact"><button id="bwu">Deshacer</button><button class="pri" id="bws">Guardar posiciones</button></div>`:""}</section>`}
+function bindWed(z,bs){const rail=$("#bwrail");if(!rail)return;const chips=[...rail.querySelectorAll(".bwchip")],W=()=>rail.clientWidth;
+  const sz=()=>Math.max(22,Math.min(40,W()/bs.length-6)),g=()=>sz()+4;
+  const X={};bs.forEach(b=>{const v=S.bpend&&b.id in S.bpend?S.bpend[b.id]:b._ep??.5;X[b.id]=v*W()});
+  const paint=()=>{const s0=sz();chips.forEach(c=>{c.style.width=c.style.height=s0+"px";c.style.left=(X[c.dataset.wb]-s0/2)+"px"})};
+  /* al empezar a arrastrar se respeta lo mínimo: ninguna ficha encima de otra */
+  {const ids=bs.map(b=>b.id).sort((a,b)=>X[a]-X[b]);const G=g(),w=W();for(let i=0;i<ids.length;i++){const lo=i?X[ids[i-1]]+G:G/2;if(X[ids[i]]<lo)X[ids[i]]=lo}
+   for(let i=ids.length-1;i>=0;i--){const hi=i<ids.length-1?X[ids[i+1]]-G:w-G/2;if(X[ids[i]]>hi)X[ids[i]]=hi}}
+  paint();
+  const mapDot=(id,v)=>{const gz=[...document.querySelectorAll(".bz")].find(x=>x.dataset.z===z.id),p=gz?.querySelector(".bwall"),c=gz?.querySelector(`circle[data-bid="${id}"]`);if(!p||!c)return;const pt=p.getPointAtLength(p.getTotalLength()*v);c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);gz.querySelectorAll(".btick").forEach(t=>t.remove())};
+  let drag=null;
+  const start=(id,cx)=>{drag={id,base:{...X},dx:cx-rail.getBoundingClientRect().left-X[id]};rail.querySelector(`[data-wb="${id}"]`).classList.add("grab")};
+  const move=cx=>{if(!drag)return;const w=W(),G=g(),id=drag.id,B=drag.base,others=bs.map(b=>b.id).filter(x=>x!==id);
+    let x=cx-rail.getBoundingClientRect().left-drag.dx;const left=others.filter(o=>B[o]<x).sort((a,b)=>B[b]-B[a]),right=others.filter(o=>B[o]>=x).sort((a,b)=>B[a]-B[b]);
+    x=Math.max((left.length+.5)*G,Math.min(w-(right.length+.5)*G,x));X[id]=x;
+    let cur=x;left.forEach(o=>{cur=Math.min(B[o],cur-G);X[o]=cur});cur=x;right.forEach(o=>{cur=Math.max(B[o],cur+G);X[o]=cur});
+    paint();bs.forEach(b=>mapDot(b.id,X[b.id]/w))};
+  const end=()=>{if(!drag)return;const w=W(),P=S.bpend=S.bpend||{};bs.forEach(b=>{const v=Math.round(X[b.id]/w*1000)/1000;if(Math.abs(v-(b._ep??-1))>.001||b.id in P||b.pos==null)P[b.id]=v});drag=null;
+    const y0=scrollY;boulderView();scrollTo(0,y0)};
+  chips.forEach(c=>{const id=c.dataset.wb;
+    c.addEventListener("pointerdown",e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}start(id,e.clientX)});
+    c.addEventListener("pointermove",e=>move(e.clientX));c.addEventListener("pointerup",end);c.addEventListener("pointercancel",end);
+    c.addEventListener("touchstart",e=>{e.preventDefault();start(id,e.touches[0].clientX)},{passive:false});
+    c.addEventListener("touchmove",e=>{e.preventDefault();move(e.touches[0].clientX)},{passive:false});
+    c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false})});
+  addEventListener("resize",paint,{once:true});
+  if($("#bwu"))$("#bwu").onclick=()=>$("#bpu")?.click();if($("#bws"))$("#bws").onclick=()=>$("#bps")?.click()}
 /* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
 function quickHtml(z,bs){const q=S.qk||(S.qk={pick:null,date:isoDay(new Date())});
   return `<div class="qhere" id="qhere"><span><small>Estás montando en</small><b>${z.name}</b></span><button id="qchg">Cambiar</button></div>
