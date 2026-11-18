@@ -98,7 +98,7 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
 .bz.sel .bwall{stroke:var(--wallsel);stroke-opacity:1}
 .bdot{stroke:var(--ink);stroke-width:1.2}
-.bdot.bdrag{cursor:grab;touch-action:none;r:10px}.bdot.grab{stroke:var(--acc);stroke-width:3}
+.bdot.bdrag{cursor:grab;touch-action:none;r:11px}.bpend{position:fixed;left:12px;right:12px;max-width:600px;margin:0 auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:16;box-shadow:0 8px 24px rgba(0,0,0,.5);background:#2a1622;border:1px solid var(--acc);border-radius:12px;padding:8px 10px;font-size:.82rem;line-height:1.25;display:flex;align-items:center;gap:8px}.bpend span{flex:1}.bpend button{min-height:40px;padding:0 14px}.bdot.grab{stroke:var(--acc);stroke-width:3}
 .bdot.dn{stroke:var(--g1);stroke-width:3.5}
 .hold{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
 .hold i{width:14px;height:14px;border-radius:3px;border:1px solid var(--mut);display:inline-block}
@@ -2288,12 +2288,12 @@ function bSvg(){
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     /* los colocados a mano (pos 0–1 a lo largo de la pared) van en su sitio; el resto se reparte como siempre */
-    const free=bs.filter(b=>b.pos==null),drag=S.edit&&S.zone===g.dataset.z;
+    const PP=b=>S.bpend&&b.id in S.bpend?S.bpend[b.id]:b.pos,free=bs.filter(b=>PP(b)==null),drag=S.edit&&S.zone===g.dataset.z;
     /* sin colocar: si nadie está colocado, repartidos; si no, cada uno al centro del hueco más grande que quede */
-    const fp=[];{const fixed=bs.filter(b=>b.pos!=null).map(b=>b.pos);if(!fixed.length)free.forEach((_,i)=>fp.push((i+.5)/free.length));
+    const fp=[];{const fixed=bs.filter(b=>PP(b)!=null).map(PP);if(!fixed.length)free.forEach((_,i)=>fp.push((i+.5)/free.length));
       else free.forEach(()=>{const P=[...fixed,...fp].sort((a,b)=>a-b),E=[0,...P,1];let gi=0,gw=-1;for(let k=0;k<E.length-1;k++){const w=(E[k+1]-E[k])*((k===0||k===E.length-2)?2:1);if(w>gw){gw=w;gi=k}}
         const v=gi===0?E[1]/2:gi===E.length-2?(E[gi]+1)/2:(E[gi]+E[gi+1])/2;fp.push(v)})}
-    bs.forEach((b,i)=>{const fi=free.indexOf(b),pl=b.pos!=null?L*b.pos:L*fp[fi],pt=p.getPointAtLength(pl),c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.dataset.bid=b.id;if(drag)c.classList.add("bdrag");
+    bs.forEach((b,i)=>{const fi=free.indexOf(b),pl=PP(b)!=null?L*PP(b):L*fp[fi],pt=p.getPointAtLength(pl),c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.dataset.bid=b.id;if(drag)c.classList.add("bdrag");
       c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);c.setAttribute("r",7);c.setAttribute("fill",b.color==="dorado"?"url(#bgold)":BCOL[b.color][1]);c.setAttribute("class",(drag?"bdrag ":"")+"bdot"+(S.just?.has(b.id)?" jst":isNew(b)?" nw":"")+(myAsc(b.id)?" dn":"")+(HS?(HS.has(b.id)?" hit":" dim"):""));box.appendChild(c);
       /* hecho por mí este bimestre: tick blanco con borde oscuro, se lee sobre cualquier color */
       if(myAsc(b.id)){const t=document.createElementNS("http://www.w3.org/2000/svg","g");t.setAttribute("class","btick");t.setAttribute("transform",`translate(${pt.x} ${pt.y}) scale(.85)`);
@@ -2303,14 +2303,25 @@ function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
 function bDrag(c,p,L,b,bs,pl){let on=false,len=0;b._pl=pl;
   const near=(x,y)=>{let best=0,bd=1e9;const N=240;for(let k=0;k<=N;k++){const q=p.getPointAtLength(L*k/N),d=(q.x-x)**2+(q.y-y)**2;if(d<bd){bd=d;best=L*k/N}}
     for(let st=L/N;st>.3;st/=2)for(const t of [best-st,best+st]){if(t<0||t>L)continue;const q=p.getPointAtLength(t),d=(q.x-x)**2+(q.y-y)**2;if(d<bd){bd=d;best=t}}return best};
-  c.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();on=true;c.setPointerCapture(e.pointerId);c.classList.add("grab")});
-  c.addEventListener("pointermove",e=>{if(!on)return;const m=c.ownerSVGElement.getScreenCTM().inverse(),q=new DOMPoint(e.clientX,e.clientY).matrixTransform(m);len=near(q.x,q.y);const pt=p.getPointAtLength(len);c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y)});
-  c.addEventListener("pointerup",async e=>{if(!on)return;on=false;c.classList.remove("grab");if(!len)return;const pos=Math.round(len/L*1000)/1000;
-    /* la primera vez que se toca una sección, el resto de bloques se queda fijo donde estaba para que no salten */
-    const rest=bs.filter(x=>x!==b&&x.pos==null).map(x=>({x,pos:Math.round(x._pl/L*1000)/1000}));
-    for(const it of [{x:b,pos},...rest]){const{error}=await sb.from("liga_routes").update({pos:it.pos}).eq("id",it.x.id);if(error)return toast("No se ha podido guardar: "+error.message);it.x.pos=it.pos}
-    toast("Posición guardada");boulderView()});
+  const move=(x,y)=>{const m=c.ownerSVGElement.getScreenCTM().inverse(),q=new DOMPoint(x,y).matrixTransform(m);len=near(q.x,q.y);const pt=p.getPointAtLength(len);c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y)};
+  /* al soltar no se guarda todavía: queda pendiente hasta pulsar «Guardar posiciones» */
+  const end=()=>{if(!on)return;on=false;c.classList.remove("grab");if(!len)return;const P=S.bpend=S.bpend||{};
+    bs.forEach(x=>{if(x!==b&&x.pos==null&&!(x.id in P))P[x.id]=Math.round(x._pl/L*1000)/1000});P[b.id]=Math.round(len/L*1000)/1000;(S.bmv=S.bmv||new Set).add(b.id);
+    const y0=scrollY;boulderView();scrollTo(0,y0)};
+  c.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();on=true;len=0;try{c.setPointerCapture(e.pointerId)}catch(_){}c.classList.add("grab")});
+  c.addEventListener("pointermove",e=>{if(on)move(e.clientX,e.clientY)});
+  c.addEventListener("pointerup",end);c.addEventListener("pointercancel",end);
+  /* en el móvil, que el dedo mueva el punto y no la página */
+  c.addEventListener("touchstart",e=>{e.preventDefault();on=true;len=0;c.classList.add("grab")},{passive:false});
+  c.addEventListener("touchmove",e=>{e.preventDefault();if(on){const t=e.touches[0];move(t.clientX,t.clientY)}},{passive:false});
+  c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false});
   c.addEventListener("click",e=>e.stopPropagation())}
+function bPendBar(){if(!S.bpend)return"";const n=S.bmv?.size||1;
+  return `<div class="bpend"><span><b>${n===1?"1 bloque movido":n+" bloques movidos"}</b><br>sin guardar</span><button id="bpu">Deshacer</button><button class="pri" id="bps">Guardar</button></div>`}
+function bindPend(){if($("#bpu"))$("#bpu").onclick=()=>{S.bpend=null;S.bmv=null;boulderView()};
+  if($("#bps"))$("#bps").onclick=async()=>{if(S.busy)return;S.busy=true;const P=S.bpend;
+    for(const id in P){const{error}=await sb.from("liga_routes").update({pos:P[id]}).eq("id",id);if(error){S.busy=false;return toast("No se ha podido guardar: "+error.message)}const r=S.routes.find(x=>x.id===id);if(r)r.pos=P[id]}
+    S.busy=false;S.bpend=null;S.bmv=null;toast("Posiciones guardadas");boulderView()}}
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
@@ -2323,10 +2334,10 @@ function boulderView(){
   document.querySelectorAll(".bz").forEach(el=>{const go=()=>{S.zone=el.dataset.z;S.open=null;S.arm=null;boulderView();$("#zp").scrollIntoView({behavior:"smooth",block:"start"})};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
   if(!z){const res=resultsHtml();$("#zp").innerHTML=res??`<div class="hint">Toca un muro o un color para ver sus bloques.</div>${newsBox()}`;bindNews(boulderView);return}
   const bs=bOf(z.id);
-  $("#zp").innerHTML=`${S.edit?quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
+  $("#zp").innerHTML=`${S.edit?bPendBar()+quickHtml(z,bs):""}<div class="top" style="margin:${S.edit?"14px":"0"} 0 8px"><h3>${S.edit?"Ahora en ":""}${z.name}</h3><span class="sub">${bs.length} ${bs.length===1?"bloque":"bloques"}</span></div>
    <section class="lc">${bs.map(bRow).join("")||`<div class="hint" style="padding:14px">No hay bloques montados en este sector.</div>`}
    </section>${S.edit?renHtml(bs):""}`;
-  bindB(z);if(S.edit)bindQuick(z,bs);
+  bindB(z);if(S.edit){bindQuick(z,bs);bindPend()}
 }
 /* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
 function quickHtml(z,bs){const q=S.qk||(S.qk={pick:null,date:isoDay(new Date())});
