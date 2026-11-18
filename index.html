@@ -2323,9 +2323,13 @@ function bDrag(c,p,L,b,bs,pl){let on=false,len=0;b._pl=pl;
 function bPendBar(){if(!S.bpend||!S.edit)return"";const n=S.bmv?.size||1;
   return `<div class="bpend"><button class="pri" id="bps">Guardar</button><button id="bpu">Deshacer</button></div>`}
 function bindPend(){if($("#bpu"))$("#bpu").onclick=()=>{S.bpend=null;S.bmv=null;boulderView()};
-  if($("#bps"))$("#bps").onclick=async()=>{if(S.busy)return;S.busy=true;const P=S.bpend;
-    for(const id in P){const{error}=await sb.from("liga_routes").update({pos:P[id]}).eq("id",id);if(error){S.busy=false;return toast("No se ha podido guardar: "+error.message)}const r=S.routes.find(x=>x.id===id);if(r)r.pos=P[id]}
-    S.busy=false;S.bpend=null;S.bmv=null;toast("Posiciones guardadas");boulderView()}}
+  if($("#bps"))$("#bps").onclick=async()=>{if(S.bsav)return;const P=S.bpend||{},ids=Object.keys(P);if(!ids.length)return;S.bsav=true;toast("Guardando…");let ok=0;
+    try{for(const id of ids){const{data,error}=await sb.from("liga_routes").update({pos:P[id]}).eq("id",id).select("id,pos");
+        if(error){toast("No se ha podido guardar: "+error.message);return}
+        if(!data?.length){toast("No se ha guardado: tu cuenta no tiene permiso para editar boulder");return}
+        ok++;const r=S.routes.find(x=>x.id===id);if(r)r.pos=data[0].pos}
+      S.bpend=null;S.bmv=null;toast(ok===1?"Posición guardada":ok+" posiciones guardadas");boulderView()}
+    catch(e){toast("No se ha podido guardar: "+(e.message||e))}finally{S.bsav=false}}}
 const bOf=z=>S.routes.filter(r=>r.sec==="boulder"&&r.zone===z&&r.active).sort((a,b)=>BKEYS.indexOf(a.color)-BKEYS.indexOf(b.color)||(a.created||"").localeCompare(b.created||""));
 function boulderView(){
   const z=BSECT.find(x=>x.id===S.zone);
