@@ -292,6 +292,7 @@ button.on{color:#fff}
 /* Barra de navegación inferior */
 body.hasnav main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .bnav{position:fixed;left:0;right:0;bottom:0;z-index:15;transform:translate3d(0,0,0);-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#0b1118;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+body.navoff .bnav{display:none}
 .bnav div{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
 .bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mut);padding:6px 0 4px;min-height:54px;border-radius:10px}
 .bnav button svg{width:24px;height:24px}
@@ -1205,7 +1206,14 @@ function navBar(){const hide=["login","name","pending","loading","error","setup"
     if(k==="Logros"){S.view="logros";S.edit=false;return render()}
     if(k==="Perfil"){if(!S.me)return needLogin();if(!me())return toast("Tu perfil aparecerá cuando el administrador apruebe tu cuenta.");return openProfile(S.me)}
     if(!sec){S.sec=S.lastSec&&!S.hid?.has(S.lastSec)?S.lastSec:mainSec();S.zone=null;S.open=null}S.view="sec";S.tab=k==="Zona"?"mapa":"ranking";render()})}
-function render(){if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
+/* iPhone: al volver de la cámara o con el teclado abierto la barra fija se queda flotando a media pantalla.
+   Mientras se lee una tablilla o hay un campo de texto activo se oculta, y al cambiar el tamaño visible se recoloca */
+function navFix(){const n=$("#bnav");if(!n)return;const vv=window.visualViewport,kb=vv&&vv.height<innerHeight-120,typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||"")&&document.activeElement.type!=="file";
+  document.body.classList.toggle("navoff",!!(S.tq||kb||typing));n.style.transform="translate3d(0,0,0)";requestAnimationFrame(()=>{n.style.transform=""})}
+if(window.visualViewport){visualViewport.addEventListener("resize",navFix);visualViewport.addEventListener("scroll",navFix)}
+addEventListener("focusin",()=>setTimeout(navFix,50));addEventListener("focusout",()=>setTimeout(navFix,150));
+document.addEventListener("visibilitychange",()=>setTimeout(navFix,300));addEventListener("pageshow",()=>setTimeout(navFix,300));
+function render(){setTimeout(navFix,0);if(S.holdSplash&&!["error","setup","newpw"].includes(S.view)){document.body.classList.remove("hasnav");if($("#bnav"))$("#bnav").hidden=true;return loadingView()}
   if(S.scrollTop)window.scrollTo(0,0);S.scrollTop=false;if(!["home","rules","perfil","approvals","logros","buzon","notas","vs","login","name","pending","loading","error","setup","forgot","newpw"].includes(S.view)&&S.sec)S.lastSec=S.sec;navBar();({logros:logrosView,buzon,notas:notasView,vs:vsView,forgot:forgotView,newpw:newPwView,home,rules,perfil,approvals,pending:pendingView,login,name:nameView,loading:loadingView,error:errorView,setup:setupView}[S.view]||section)()}
 /* Tras cada pintado se mira si hay logros nuevos que celebrar */
 const _render=render;render=function(){_render();if(!["loading","error","setup","login","name","forgot","newpw"].includes(S.view))setTimeout(checkUnlocks,350)};
@@ -2257,7 +2265,7 @@ function tBox(){const q=S.tq;
 function bindTBox(){const q=S.tq;
   if($("#tfile"))$("#tfile").onchange=e=>{const f=e.target.files[0];if(f)tRead(f)};
   if($("#tx"))$("#tx").onclick=()=>{if(S.tq?.img)URL.revokeObjectURL(S.tq.img);S.tq=null;mapView()};
-  if(q?.st==="crop"){bindCrop();$("#tgo").onclick=tOcr;const im=$("#tcb img"),go=()=>$("#tx")?.scrollIntoView({block:"end",behavior:"smooth"});im.complete?requestAnimationFrame(go):im.addEventListener("load",go,{once:true})}
+  if(q?.st==="crop"){bindCrop();$("#tgo").onclick=tOcr;navFix()}
   if(!q||q.st!=="rows")return;
   const plan=()=>{$("#tplan").innerHTML=tPlanHtml();bindPlan()};
   document.querySelectorAll("[data-tf]").forEach(el=>{const i=+el.closest("[data-ti]").dataset.ti,f=el.dataset.tf;el.oninput=el.onchange=()=>{q.rows[i][f]=f==="line"?el.value.replace(/\D/g,""):el.value;
@@ -2482,7 +2490,7 @@ function mapSvg(){
     <rect class="inset" x="${BOX.x}" y="${BOX.y}" width="${BOX.w}" height="${BOX.h}" rx="6"/>
     <text class="area" x="${BOX.x+12}" y="${BOX.y+20}">ZONA EXTERIOR</text>${g}</svg>`}
 
-function mapView(){
+function mapView(){setTimeout(navFix,0);
   const z=ZONES[S.sec]?.find(x=>x.id===S.zone);
   $("#body").innerHTML=`${S.edit&&ZONES[S.sec]?tBox():""}${ZONES[S.sec]?finderHtml():""}<div class="map">${mapSvg()}</div><div id="zp" style="margin-top:12px"></div>`;
   if(ZONES[S.sec])bindFinder(mapView);if(S.edit)bindTBox();
