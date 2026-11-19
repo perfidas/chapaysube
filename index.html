@@ -426,6 +426,7 @@ button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text
 .vtx{flex:1;min-width:0;color:inherit;text-decoration:none}.vtx b{display:block}.vtx .sub{font-size:.8rem}
 .bmg{min-height:0;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);font-size:.8rem;flex:none}.bmg.on{border-color:var(--acc);color:var(--ink)}
 .vadd{margin-top:8px;width:100%}.vfm{margin-top:8px}.vfm input{width:100%;margin:6px 0 4px}.vfm .acts{display:flex;gap:8px;margin-top:6px}.vfm .acts button{flex:1}
+.nopt{font-size:.68rem;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:1px 5px;white-space:nowrap}
 .board{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
 .bcell{background:#0c141b;border:1px solid #22303c;border-radius:8px;padding:9px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .bcell b{font:900 32px/1 var(--disp)}.bcell.g b{color:var(--gold)}.bcell.g{border-color:rgba(255,197,61,.5)}
@@ -957,7 +958,12 @@ function showErr(e){S.view="error";S.err=e.message||String(e);render()}
 function period(mode,d=new Date()){const y=d.getFullYear();
   if(mode==="year")return{from:new Date(y,0,1),to:new Date(y+1,0,1),label:"Anual "+y};
   const b=Math.floor(d.getMonth()/2);return{from:new Date(y,b*2,1),to:new Date(y,b*2+2,1),label:BIM[b]+" "+y}}
-const pts=a=>a.sec==="kilter"?kpts(a.grade,KANG[a.route]||0,a.style):a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
+/* Desde la temporada 2027, solo puntúan las vías y bloques montados ese mismo año (Kilter no tiene fecha y puntúa siempre) */
+const SCORE_FROM=2027;let _rc=null,_rcn=-1;
+const rCreated=id=>{if(_rcn!==S.routes.length||!_rc){_rc=new Map(S.routes.map(r=>[r.id,r.created||""]));_rcn=S.routes.length}return _rc.get(id)||""};
+const oldSet=a=>{if(a.sec==="kilter")return false;const y=new Date(a.at).getFullYear();if(y<SCORE_FROM)return false;const c=rCreated(a.route);return !!c&&c<y+"-01-01"};
+const routeOld=r=>r&&r.sec!=="kilter"&&new Date().getFullYear()>=SCORE_FROM&&!!r.created&&r.created<new Date().getFullYear()+"-01-01";
+const pts=a=>oldSet(a)?0:a.sec==="kilter"?kpts(a.grade,KANG[a.route]||0,a.style):a.sec==="boulder"?Math.round((BCOL[a.grade]?.[2]||0)*(BSM[a.style]||1)):Math.round((GP[a.grade]||0)*(SM[a.style]||1));
 function ranking(sec,mode){if(mode==="year")return annual(sec);if(mode==="week"){const w=weekOf();return rankRange(sec,w.from,w.to)}const{from,to}=period("bim");return rankRange(sec,from,to)}
 /* Anual: en cada bimestre los 10 primeros reciben 10, 9, 8… 1 puntos de liga */
 const LEAGUE=[10,9,8,7,6,5,4,3,2,1];
@@ -1324,6 +1330,7 @@ function rules(){
   $("#app").innerHTML=`<div class="top"><button id="bk">Volver</button></div>
   <article class="rl"><h2>Cómo se puntúa</h2>
   <p>La liga tiene cuatro secciones: <b>Cuerda</b>, <b>Autoseguro</b>, <b>Boulder</b> y <b>Kilter</b>. Cada una tiene su propio ranking y los puntos de una no cuentan en las otras.</p>
+  <p><b>Desde 2027, solo puntúan las vías y bloques montados ese mismo año.</b> Los montados antes del 1 de enero se pueden seguir marcando, pero no suman puntos. La Kilter puntúa siempre.</p>
   <h3>Ranking bimestral</h3>
   <ul>
    <li>El año se divide en seis bimestres: ${BIM.join(", ")}. El día 1 de cada bimestre el ranking empieza de cero.</li>
@@ -2525,7 +2532,7 @@ function routeRow(r){
   const f=FQ(),dim=fOn(f)&&!fMatch(r,f),dd=r.created?new Date(r.created+"T12:00").toLocaleDateString("es-ES",{day:"numeric",month:"short"}).replace(".",""):"";
   return `<div class="rt ${dim?"dimr":""}"><button class="hd tbl" data-r="${r.id}" aria-expanded="${open}"><span class="tb-bar" style="background:${h[1]}"></span>
   <span class="tb-main"><span class="tb-top">${r.line} · ${h[0]}${isNew(r)?NEWB:""}${S.proj.has(r.id)?PJS:""}</span><span class="tb-gr">${r.grade}</span></span>
-  <span class="tb-side"><span class="tb-date">${dd}</span>${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:""}</span></button>
+  <span class="tb-side"><span class="tb-date">${dd}</span>${routeOld(r)?`<span class="nopt">No puntúa</span>`:""}${rateTag(r)}${a?`<span class="sty ${STY[a.style]?.[0]||""}${S.jm===r.id?" pop":""}" title="${a.style}">${STY[a.style]?.[1]||""}<span><b>${a.style}</b>+${pts(a)} pts</span></span>`:""}</span></button>
   ${open?`<div class="bd"><div class="sub">¿Cómo la has hecho? Puntos base del ${r.grade}: ${GP[r.grade]}</div>
   <div class="styles">${STYLES.map(([st,m])=>`<button data-st="${st}" class="sbi ${a&&a.style===st?"on":""}">${STY[st]?.[1]||""}${st}<small>+${Math.round(GP[r.grade]*m)}</small></button>`).join("")}</div>
   ${rateLine(r)}${betasHtml(r)}${kingHtml(r)}${whoHtml(r)}${fwHtml(r)}${projBtn(r)}${a?`<button class="dng" id="rm">${S.arm==="rm"?"Pulsa otra vez para quitarla":"Quitar mi encadene"}</button>`:""}
