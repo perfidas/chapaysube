@@ -2222,6 +2222,11 @@ const tOther=()=>S.sec==="cuerda"?"autoseguro":"cuerda";
 /* Qué cambia en cada línea, siempre en cuerda y autoseguro (salvo líneas tachadas): la tablilla manda. Vía igual (mismo color) se corrige, la nueva se añade y la que ya no está se desmonta */
 function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&&GRADES.includes(r.grade)),secs=[S.sec,tOther()],items=[],notes=[];
   const lines=[...new Set(ok.map(r=>+r.line))].sort((a,b)=>a-b);
+  /* fila sin fecha legible: toma la fecha más repetida de su misma tablilla */
+  ok.forEach(r=>{if(!r.created){const c={};ok.filter(x=>x.line===r.line&&x.created).forEach(x=>c[x.created]=(c[x.created]||0)+1);const t=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];if(t){r.created=t[0];r.dguess=true}}});
+  /* tablilla leída entera (filas N.1, N.2… sin huecos): lo que no aparece se marca para desmontar */
+  const full={},miss={};lines.forEach(ln=>{const ns=ok.filter(r=>+r.line===ln).map(r=>+r.n).filter(n=>n>0),mx=Math.max(0,...ns),hs=[];for(let k=1;k<=mx;k++)if(!ns.includes(k))hs.push(k);full[ln]=ns.length>0&&!hs.length;miss[ln]=hs});
+  lines.forEach(ln=>{if(miss[ln].length)notes.push(`No he leído ${miss[ln].length===1?"la fila":"las filas"} ${miss[ln].map(k=>ln+"."+k).join(", ")}. Revisa la foto o añádela abajo.`)});
   for(const sec of secs)for(const ln of lines){if(UNUSED[sec]?.has(ln)){if(sec===S.sec)notes.push(`La línea ${ln} está tachada en ${sec}: no se toca.`);continue}
     const cur=S.routes.filter(r=>r.active&&r.sec===sec&&r.line===ln),used=new Set();
     ok.filter(r=>+r.line===ln).forEach(t=>{const m=cur.find(c=>!used.has(c.id)&&c.hold===t.hold);
@@ -2230,17 +2235,17 @@ function tPlan(){const q=S.tq,ok=q.rows.filter(r=>LINES[+r.line]&&HOLDS[r.hold]&
       else if(m){used.add(m.id);const ch={};if(m.grade!==t.grade)ch.grade=t.grade;if(t.created&&m.created!==t.created)ch.created=t.created;
         if(Object.keys(ch).length)items.push({k:sec+m.id,op:"upd",sec,ln,id:m.id,ch,txt:`${HOLDS[t.hold][0]}: ${ch.grade?`${m.grade} → ${t.grade}`:t.grade}${ch.created?` · fecha ${fdate(t.created)}`:""}`});
         else items.push({k:sec+m.id,op:"same",sec,ln,txt:`${HOLDS[t.hold][0]} ${t.grade}: ya está igual`})}
-      else items.push({k:sec+ln+t.hold+t.grade+(t.n||""),op:"add",sec,ln,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created||isoDay(new Date())},txt:`${HOLDS[t.hold][0]} ${t.grade}${t.created?" · "+fdate(t.created):""}`})});
-    cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",sec,ln,id:c.id,txt:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: no la he leído en la foto. Márcala solo si ya no está en la tablilla`}))}
+      else items.push({k:sec+ln+t.hold+t.grade+(t.n||""),op:"add",sec,ln,row:{sec,line:ln,grade:t.grade,hold:t.hold,created:t.created||isoDay(new Date())},txt:`${HOLDS[t.hold][0]} ${t.grade}${t.created?" · "+fdate(t.created)+(t.dguess?" (fecha de las otras filas)":""):""}`})});
+    cur.filter(c=>!used.has(c.id)).forEach(c=>items.push({k:sec+c.id+"d",op:"del",pre:full[ln],sec,ln,id:c.id,txt:full[ln]?`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: ya no está en la tablilla`:`${HOLDS[c.hold]?.[0]||c.hold} ${c.grade}: no la he leído en la foto. Márcala solo si ya no está en la tablilla`}))}
   return{items,notes,bad:q.rows.length-ok.length}}
 const HAND_DAY="2026-10-09";
 const TOP={rep:["Vía nueva","up"],add:["Añadir","up"],upd:["Corregir","eq"],del:["¿Desmontar?","dw"],same:["Igual",""]};
-/* Desmontar nunca va marcado de serie: si la foto se lee mal, no se quita ninguna vía que siga en la tablilla */
-const tOn=(q,i)=>i.op==="del"?q.on.has(i.k):!q.off.has(i.k);
+/* Desmontar va marcado solo si la tablilla se ha leído entera (sin filas perdidas); si falta alguna, se deja sin marcar */
+const tOn=(q,i)=>i.op==="del"&&!i.pre?q.on.has(i.k):!q.off.has(i.k);
 function tPlanHtml(){const{items,notes,bad}=tPlan(),q=S.tq,secs=[...new Set(items.map(i=>i.sec))];
   const act=items.filter(i=>i.op!=="same"&&tOn(q,i)).length;
   return `${bad?`<div class="sub" style="color:var(--gold)">${bad===1?"Hay 1 fila":"Hay "+bad+" filas"} sin completar (línea, color o grado). No se aplicará${bad===1?"":"n"} hasta que la${bad===1?"":"s"} completes.</div>`:""}
-   ${secs.map(sec=>`<div class="k" style="margin-top:6px">${SECTIONS.find(s=>s.id===sec).name}</div>${items.filter(i=>i.sec===sec).map(i=>`<label class="tpi ${i.op}">${i.op==="same"?'<span class="tck">✓</span>':`<input type="checkbox" data-tk="${i.k}" data-del="${i.op==="del"?1:""}" ${tOn(q,i)?"checked":""}>`}<span><b>Línea ${i.ln} · ${TOP[i.op][0]}</b><br><span class="sub">${esc(i.txt)}</span></span></label>`).join("")}`).join("")}
+   ${secs.map(sec=>`<div class="k" style="margin-top:6px">${SECTIONS.find(s=>s.id===sec).name}</div>${items.filter(i=>i.sec===sec).map(i=>`<label class="tpi ${i.op}">${i.op==="same"?'<span class="tck">✓</span>':`<input type="checkbox" data-tk="${i.k}" data-del="${i.op==="del"&&!i.pre?1:""}" ${tOn(q,i)?"checked":""}>`}<span><b>Línea ${i.ln} · ${TOP[i.op][0]}</b><br><span class="sub">${esc(i.txt)}</span></span></label>`).join("")}`).join("")}
    ${notes.map(n=>`<div class="sub">${esc(n)}</div>`).join("")}
    ${items.length?"":`<div class="sub">Completa las filas para ver los cambios.</div>`}
    <button class="pri" id="tap" ${act?"":"disabled"}>${act?`Aplicar ${act} ${act===1?"cambio":"cambios"}`:"No hay cambios que aplicar"}</button>`}
