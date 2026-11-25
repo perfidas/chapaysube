@@ -99,7 +99,7 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .bz.sel .bwall{stroke:var(--wallsel);stroke-opacity:1}
 .bdot{stroke:var(--ink);stroke-width:1.2}
 .bdot.bdrag{cursor:grab;touch-action:none;r:11px}.bwed{border:1px solid var(--line);border-radius:14px;padding:12px 14px 10px;margin-bottom:14px;background:#131d26}.bwed h3{margin:0}.bwed .sub{margin:2px 0 8px;font-size:.82rem}
-.bwrail{position:relative;height:56px;margin:0 2px;touch-action:none}.bwline{position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;border-radius:6px;background:var(--acc);opacity:.85}
+.bwscroll{overflow-x:auto;overflow-y:hidden;margin:0 -4px;padding:0 4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.bwrail{position:relative;height:56px;touch-action:pan-x}.bwchip.on{box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.5)}.bwsel{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.85rem;color:var(--mut)}.bwsel span{flex:1;text-align:center;min-width:0}.bwsel b{color:var(--ink)}.bwsel button{flex:none;width:48px;min-height:40px;padding:0;font-size:1rem}.bwsel button:disabled{opacity:.35}circle.bsel{stroke:#fff;stroke-width:3;r:10px}.bwline{position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;border-radius:6px;background:var(--acc);opacity:.85}
 .bwchip{position:absolute;top:50%;transform:translateY(-50%);min-height:0;padding:0;border-radius:50%;border:0;box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,.5);cursor:grab;touch-action:none}.bwdot{position:absolute;left:50%;top:50%;width:46%;height:46%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none}.bwchip.grab{transform:translateY(-50%) scale(1.18);z-index:2}
 .bwends{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mut);margin-top:2px}.bwact{display:flex;gap:8px;margin-top:10px}.bwact button{flex:1}
 .bmapw{position:relative}.bpend{position:absolute;left:8px;top:8px;z-index:6;display:flex;flex-direction:column;gap:6px;align-items:stretch;background:rgba(16,23,30,.92);border:1px solid var(--acc);border-radius:12px;padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.5);width:76px;padding:5px;gap:5px}.bpend button{min-height:34px;padding:0 4px;font-size:.78rem}.bpend span{font-size:.72rem;color:var(--mut);text-align:center}.bdot.grab{stroke:var(--acc);stroke-width:3}
@@ -2370,29 +2370,39 @@ function boulderView(){
 }
 /* Modo editor: la pared del sector estirada a lo ancho; cada bloque es una ficha que se arrastra.
    Salen equidistantes; al arrastrar empujan a las vecinas sin montarse nunca y vuelven a su sitio si te alejas */
-function bwedHtml(z,bs){if(!bs.length)return"";const n=S.bpend?Object.keys(S.bpend).length:0;
-  return `<section class="bwed"><h3>Coloca los bloques de ${z.name}</h3><p class="sub">Arrastra cada ficha a donde está el bloque en la pared.</p>
-   <div class="bwrail" id="bwrail"><div class="bwline"></div>${bs.map(b=>`<button type="button" class="bwchip" data-wb="${b.id}" style="background:${b.hold&&HOLDS[b.hold]?HOLDS[b.hold][1]:"#3a4658"}" aria-label="${BCOL[b.color][0]}${b.hold&&HOLDS[b.hold]?", presas "+HOLDS[b.hold][0].toLowerCase():""}"><i class="bwdot" style="background:${bbg(b.color)}"></i></button>`).join("")}</div>
+function bwInfo(b){return b?`<b>${BCOL[b.color][0]}</b> · ${b.hold&&HOLDS[b.hold]?"presas "+(h=>h.endsWith("l")?h+"es":h+"s")(HOLDS[b.hold][0].toLowerCase()):b.name?esc(b.name):"presas sin indicar"}`:"Toca una ficha para ver cuál es y moverla con las flechas"}
+function bwedHtml(z,bs){if(!bs.length)return"";const n=S.bpend?Object.keys(S.bpend).length:0,sel=bs.find(b=>b.id===S.bsel);
+  return `<section class="bwed"><h3>Coloca los bloques de ${z.name}</h3><p class="sub">Arrastra cada ficha a donde está el bloque en la pared.${bs.length>8?" Desliza la barra para ver el resto.":""}</p>
+   <div class="bwscroll" id="bwscroll"><div class="bwrail" id="bwrail"><div class="bwline"></div>${bs.map(b=>`<button type="button" class="bwchip${b.id===S.bsel?" on":""}" data-wb="${b.id}" style="background:${b.hold&&HOLDS[b.hold]?HOLDS[b.hold][1]:"#3a4658"}" aria-label="${BCOL[b.color][0]}${b.hold&&HOLDS[b.hold]?", presas "+HOLDS[b.hold][0].toLowerCase():""}"><i class="bwdot" style="background:${bbg(b.color)}"></i></button>`).join("")}</div></div>
    <div class="bwends"><span>${z.prv?"← "+z.prv:"inicio"}</span><span>${z.nxt?z.nxt+" →":"fin"}</span></div>
-   ${n?`<div class="bwact"><button id="bwu">Deshacer</button><button class="pri" id="bws">Guardar posiciones</button></div>`:""}</section>`}
-function bindWed(z,bs){const rail=$("#bwrail");if(!rail)return;const chips=[...rail.querySelectorAll(".bwchip")],W=()=>rail.clientWidth;
-  const sz=()=>Math.max(22,Math.min(40,W()/bs.length-6)),g=()=>sz()+4;
+   <div class="bwsel"><button type="button" id="bwl" aria-label="Mover a la izquierda" ${sel?"":"disabled"}>◀</button><span id="bwinfo">${bwInfo(sel)}</span><button type="button" id="bwr" aria-label="Mover a la derecha" ${sel?"":"disabled"}>▶</button></div>
+   ${n?`<div class="bwact"><button id="bwu">Deshacer</button><button class="pri" id="bws">Guardar ${n===1?"posición":n+" posiciones"}</button></div>`:""}</section>`}
+function bindWed(z,bs){const rail=$("#bwrail"),scr=$("#bwscroll");if(!rail)return;const chips=[...rail.querySelectorAll(".bwchip")];
+  /* fichas de tamaño fijo para el dedo; si no caben con holgura, la barra se alarga y se desliza */
+  const SZ=34,G=SZ+6,need=Math.ceil(bs.length*G*1.6);rail.style.width=Math.max(scr.clientWidth,need)+"px";const W=()=>rail.clientWidth;
+  if(S.bwsx!=null&&S.bwz===z.id)scr.scrollLeft=S.bwsx;S.bwz=z.id;scr.addEventListener("scroll",()=>{S.bwsx=scr.scrollLeft},{passive:true});
   const X={};bs.forEach(b=>{const v=S.bpend&&b.id in S.bpend?S.bpend[b.id]:b._ep??.5;X[b.id]=v*W()});
-  const paint=()=>{const s0=sz();chips.forEach(c=>{c.style.width=c.style.height=s0+"px";c.style.left=(X[c.dataset.wb]-s0/2)+"px"})};
-  /* al empezar a arrastrar se respeta lo mínimo: ninguna ficha encima de otra */
-  {const ids=bs.map(b=>b.id).sort((a,b)=>X[a]-X[b]);const G=g(),w=W();for(let i=0;i<ids.length;i++){const lo=i?X[ids[i-1]]+G:G/2;if(X[ids[i]]<lo)X[ids[i]]=lo}
-   for(let i=ids.length-1;i>=0;i--){const hi=i<ids.length-1?X[ids[i+1]]-G:w-G/2;if(X[ids[i]]>hi)X[ids[i]]=hi}}
-  paint();
+  const fit=()=>{const ids=bs.map(b=>b.id).sort((a,b)=>X[a]-X[b]),w=W();for(let i=0;i<ids.length;i++){const lo=i?X[ids[i-1]]+G:G/2;if(X[ids[i]]<lo)X[ids[i]]=lo}
+    for(let i=ids.length-1;i>=0;i--){const hi=i<ids.length-1?X[ids[i+1]]-G:w-G/2;if(X[ids[i]]>hi)X[ids[i]]=hi}};
+  const paint=()=>chips.forEach(c=>{c.style.width=c.style.height=SZ+"px";c.style.left=(X[c.dataset.wb]-SZ/2)+"px"});
+  fit();paint();
   const mapDot=(id,v)=>{const gz=[...document.querySelectorAll(".bz")].find(x=>x.dataset.z===z.id),p=gz?.querySelector(".bwall"),c=gz?.querySelector(`circle[data-bid="${id}"]`);if(!p||!c)return;const pt=p.getPointAtLength(p.getTotalLength()*v);c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);gz.querySelectorAll(".btick").forEach(t=>t.remove())};
-  let drag=null;
-  const start=(id,cx)=>{drag={id,base:{...X},dx:cx-rail.getBoundingClientRect().left-X[id]};rail.querySelector(`[data-wb="${id}"]`).classList.add("grab")};
-  const move=cx=>{if(!drag)return;const w=W(),G=g(),id=drag.id,B=drag.base,others=bs.map(b=>b.id).filter(x=>x!==id);
-    let x=cx-rail.getBoundingClientRect().left-drag.dx;const left=others.filter(o=>B[o]<x).sort((a,b)=>B[b]-B[a]),right=others.filter(o=>B[o]>=x).sort((a,b)=>B[a]-B[b]);
+  const mark=()=>document.querySelectorAll("circle[data-bid]").forEach(c=>c.classList.toggle("bsel",c.dataset.bid===S.bsel));mark();
+  if(S.bsel&&S.bwfocus){S.bwfocus=false;const c=rail.querySelector(`[data-wb="${S.bsel}"]`);if(c){const l=c.offsetLeft-scr.clientWidth/2+SZ/2;if(c.offsetLeft<scr.scrollLeft||c.offsetLeft+SZ>scr.scrollLeft+scr.clientWidth)scr.scrollLeft=l}}
+  const save=()=>{const w=W(),P=S.bpend=S.bpend||{};bs.forEach(b=>{const v=Math.round(X[b.id]/w*1000)/1000;if(Math.abs(v-(b._ep??-1))>.001||b.id in P||b.pos==null)P[b.id]=v});
+    const y0=scrollY;S.bwsx=scr.scrollLeft;boulderView();scrollTo(0,y0)};
+  /* mueve una ficha hasta x; las de al lado se apartan sin montarse */
+  const push=(id,x,B)=>{const w=W(),others=bs.map(b=>b.id).filter(o=>o!==id);
+    const left=others.filter(o=>B[o]<x).sort((a,b)=>B[b]-B[a]),right=others.filter(o=>B[o]>=x).sort((a,b)=>B[a]-B[b]);
     x=Math.max((left.length+.5)*G,Math.min(w-(right.length+.5)*G,x));X[id]=x;
-    let cur=x;left.forEach(o=>{cur=Math.min(B[o],cur-G);X[o]=cur});cur=x;right.forEach(o=>{cur=Math.max(B[o],cur+G);X[o]=cur});
-    paint();bs.forEach(b=>mapDot(b.id,X[b.id]/w))};
-  const end=()=>{if(!drag)return;const w=W(),P=S.bpend=S.bpend||{};bs.forEach(b=>{const v=Math.round(X[b.id]/w*1000)/1000;if(Math.abs(v-(b._ep??-1))>.001||b.id in P||b.pos==null)P[b.id]=v});drag=null;
-    const y0=scrollY;boulderView();scrollTo(0,y0)};
+    let cur=x;left.forEach(o=>{cur=Math.min(B[o],cur-G);X[o]=cur});cur=x;right.forEach(o=>{cur=Math.max(B[o],cur+G);X[o]=cur});paint();bs.forEach(b=>mapDot(b.id,X[b.id]/w))};
+  let drag=null,raf=0;
+  const start=(id,cx)=>{drag={id,base:{...X},dx:cx-rail.getBoundingClientRect().left-X[id],cx,moved:false};rail.querySelector(`[data-wb="${id}"]`).classList.add("grab")};
+  const step=()=>{raf=0;if(!drag)return;const r=scr.getBoundingClientRect(),e=36;let v=0;if(drag.cx<r.left+e)v=-Math.max(4,(r.left+e-drag.cx)/3);else if(drag.cx>r.right-e)v=Math.max(4,(drag.cx-r.right+e)/3);
+    if(v&&drag.moved){const o=scr.scrollLeft;scr.scrollLeft+=v;if(scr.scrollLeft!==o){push(drag.id,drag.cx-rail.getBoundingClientRect().left-drag.dx,drag.base)}raf=requestAnimationFrame(step)}};
+  const move=cx=>{if(!drag)return;if(Math.abs(cx-drag.cx)>4)drag.moved=true;drag.cx=cx;if(!drag.moved)return;push(drag.id,cx-rail.getBoundingClientRect().left-drag.dx,drag.base);if(!raf)raf=requestAnimationFrame(step)};
+  const end=()=>{if(!drag)return;const d=drag;drag=null;if(raf){cancelAnimationFrame(raf);raf=0}
+    if(!d.moved){S.bsel=S.bsel===d.id?null:d.id;const y0=scrollY;S.bwsx=scr.scrollLeft;boulderView();scrollTo(0,y0);return}S.bsel=d.id;S.bwfocus=true;save()};
   chips.forEach(c=>{const id=c.dataset.wb;
     /* ratón con pointer; dedo solo con touch (en iPhone el pointercancel cortaba el arrastre a medias) */
     c.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse")return;e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}start(id,e.clientX)});
@@ -2400,6 +2410,10 @@ function bindWed(z,bs){const rail=$("#bwrail");if(!rail)return;const chips=[...r
     c.addEventListener("touchstart",e=>{e.preventDefault();start(id,e.touches[0].clientX)},{passive:false});
     c.addEventListener("touchmove",e=>{e.preventDefault();move(e.touches[0].clientX)},{passive:false});
     c.addEventListener("touchend",e=>{e.preventDefault();end()},{passive:false});c.addEventListener("touchcancel",()=>end())});
+  /* flechas: pasos cortos y precisos; al llegar a la de al lado, la adelanta */
+  const nudge=dir=>{const id=S.bsel;if(!id||!(id in X))return;const B={...X},ids=bs.map(b=>b.id).sort((a,b)=>X[a]-X[b]),k=ids.indexOf(id),nb=ids[k+dir];
+    let x=X[id]+dir*G/3;if(nb&&(dir>0?x+G>X[nb]:x-G<X[nb])){x=X[nb];B[nb]=X[id];}push(id,x,B);S.bwfocus=true;save()};
+  if($("#bwl"))$("#bwl").onclick=()=>nudge(-1);if($("#bwr"))$("#bwr").onclick=()=>nudge(1);
   addEventListener("resize",paint,{once:true});
   bindPend()}
 /* Carga rápida: el sector se elige en el plano y se recuerda en una franja fija; cada bloque se monta con dos toques */
