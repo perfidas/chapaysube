@@ -728,8 +728,8 @@ button.dh.dtg{width:100%;min-height:0;border:0;border-radius:0;font:inherit;text
 <script>
 /* ===== Configuración de Supabase: pega aquí los datos de tu proyecto (Project Settings > API) ===== */
 const CFG={url:"https://ctziadohyvkyikcjbepz.supabase.co",key:"sb_publishable_QMkPAjb5L-ZKNXPxX1mDjw_djy4fNKT"};
-const GRADES=["4","5a","5b","5c","6a","6a+","6b","6b+","6c","6c+","7a","7a+","7b","7b+","7c","7c+","8a","8a+","8b"];
-const GP={"4":30,"5a":45,"5b":60,"5c":80,"6a":100,"6a+":120,"6b":150,"6b+":180,"6c":220,"6c+":260,"7a":320,"7a+":380,"7b":450,"7b+":520,"7c":600,"7c+":700,"8a":800,"8a+":920,"8b":1050};
+const GRADES=["4","5a","5b","5c","5c+","6a","6a+","6b","6b+","6c","6c+","7a","7a+","7b","7b+","7c","7c+","8a","8a+","8b","8b+","8c"];
+const GP={"4":30,"5a":45,"5b":60,"5c":80,"5c+":90,"6a":100,"6a+":120,"6b":150,"6b+":180,"6c":220,"6c+":260,"7a":320,"7a+":380,"7b":450,"7b+":520,"7c":600,"7c+":700,"8a":800,"8a+":920,"8b":1050,"8b+":1200,"8c":1350};
 const STYLES=[["A vista",1.3],["Encadenada",1]]; /* En vías ya no hay flash; los flash antiguos se siguen mostrando y puntuando */
 const SM=Object.fromEntries(STYLES);
 const HOLDS={amarilla:["Amarilla","#f2c500"],verde:["Verde","#2fa35d"],azul:["Azul","#2a6fdb"],roja:["Roja","#d8322a"],negra:["Negra","#1d1d1d"],blanca:["Blanca","#f4f4f4"],menta:["Menta","#7fdcc2"],rosa:["Rosa","#ef5fa7"],morada:["Morada","#7d45c4"]};
@@ -1003,7 +1003,7 @@ const daysLeft=()=>Math.ceil((period("bim").to-new Date())/864e5);
 const fmt=n=>n.toLocaleString("es-ES");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const kgc=g=>gcol({"5":"5b","5+":"5c"}[g]||String(g).toLowerCase());
-const gcol=g=>{const i=GRADES.indexOf(g);return i<4?"var(--g1)":i<10?"var(--g2)":i<14?"var(--g3)":"var(--g4)"};
+const gcol=g=>{const i=GRADES.indexOf(g);return i<5?"var(--g1)":i<11?"var(--g2)":i<15?"var(--g3)":"var(--g4)"};
 const $=s=>document.querySelector(s);
 const me=()=>S.users.find(u=>u.id===S.me);
 
@@ -2164,7 +2164,7 @@ function kilterView(){
 const TCOL=[[/^amaril|^.?.?arill|marill|ritlo$|rillo$/,"amarilla"],[/^verd|^erde/,"verde"],[/^azu/,"azul"],[/^roj/,"roja"],[/^negr|^egro/,"negra"],[/^blan|^lanc/,"blanca"],[/^ment/,"menta"],[/^rosa/,"rosa"],[/^mora|^orad/,"morada"]];
 const tColor=t=>{t=t.toLowerCase().normalize("NFD").replace(/[^a-z]/g,"");if(t.length<4)return null;for(const[re,k]of TCOL)if(re.test(t))return k;return null};
 function tGrade1(t){const m=t.match(/^([4-8])([abc])?(t?\+|[t*])?[.,']?$/i);if(!m)return null;const d=m[1],l=(m[2]||"").toLowerCase(),p=m[3]?"+":"";
-  if(d==="4")return"4";if(!l)return null;const g=d+l+(d==="5"?"":p);return GRADES.includes(g)?g:null}
+  if(d==="4")return"4";if(!l)return null;const g=d+l+p;return GRADES.includes(g)?g:GRADES.includes(d+l)?d+l:null}
 /* La barra de color de la izquierda a veces se lee como «J», «1» o «|» pegada al grado; la «T» o la «J» sueltas suelen ser un 7 */
 function tGrade(t){t=t.replace(/\s/g,"");return tGrade1(t)||tGrade1(t.replace(/^[TJ/]/,"7"))||tGrade1(t.slice(1))||tGrade1(t.slice(1).replace(/^[TJ/]/,"7"))}
 function tDate(t){const m=t.match(/(\d{2})[.,:](\d{2})(?:[.,:]+(\d{2,4}))?/);if(!m||(!m[3]&&!/[.,:]$/.test(t)))return null;let d=+m[1],mo=+m[2],y=+(m[3]||0);
