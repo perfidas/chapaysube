@@ -92,7 +92,7 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .ed{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--line);padding-top:10px}
 .ed label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:3px}
 .ed .full{grid-column:1/-1}
-.floor{fill:var(--floor)}svg .bz:not(.sel) .bwall.alt{stroke:#a3b6c2}.dens rect{fill:none;stroke:#3a4a58;stroke-width:2;stroke-dasharray:6 5}.dens text{font:600 13px var(--body);fill:#4f6170;letter-spacing:.5px}
+.floor{fill:var(--floor)}svg .bz:not(.sel) .bwall.alt{stroke:#a3b6c2}
 .island{fill:var(--block)}
 .bwall{fill:none;stroke:var(--wall2);stroke-width:12;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
 .bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
@@ -2310,7 +2310,6 @@ function bSvg(){
   return `<svg viewBox="0 10 580 1000" role="img" aria-label="Plano de la sala de boulder" class="${S.edit&&S.zone?"has":""}"><defs><linearGradient id="bgold" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="#ffffff"/><stop offset=".5" stop-color="#111111"/></linearGradient></defs>
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
-   <g class="dens" aria-hidden="true"><rect x="442" y="732" width="43" height="182" rx="8"/><text x="463.5" y="823" transform="rotate(90 463.5 823)" text-anchor="middle">Densidad</text></g>
    ${zs}</svg>`}
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
