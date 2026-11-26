@@ -92,7 +92,7 @@ input,select{background:var(--card);border:1px solid var(--line);border-radius:8
 .ed{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--line);padding-top:10px}
 .ed label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:3px}
 .ed .full{grid-column:1/-1}
-.floor{fill:var(--floor)}svg .bz:not(.sel) .bwall.alt{stroke:#a3b6c2}.dens rect{fill:none;stroke:#3a4a58;stroke-width:2;stroke-dasharray:6 5}.dens text{font:600 13px var(--body);fill:#4f6170;letter-spacing:.5px}.bbadge circle{fill:#22303c;stroke:#6f8797;stroke-width:1.5}.bbadge text{font:700 16px var(--body);fill:var(--ink)}.bbadge.sel circle{fill:var(--wallsel);stroke:var(--wallsel)}.bbadge{pointer-events:none}
+.floor{fill:var(--floor)}svg .bz:not(.sel) .bwall.alt{stroke:#a3b6c2}.dens rect{fill:none;stroke:#3a4a58;stroke-width:2;stroke-dasharray:6 5}.dens text{font:600 13px var(--body);fill:#4f6170;letter-spacing:.5px}
 .island{fill:var(--block)}
 .bwall{fill:none;stroke:var(--wall2);stroke-width:12;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
 .bz:hover .bwall,.bz:focus-visible .bwall{stroke:var(--acc);stroke-opacity:.6}
@@ -2311,10 +2311,7 @@ function bSvg(){
    <path class="floor" d="${BFLOOR}"/>
    <path class="island" d="${ISLAND}"/>
    <g class="dens" aria-hidden="true"><rect x="442" y="732" width="43" height="182" rx="8"/><text x="463.5" y="823" transform="rotate(90 463.5 823)" text-anchor="middle">Densidad</text></g>
-   ${zs}${S.edit?"":bBadges()}</svg>`}
-/* Número de cada pared (como en 8a.nu) junto a su tramo, para orientarse sin entrar en el editor */
-function bBadges(){const P={1:[551,318],2:[431,350],3:[225,380],4:[186,196],5:[142,625],6:[211,869]};
-  return Object.entries(P).map(([n,[x,y]])=>{const sel=!!S.zone&&S.zone.startsWith("p"+n+"-");return `<g class="bbadge${sel?" sel":""}" aria-hidden="true"><circle cx="${x}" cy="${y}" r="15"/><text x="${x}" y="${y+6}" text-anchor="middle">${n}</text></g>`}).join("")}
+   ${zs}</svg>`}
 function placeBDots(){const hl=fHits(),HS=hl?new Set(hl.map(r=>r.id)):null;
   document.querySelectorAll(".bz").forEach(g=>{const p=g.querySelector(".bwall"),L=p.getTotalLength(),bs=bOf(g.dataset.z),box=g.querySelector(".bdots");
     /* los colocados a mano (pos 0–1 a lo largo de la pared) van en su sitio; el resto se reparte como siempre */
